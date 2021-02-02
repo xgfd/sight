@@ -1,5 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import { sha256hash } from './utils';
+import createControlComponent from './components/ControlPanel';
+import { loadScript, sha256hash } from './utils';
 
 class Operation {
   readonly id: string;
@@ -8,17 +9,38 @@ class Operation {
 
   readonly scriptHash: string;
 
+  loading: boolean;
+
   name: string;
+
+  package: 'custom' | 'builtin';
 
   resultImage: string;
 
-  args: (string | number)[] = [];
+  ControlPanel;
 
-  constructor(name: string, script = '') {
+  args: ([number, number] | string | number | boolean)[] = [];
+
+  constructor(
+    name: string,
+    pack: 'custom' | 'builtin' = 'custom',
+    newCustomOp = false
+  ) {
     this.id = uuidv4();
+    this.loading = false;
     this.name = name;
-    this.script = script;
-    this.scriptHash = sha256hash(script);
+    this.package = pack;
+    const component = createControlComponent(this);
+    this.ControlPanel = component;
+    this.args = component.defaultValues;
+
+    if (newCustomOp) {
+      this.script = loadScript('__template__', 'templates');
+    } else {
+      this.script = loadScript(this.name, this.package);
+    }
+
+    this.scriptHash = sha256hash(this.script);
     this.resultImage = '';
   }
 
@@ -32,6 +54,20 @@ class Operation {
       return true;
     }
     return false;
+  }
+
+  public updateArgs(index: number, value: any) {
+    this.args[index] = value;
+    // create a new copy to trigger update
+    this.args = [...this.args];
+  }
+
+  public getScript() {
+    return this.script;
+  }
+
+  public getHash() {
+    return this.scriptHash;
   }
 
   public serialiseToPython() {

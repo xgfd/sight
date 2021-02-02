@@ -1,10 +1,16 @@
 {
   "folders": [
     {
-      "path": "."
+      "name": "src",
+      "path": "src"
     },
     {
+      "name": "vision",
       "path": "src/assets/vision"
+    },
+    {
+      "name": "cv-fiddle",
+      "path": "."
     }
   ],
   "settings": {
@@ -17,8 +23,6 @@
     "javascript.validate.enable": false,
     "javascript.format.enable": false,
     "typescript.format.enable": false,
-    "cSpell.words": [
-      "imwrite"
-    ]
+    "cSpell.words": ["Sider", "imwrite"]
   }
 }

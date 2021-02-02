@@ -171,6 +171,9 @@ def _run_step(
         if image is not None:
             args = (image, *args)
         ret_image = fn(*args)
+        # allow multiple returns
+        if isinstance(ret_image, tuple):
+            ret_image = ret_image[0]
         assert ret_image is not None
         save = True
 
