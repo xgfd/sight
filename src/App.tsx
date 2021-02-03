@@ -22,7 +22,6 @@ loader.config({
 interface IAppState {
   collapsed: boolean;
   script: string;
-  saved: boolean;
   selectedOp: Operation;
   selectionIndex: number;
   operations: Operation[];
@@ -38,7 +37,6 @@ class App extends Component<unknown, IAppState> {
     this.state = {
       collapsed: false,
       script: operations[selectionIndex].getScript(),
-      saved: true,
       selectedOp: operations[selectionIndex],
       selectionIndex,
       operations,
@@ -57,12 +55,6 @@ class App extends Component<unknown, IAppState> {
    * @param op The new selected operation.
    */
   selectOp = (op: Operation, index: number) => {
-    const newSelectKey = op.id;
-    const { selectedOp, saved } = this.state;
-    const selectedKey = selectedOp.id;
-    if (newSelectKey !== selectedKey && !saved) {
-      notify('warning', 'The current operation is not saved.');
-    }
     this.setState({
       selectedOp: op,
       script: op.getScript(),
@@ -80,26 +72,29 @@ class App extends Component<unknown, IAppState> {
   insertOp = (op: Operation, index: number) => {
     const { operations } = this.state;
     operations.splice(index + 1, 0, op);
-    this.setState({ operations, saved: false });
+    this.setState({ operations });
     this.selectOp(op, index + 1);
   };
 
   /**
-   * Remove the operation at the index and select the operation above it.
+   * Remove the operation at the index and select the operation after it.
    * Re-calculate all operations after the removed operation.
    * @param index Index of the operation to be removed.
    */
   removeOp = (index: number) => {
     const { operations } = this.state;
     operations.splice(index, 1);
-    this.setState({ operations });
-    const lastOp = operations[index - 1];
-    this.selectOp(lastOp, index - 1);
-    // refresh all operations after the removed operation
+
     // if it's not the last operation
+    // select the next operation in line and
+    // refresh all operations after the removed operation
     if (index < operations.length) {
       this.evalOpSeq(index);
+      this.selectOp(operations[index], index);
+    } else {
+      this.selectOp(operations[index - 1], index - 1);
     }
+    this.setState({ operations });
   };
 
   setEditorContent = (script: string) => {
@@ -126,7 +121,6 @@ class App extends Component<unknown, IAppState> {
       selectOnLineNumbers: true,
     };
     const { collapsed, script, operations, selectedOp } = this.state;
-    const selectedKey = selectedOp.id;
     const { ControlPanel } = selectedOp;
     return (
       <ErrorBoundary>
@@ -147,7 +141,8 @@ class App extends Component<unknown, IAppState> {
             }}
           >
             <OpList
-              selectedKey={selectedKey}
+              selectedKey={selectedOp.id}
+              saved={selectedOp.saved}
               operations={operations}
               selectOp={this.selectOp}
               insertOp={this.insertOp}

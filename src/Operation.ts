@@ -9,6 +9,8 @@ class Operation {
 
   readonly scriptHash: string;
 
+  saved = true;
+
   loading: boolean;
 
   name: string;
@@ -36,6 +38,7 @@ class Operation {
 
     if (newCustomOp) {
       this.script = loadScript('__template__', 'templates');
+      this.saved = false;
     } else {
       this.script = loadScript(this.name, this.package);
     }
