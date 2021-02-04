@@ -15,11 +15,21 @@ function loadScript(name: string, pack: 'builtin' | 'custom' | 'templates') {
   try {
     script = fs.readFileSync(pyPath, 'utf8');
   } catch (e) {
-    // TODO defaults to "" or __template__.py?
     script = '';
   }
   return script;
 }
+
+function writeScript(
+  name: string,
+  pack: 'builtin' | 'custom' | 'templates',
+  script: string
+) {
+  const pyPath = path.join(VISION, pack, `${name}.py`);
+  // throw errors so App can catch it and display warnings
+  fs.writeFileSync(pyPath, script);
+}
+
 class Operation {
   readonly id: string;
 
@@ -27,7 +37,8 @@ class Operation {
 
   readonly scriptHash: string;
 
-  saved = true;
+  // false if script is changed but not re-calculated
+  resultUpToDate = true;
 
   loading: boolean;
 
@@ -48,33 +59,38 @@ class Operation {
   ) {
     this.id = uuidv4();
     this.loading = false;
-    this.name = name;
+    // remove invalid char for a python module's name
+    this.name = name.replaceAll(/\.|-|\s|,/gi, '_');
     this.package = pack;
     const component = createControlComponent(this);
     this.ControlPanel = component;
+    // important: create a shallow copy to avoid unwanted modification to component.defaultValues
     this.args = [...component.defaultValues];
 
     if (newCustomOp) {
-      this.script = loadScript('__template__', 'templates');
-      this.saved = false;
+      this.resultUpToDate = false;
+      const script = loadScript('__template__', 'templates');
+      this.script = script;
+      this.scriptHash = sha256hash(script);
+      writeScript(this.name, this.package, script);
     } else {
       this.script = loadScript(this.name, this.package);
+      this.scriptHash = sha256hash(this.script);
     }
 
-    this.scriptHash = sha256hash(this.script);
     this.resultImageHash = '';
   }
 
-  public updateScript(script: string): boolean {
-    // this.script is readonly
-    // cast it to unknown to enable assignment internally
-    (this.script as unknown) = script;
-    const hash = sha256hash(script);
-    if (hash !== this.script) {
+  public updateScript(script: string) {
+    if (this.script !== script) {
+      // this.script is readonly
+      // cast it to unknown to enable assignment internally
+      this.resultUpToDate = false;
+      (this.script as unknown) = script;
+      const hash = sha256hash(script);
       (this.scriptHash as unknown) = hash;
-      return true;
+      writeScript(this.name, this.package, script);
     }
-    return false;
   }
 
   public updateArgs(index: number, value: any) {
@@ -89,12 +105,6 @@ class Operation {
 
   public getHash() {
     return this.scriptHash;
-  }
-
-  public serialiseToPython() {
-    let pyScript = '';
-    pyScript = this.script;
-    return pyScript;
   }
 
   public toJson() {

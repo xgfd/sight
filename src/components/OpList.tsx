@@ -48,16 +48,19 @@ function getIcon(op: Operation): React.ReactNode {
 interface IProps {
   operations: Operation[];
   selectedKey: string;
-  saved: boolean;
+  resultUpToDate: boolean;
   selectOp: (op: Operation, index: number) => void;
   insertOp: (op: Operation, index: number) => void;
   removeOp: (index: number) => void;
 }
 
-class OpList extends Component<IProps, unknown> {
+class OpList extends Component<
+  IProps,
+  { installedScripts: { builtin: string[]; custom: string[] } }
+> {
   constructor(props: IProps) {
     super(props);
-    this.state = {};
+    this.state = { installedScripts: listScripts() };
   }
 
   insertOp = (fullOpName: string, index: number) => {
@@ -68,6 +71,7 @@ class OpList extends Component<IProps, unknown> {
     if (name.startsWith('__')) {
       const trimUnderscores = name.substring(2);
       newOp = new Operation(trimUnderscores, 'custom', true);
+      this.setState({ installedScripts: listScripts() });
     } else {
       newOp = new Operation(name, pack as 'custom' | 'builtin');
     }
@@ -75,9 +79,15 @@ class OpList extends Component<IProps, unknown> {
   };
 
   render() {
-    const { operations, selectedKey, saved, selectOp, removeOp } = this.props;
+    const {
+      operations,
+      selectedKey,
+      resultUpToDate,
+      selectOp,
+      removeOp,
+    } = this.props;
 
-    const installedScripts = listScripts();
+    const { installedScripts } = this.state;
 
     const dropdownMenu = (index: number) => (
       <Menu
@@ -87,7 +97,7 @@ class OpList extends Component<IProps, unknown> {
         }}
         style={{ width: 256 }}
       >
-        <Menu.Item key={`custom.__custom${installedScripts.custom.length}`}>
+        <Menu.Item key={`custom.__custom${installedScripts.custom.length + 1}`}>
           <PlusCircleOutlined />
           <Text strong>New</Text>
         </Menu.Item>
@@ -107,7 +117,7 @@ class OpList extends Component<IProps, unknown> {
     const opItems = operations.map((op, index) => {
       // Menu.Item.onClick and Popconfirm are mutually exclusive
       // only show Popconfirm when moving away from a unsaved op.
-      const popconfirmDisabled = saved || selectedKey === op.id;
+      const popconfirmDisabled = resultUpToDate || selectedKey === op.id;
       return (
         <Menu.Item
           key={op.id}
@@ -121,11 +131,11 @@ class OpList extends Component<IProps, unknown> {
           }}
         >
           <Popconfirm
-            title="Script not saved. Are sure to switch?"
+            title="Script not executed. Use the Run button to execute?"
             disabled={popconfirmDisabled}
-            onConfirm={() => {
-              selectOp(op, index);
-            }}
+            // onConfirm={() => {
+            //   selectOp(op, index);
+            // }}
           >
             <Space size="middle">
               <Text ellipsis={{ tooltip: op.name }} style={{ width: 60 }}>

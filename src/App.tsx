@@ -1,10 +1,11 @@
 import {
   CaretRightOutlined,
+  CheckOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
 } from '@ant-design/icons';
 import Editor, { loader } from '@monaco-editor/react';
-import { Alert, Divider, Layout } from 'antd';
+import { Alert, Divider, Layout, Tooltip } from 'antd';
 import debounce from 'lodash.debounce';
 import path from 'path';
 import React, { Component } from 'react';
@@ -37,10 +38,11 @@ class App extends Component<unknown, IAppState> {
     const canny = new Operation('canny', 'builtin');
     const operations = [imread, canny];
     const selectionIndex = 0;
+    const selection = operations[selectionIndex];
     this.state = {
       collapsed: false,
-      script: operations[selectionIndex].getScript(),
-      selectedOp: operations[selectionIndex],
+      script: selection.getScript(),
+      selectedOp: selection,
       selectionIndex,
       operations,
     };
@@ -83,7 +85,7 @@ class App extends Component<unknown, IAppState> {
     });
   };
 
-  evalDebounced = debounce(this.execOperations, 200); // eslint-disable-line react/sort-comp
+  evalDebounced: (index?: number) => void = debounce(this.execOperations, 200); // eslint-disable-line react/sort-comp
 
   toggleOpList = () => {
     const { collapsed } = this.state;
@@ -163,16 +165,24 @@ class App extends Component<unknown, IAppState> {
     this.setState({ operations });
   };
 
-  setEditorContent = (script: string) => {
-    this.setState({
-      script,
-    });
+  onEditorChange = (script: string | undefined) => {
+    if (script === undefined) {
+      return;
+    }
+
+    const { selectedOp } = this.state;
+    if (selectedOp.package !== 'builtin') {
+      selectedOp.updateScript(script);
+    } else {
+      notify(
+        'warning',
+        'Builtin functions are readonly and changes are discarded'
+      );
+    }
+    this.setState({ selectedOp });
   };
 
   render() {
-    const options = {
-      selectOnLineNumbers: true,
-    };
     const { collapsed, script, operations, selectedOp } = this.state;
     const { ControlPanel } = selectedOp;
     return (
@@ -195,7 +205,7 @@ class App extends Component<unknown, IAppState> {
           >
             <OpList
               selectedKey={selectedOp.id}
-              saved={selectedOp.saved}
+              resultUpToDate={selectedOp.resultUpToDate}
               operations={operations}
               selectOp={this.selectOp}
               insertOp={this.insertOp}
@@ -204,6 +214,7 @@ class App extends Component<unknown, IAppState> {
           </Sider>
           <Layout className="site-layout">
             <Header
+              key={selectedOp.resultUpToDate ? 0 : 1}
               className="site-layout-background"
               style={{
                 position: 'fixed',
@@ -212,15 +223,31 @@ class App extends Component<unknown, IAppState> {
                 padding: 0,
               }}
             >
-              {React.createElement(
-                collapsed ? MenuUnfoldOutlined : MenuFoldOutlined,
-                {
-                  className: 'trigger',
-                  onClick: this.toggleOpList,
-                }
+              {collapsed ? (
+                <MenuUnfoldOutlined
+                  className="trigger"
+                  onClick={this.toggleOpList}
+                />
+              ) : (
+                <MenuFoldOutlined
+                  className="trigger"
+                  onClick={this.toggleOpList}
+                />
               )}
-              <Divider type="vertical" />
-              <CaretRightOutlined className="trigger" />
+
+              {selectedOp.name !== 'imread' && !selectedOp.resultUpToDate ? (
+                <>
+                  <Divider type="vertical" />
+                  <Tooltip title="Run">
+                    <CaretRightOutlined
+                      className="trigger"
+                      onClick={() => this.evalDebounced()}
+                    />
+                  </Tooltip>
+                </>
+              ) : (
+                <></>
+              )}
             </Header>
             <Layout
               style={{
@@ -229,7 +256,14 @@ class App extends Component<unknown, IAppState> {
               }}
             >
               <Content className="site-layout-background">
-                <Editor defaultLanguage="python" value={script} />
+                <Editor
+                  defaultLanguage="python"
+                  language="python"
+                  value={script}
+                  options={{ readOnly: selectedOp.package === 'builtin' }}
+                  onChange={this.onEditorChange}
+                  onValidate={(marker) => console.log(marker)}
+                />
               </Content>
               <Sider
                 theme="light"

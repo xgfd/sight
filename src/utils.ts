@@ -63,6 +63,7 @@ function run(
         }
         // in case of error the resultHash should be ""
         retOp.resultImageHash = resultHash;
+        retOp.resultUpToDate = true;
         cb(retOp, resultHash);
       } else if (rid) {
         notify('warning', `Operation ${rid} not found`);
