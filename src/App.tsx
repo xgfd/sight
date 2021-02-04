@@ -4,14 +4,16 @@ import {
   MenuUnfoldOutlined,
 } from '@ant-design/icons';
 import Editor, { loader } from '@monaco-editor/react';
-import { Alert, Divider, Image, Layout, Space } from 'antd';
+import { Alert, Divider, Layout } from 'antd';
+import debounce from 'lodash.debounce';
 import path from 'path';
 import React, { Component } from 'react';
 import './App.global.css';
+import Gallery from './components/Gallery';
 import OpList from './components/OpList';
 import Operation from './Operation';
-import { notify } from './utils';
-// import icon from '../assets/icon.svg';
+import { notify, run } from './utils';
+
 const { ErrorBoundary } = Alert;
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -25,8 +27,48 @@ interface IAppState {
   selectedOp: Operation;
   selectionIndex: number;
   operations: Operation[];
+  currentRetHash: string;
 }
 class App extends Component<unknown, IAppState> {
+  evalOpSeq = debounce((index?: number) => {
+    const { operations, selectionIndex } = this.state;
+    if (index === undefined) {
+      /* eslint-disable-next-line */
+      index = selectionIndex;
+    }
+    const lastResultHash =
+      index > 0 ? operations[index - 1].resultImageHash : '';
+    const refreshSeq = operations.slice(index);
+
+    // unless it's imread, cancel execution if the first operation doesn't have an input result hash
+    if (
+      refreshSeq.length > 0 &&
+      refreshSeq[0].name !== 'imread' &&
+      !refreshSeq[0].resultImageHash
+    ) {
+      notify('warning', 'Please execute Imread first.');
+      return;
+    }
+    // set all pending operations' loading flag
+    const beforeRun = () => {
+      refreshSeq.forEach((op: Operation) => {
+        op.loading = true;
+      });
+      this.setState({ operations });
+    };
+
+    run(
+      refreshSeq,
+      lastResultHash,
+      beforeRun,
+      (op: Operation, result: string) => {
+        op.loading = false;
+        this.setState({ operations: [...operations], currentRetHash: result });
+        console.log(result);
+      }
+    );
+  }, 200);
+
   constructor(props: unknown) {
     super(props);
 
@@ -34,12 +76,14 @@ class App extends Component<unknown, IAppState> {
     const canny = new Operation('canny', 'builtin');
     const operations = [imread, canny];
     const selectionIndex = 0;
+    const currentRetHash = '';
     this.state = {
       collapsed: false,
       script: operations[selectionIndex].getScript(),
       selectedOp: operations[selectionIndex],
       selectionIndex,
       operations,
+      currentRetHash,
     };
   }
 
@@ -55,6 +99,7 @@ class App extends Component<unknown, IAppState> {
    * @param op The new selected operation.
    */
   selectOp = (op: Operation, index: number) => {
+    // notify('info', op.name, op.id);
     this.setState({
       selectedOp: op,
       script: op.getScript(),
@@ -103,24 +148,17 @@ class App extends Component<unknown, IAppState> {
     });
   };
 
-  evalOpSeq = (index?: number) => {
-    const { operations, selectionIndex } = this.state;
-    if (index === undefined) {
-      /* eslint-disable-next-line */
-      index = selectionIndex;
-    }
-    const refreshSeq = operations.slice(index);
-    const instructions = refreshSeq.map(
-      (op) => `${op.name}(${op.args.join(', ')})`
-    );
-    console.log(instructions);
-  };
-
   render() {
     const options = {
       selectOnLineNumbers: true,
     };
-    const { collapsed, script, operations, selectedOp } = this.state;
+    const {
+      collapsed,
+      script,
+      operations,
+      selectedOp,
+      currentRetHash,
+    } = this.state;
     const { ControlPanel } = selectedOp;
     return (
       <ErrorBoundary>
@@ -172,7 +210,7 @@ class App extends Component<unknown, IAppState> {
             <Layout
               style={{
                 marginTop: 64,
-                height: 'calc(100vh - 64px - 90px)',
+                height: 'calc(100vh - 64px - 110px)',
               }}
             >
               <Content className="site-layout-background">
@@ -198,28 +236,14 @@ class App extends Component<unknown, IAppState> {
               style={{
                 overflow: 'auto',
                 padding: 10,
-                height: 90,
+                height: 110,
               }}
             >
-              <Image.PreviewGroup>
-                <Space>
-                  <Image
-                    // height={70}
-                    width={70}
-                    src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
-                  />
-                  <Image
-                    // height={70}
-                    width={70}
-                    src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
-                  />
-                  <Image
-                    // height={70}
-                    width={70}
-                    src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
-                  />
-                </Space>
-              </Image.PreviewGroup>
+              <Gallery
+                operations={operations}
+                selectedKey={selectedOp.id}
+                key={currentRetHash}
+              />
             </Footer>
           </Layout>
         </Layout>

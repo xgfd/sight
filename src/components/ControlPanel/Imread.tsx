@@ -11,9 +11,10 @@ export default class Imread extends DefaultControls {
 
   constructor(props: OpControlsProp) {
     super(props);
-    const fileArgs = this.state.args;
+    const { name, args } = props.selectedOp;
+    const fileArgs = [...args];
     fileArgs[0] = this.pathToRcFile(fileArgs[0]);
-    this.state = { ...this.state, live: false };
+    this.state = { name, args: fileArgs, live: false };
   }
 
   beforeUpload = (file: RcFile) => {
@@ -27,9 +28,7 @@ export default class Imread extends DefaultControls {
   };
 
   handleUpload = () => {
-    // const op = this.props.selectedOp;
     this.props.onChange();
-    // console.log('start cv', `${op.name}(${op.args.join(', ')})`);
   };
 
   pathToRcFile(filePath: string) {

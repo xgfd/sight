@@ -14,5 +14,11 @@
     "postinstall": "yarn electron-rebuild"
   },
   "license": "MIT",
-  "dependencies": {}
+  "dependencies": {
+    "lodash.debounce": "^4.0.8",
+    "python-shell": "^2.0.3"
+  },
+  "devDependencies": {
+    "@types/lodash.debounce": "^4.0.6"
+  }
 }

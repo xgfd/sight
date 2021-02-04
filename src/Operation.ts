@@ -1,7 +1,25 @@
+import crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import createControlComponent from './components/ControlPanel';
-import { loadScript, sha256hash } from './utils';
+import { VISION } from './constants';
 
+function sha256hash(data: string) {
+  return crypto.createHash('sha256').update(data).digest('hex');
+}
+
+function loadScript(name: string, pack: 'builtin' | 'custom' | 'templates') {
+  const pyPath = path.join(VISION, pack, `${name}.py`);
+  let script;
+  try {
+    script = fs.readFileSync(pyPath, 'utf8');
+  } catch (e) {
+    // TODO defaults to "" or __template__.py?
+    script = '';
+  }
+  return script;
+}
 class Operation {
   readonly id: string;
 
@@ -17,7 +35,7 @@ class Operation {
 
   package: 'custom' | 'builtin';
 
-  resultImage: string;
+  resultImageHash: string;
 
   ControlPanel;
 
@@ -34,7 +52,7 @@ class Operation {
     this.package = pack;
     const component = createControlComponent(this);
     this.ControlPanel = component;
-    this.args = component.defaultValues;
+    this.args = [...component.defaultValues];
 
     if (newCustomOp) {
       this.script = loadScript('__template__', 'templates');
@@ -44,7 +62,7 @@ class Operation {
     }
 
     this.scriptHash = sha256hash(this.script);
-    this.resultImage = '';
+    this.resultImageHash = '';
   }
 
   public updateScript(script: string): boolean {
@@ -79,8 +97,12 @@ class Operation {
     return pyScript;
   }
 
-  public serialiseToJson() {
-    return { script: this.script };
+  public toJson() {
+    return {
+      fn: `${this.package}.${this.name}`,
+      rid: this.id,
+      args: this.args,
+    };
   }
 }
 

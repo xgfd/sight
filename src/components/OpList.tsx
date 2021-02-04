@@ -150,7 +150,7 @@ class OpList extends Component<IProps, unknown> {
                   -
                 </Button>
               </div>
-              {op.loading && <Spin delay={200} size="small" />}
+              {op.loading && <Spin size="small" />}
             </Space>
           </Popconfirm>
         </Menu.Item>
