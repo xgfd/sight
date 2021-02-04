@@ -97,12 +97,16 @@ def _run_step(
         # otherwise insert the image object at the beginning
         if image is not None:
             args = (image, *args)
-        ret_image = fn(*args)
-        # allow multiple returns
-        if isinstance(ret_image, tuple):
-            ret_image = ret_image[0]
-        assert ret_image is not None
-        save = True
+        try:
+            ret_image = fn(*args)
+            # allow multiple returns
+            if isinstance(ret_image, tuple):
+                ret_image = ret_image[0]
+            assert ret_image is not None
+            save = True
+        except Exception as e:
+            res = {"rid": rid, "ret_hash": ret_hash, "error": str(e)}
+            print(json.dumps(res))
 
     # cache the result image and send a response
     Thread(
@@ -238,6 +242,7 @@ if __name__ == "__main__":
     # print(ls())
     # import time
     # time.sleep(10)
+    # print(json.dumps(sys.argv))
     cmd = sys.argv[1]
     args = []
     if len(sys.argv) > 2:

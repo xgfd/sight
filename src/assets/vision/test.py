@@ -10,9 +10,9 @@ def test_run():
 
     cmd_input = json.dumps(
         [
-            {"fn": "builtin.imread", "rid": "0", "args": ["test.png"]},
-            {"fn": "builtin.canny", "rid": "1", "args": [[80, 120], 3]},
-            {"fn": "builtin.imread", "rid": "2", "args": ["test.png"]},
+            {"fn": "builtin.imread", "rid": "0", "args": ["test.png", 0]},
+            {"fn": "builtin.canny", "rid": "1", "args": [[80, 120], 3, False]},
+            {"fn": "builtin.imread", "rid": "2", "args": ["test.png", 0]},
         ]
     )
     run(cmd_input)
@@ -20,11 +20,11 @@ def test_run():
         [
             {
                 "fn": "builtin.canny",
-                "last_hash": "3a05b27192257bee0c7df3b630b83b3ea4a4c0ad9ab257d41b812472867b4df0",
+                "last_hash": "9c41a9c17c4882da1f5bfe1a8c045ab498dae04ade52e99258209fec596c3822",
                 "rid": "1",
-                "args": [[80, 120], 3],
+                "args": [[80, 120], 3, False],
             },
-            {"fn": "builtin.imread", "rid": "2", "args": ["test.png"]},
+            {"fn": "builtin.imread", "rid": "2", "args": ["test.png", -1]},
         ]
     )
     run(cmd_input)
