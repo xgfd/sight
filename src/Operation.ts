@@ -68,7 +68,6 @@ class Operation {
     this.args = [...component.defaultValues];
 
     if (newCustomOp) {
-      this.resultUpToDate = false;
       const script = loadScript('__template__', 'templates');
       this.script = script;
       this.scriptHash = sha256hash(script);

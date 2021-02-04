@@ -1,6 +1,6 @@
+import Canny from './Canny';
 import DefaultControls, { Operation } from './Default';
 import Imread from './Imread';
-import Canny from './Canny';
 
 const controlComponents: { [key: string]: typeof DefaultControls } = {
   imread: Imread,

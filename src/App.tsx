@@ -1,6 +1,5 @@
 import {
   CaretRightOutlined,
-  CheckOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
 } from '@ant-design/icons';

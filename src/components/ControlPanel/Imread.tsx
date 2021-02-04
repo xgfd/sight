@@ -1,5 +1,5 @@
 import { UploadOutlined } from '@ant-design/icons';
-import { Select, Button, Upload } from 'antd';
+import { Button, Select, Upload } from 'antd';
 import { RcFile } from 'antd/lib/upload';
 import path from 'path';
 import React from 'react';

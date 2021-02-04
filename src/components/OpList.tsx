@@ -12,9 +12,9 @@ import {
   Button,
   Dropdown,
   Menu,
+  Popconfirm,
   Space,
   Spin,
-  Popconfirm,
   Typography,
 } from 'antd';
 import React, { Component } from 'react';
@@ -118,6 +118,7 @@ class OpList extends Component<
       // Menu.Item.onClick and Popconfirm are mutually exclusive
       // only show Popconfirm when moving away from a unsaved op.
       const popconfirmDisabled = resultUpToDate || selectedKey === op.id;
+
       return (
         <Menu.Item
           key={op.id}
@@ -133,16 +134,17 @@ class OpList extends Component<
           <Popconfirm
             title="Script not executed. Use the Run button to execute?"
             disabled={popconfirmDisabled}
-            // onConfirm={() => {
-            //   selectOp(op, index);
-            // }}
           >
             <Space size="middle">
               <Text ellipsis={{ tooltip: op.name }} style={{ width: 60 }}>
                 {op.name}
+                {op.resultImageHash}
               </Text>
               <div style={{ textAlign: 'center' }}>
-                <Dropdown overlay={dropdownMenu(index)}>
+                <Dropdown
+                  disabled={!op.resultImageHash}
+                  overlay={dropdownMenu(index)}
+                >
                   <Button type="text" size="small">
                     +
                   </Button>

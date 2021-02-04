@@ -86,12 +86,6 @@ function run(
 }
 
 /**
- * Add a new function or update an existing custom function.
- * @param op New script to be added to custom functions.
- */
-function upsert(op: Operation) {}
-
-/**
  * List scripts saved under BUILTIN and CUSTOM.
  * Walk through the file system instead of calling `ls` on the server for performance reasons.
  */
@@ -105,4 +99,4 @@ function listScripts() {
   return { builtin, custom };
 }
 
-export { listScripts, notify, run, upsert };
+export { listScripts, notify, run };
