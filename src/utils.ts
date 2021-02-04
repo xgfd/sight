@@ -4,65 +4,83 @@ import fg from 'fast-glob';
 import { BUILTIN, CUSTOM, VISION } from './constants';
 import Operation from './Operation';
 
+function notify(
+  type: 'success' | 'info' | 'warning' | 'error',
+  message: string,
+  description = ''
+) {
+  notification[type]({
+    message,
+    description,
+  });
+}
+
 /**
  * Execute a sequence of operations on the backend.
  * @param operations Operation sequence.
- * @param beforeRun Callback function that is called once before the execution of all operations.
  * @param cb Callback function that is called for **each** operation after its execution.
  */
 function run(
   operations: Operation[],
   lastHash: string,
-  beforeRun: () => void,
   cb: (op: Operation, result: string) => void
 ) {
   const instructions = operations.map((op, index) => {
     const opJson = op.toJson();
+    // add the input hash for the first operation
     if (index === 0) {
       return { ...opJson, last_hash: lastHash };
     }
     return opJson;
   });
 
-  const cmds = JSON.stringify(instructions);
-  // const cmds =
-  //   '[{"fn":"builtin.imread","rid":"0","args":["test.png"]},{"fn":"builtin.canny","rid":"1","args":[[80,120],3]},{"fn":"builtin.imread","rid":"2","args":["test.png"]}]';
-  console.log('cmds', cmds);
   const options = {
     mode: 'text' as 'json' | 'text',
     pythonOptions: ['-u'], // get print results in real-time
     scriptPath: VISION,
-    args: ['run', cmds],
+    args: ['run', JSON.stringify(instructions)],
     cwd: VISION,
   };
-  const pyshell = new PythonShell('engine.py', options);
+  const shell = new PythonShell('engine.py', options);
 
-  beforeRun();
+  // send anything to trigger the call
+  shell.send('');
 
-  pyshell.send('');
+  shell.on('message', (message) => {
+    // ignore empty messages
+    if (!message.trim()) {
+      return;
+    }
 
-  pyshell.on('message', (message) => {
-    console.log(message);
     try {
-      const { rid, ret_hash: resultHash } = JSON.parse(message);
+      const { rid, ret_hash: resultHash, error } = JSON.parse(message);
       const retOp = operations.find((op) => op.id === rid);
+
       if (retOp) {
+        // notify python execution errors
+        if (error) {
+          notify('warning', `${retOp.name}: ${error}`);
+        }
+        // in case of error the resultHash should be ""
         retOp.resultImageHash = resultHash;
         cb(retOp, resultHash);
       } else if (rid) {
-        console.error(`$Operation ${rid} not found`);
+        notify('warning', `Operation ${rid} not found`);
       }
     } catch (error) {
-      console.log(error);
+      if (error instanceof SyntaxError) {
+        notify('info', message);
+      } else {
+        console.error(error);
+      }
     }
   });
 
   // end the input stream and allow the process to exit
-  pyshell.end((err) => {
+  shell.end((err) => {
     if (err) {
-      console.log(err.stack);
+      console.error(err.stack);
     }
-    console.log('finished');
   });
 }
 
@@ -86,14 +104,4 @@ function listScripts() {
   return { builtin, custom };
 }
 
-function notify(
-  type: 'success' | 'info' | 'warning' | 'error',
-  message: string,
-  description = ''
-) {
-  notification[type]({
-    message,
-    description,
-  });
-}
 export { listScripts, notify, run, upsert };

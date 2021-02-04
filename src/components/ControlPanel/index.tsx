@@ -1,8 +1,10 @@
 import DefaultControls, { Operation } from './Default';
 import Imread from './Imread';
+import Canny from './Canny';
 
 const controlComponents: { [key: string]: typeof DefaultControls } = {
   imread: Imread,
+  canny: Canny,
 };
 
 export default function createControlComponent(op: Operation) {

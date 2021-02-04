@@ -27,48 +27,9 @@ interface IAppState {
   selectedOp: Operation;
   selectionIndex: number;
   operations: Operation[];
-  currentRetHash: string;
 }
+
 class App extends Component<unknown, IAppState> {
-  evalOpSeq = debounce((index?: number) => {
-    const { operations, selectionIndex } = this.state;
-    if (index === undefined) {
-      /* eslint-disable-next-line */
-      index = selectionIndex;
-    }
-    const lastResultHash =
-      index > 0 ? operations[index - 1].resultImageHash : '';
-    const refreshSeq = operations.slice(index);
-
-    // unless it's imread, cancel execution if the first operation doesn't have an input result hash
-    if (
-      refreshSeq.length > 0 &&
-      refreshSeq[0].name !== 'imread' &&
-      !refreshSeq[0].resultImageHash
-    ) {
-      notify('warning', 'Please execute Imread first.');
-      return;
-    }
-    // set all pending operations' loading flag
-    const beforeRun = () => {
-      refreshSeq.forEach((op: Operation) => {
-        op.loading = true;
-      });
-      this.setState({ operations });
-    };
-
-    run(
-      refreshSeq,
-      lastResultHash,
-      beforeRun,
-      (op: Operation, result: string) => {
-        op.loading = false;
-        this.setState({ operations: [...operations], currentRetHash: result });
-        console.log(result);
-      }
-    );
-  }, 200);
-
   constructor(props: unknown) {
     super(props);
 
@@ -76,16 +37,53 @@ class App extends Component<unknown, IAppState> {
     const canny = new Operation('canny', 'builtin');
     const operations = [imread, canny];
     const selectionIndex = 0;
-    const currentRetHash = '';
     this.state = {
       collapsed: false,
       script: operations[selectionIndex].getScript(),
       selectedOp: operations[selectionIndex],
       selectionIndex,
       operations,
-      currentRetHash,
     };
   }
+
+  execOperations = (index?: number) => {
+    const { operations, selectionIndex } = this.state;
+    if (index === undefined) {
+      index = selectionIndex; // eslint-disable-line no-param-reassign
+    }
+    const refreshSeq = operations.slice(index);
+
+    // use the last result hash as the input hash of this operation sequence
+    // unless this operation sequence starts from the beginning
+    const lastResultHash =
+      index > 0 ? operations[index - 1].resultImageHash : '';
+
+    // cancel execution and ask to evaluate an immediately previous `imread` if the first operation doesn't have an input result hash
+    if (
+      refreshSeq.length > 0 &&
+      refreshSeq[0].name !== 'imread' &&
+      !lastResultHash
+    ) {
+      notify('warning', 'Please execute Imread first.');
+      return;
+    }
+
+    // set all pending operations' loading flag before run
+    refreshSeq.forEach((op: Operation) => {
+      op.loading = true;
+    });
+    this.setState({ operations });
+
+    run(refreshSeq, lastResultHash, (op: Operation, result: string) => {
+      op.loading = false;
+      // op.resultImageHash should be already updated in `run`
+      // this line is a safe guard and for documentation
+      op.resultImageHash = result;
+      this.setState({ operations: [...operations] });
+    });
+  };
+
+  evalDebounced = debounce(this.execOperations, 200); // eslint-disable-line react/sort-comp
 
   toggleOpList = () => {
     const { collapsed } = this.state;
@@ -116,9 +114,24 @@ class App extends Component<unknown, IAppState> {
    */
   insertOp = (op: Operation, index: number) => {
     const { operations } = this.state;
-    operations.splice(index + 1, 0, op);
+    const selectionIndex = index + 1;
+    const selection = op;
+    operations.splice(selectionIndex, 0, op);
+
+    // automatically execute the new selected operation and its successors
+    // if it's not imread and its immediate predecessor is evaluated
+    if (selection.name !== 'imread') {
+      const lastResultHash =
+        selectionIndex > 0
+          ? operations[selectionIndex - 1].resultImageHash
+          : '';
+      if (lastResultHash) {
+        this.evalDebounced(selectionIndex);
+      }
+    }
+
+    this.selectOp(op, selectionIndex);
     this.setState({ operations });
-    this.selectOp(op, index + 1);
   };
 
   /**
@@ -130,15 +143,23 @@ class App extends Component<unknown, IAppState> {
     const { operations } = this.state;
     operations.splice(index, 1);
 
-    // if it's not the last operation
-    // select the next operation in line and
-    // refresh all operations after the removed operation
-    if (index < operations.length) {
-      this.evalOpSeq(index);
-      this.selectOp(operations[index], index);
-    } else {
-      this.selectOp(operations[index - 1], index - 1);
+    // prevent index overflow if the removed op was the last one
+    const selectionIndex = Math.min(index, operations.length - 1);
+    const selection = operations[selectionIndex];
+
+    // automatically execute the new selected operation and its successors
+    // if it's not imread and its immediate predecessor is evaluated
+    if (selection.name !== 'imread') {
+      const lastResultHash =
+        selectionIndex > 0
+          ? operations[selectionIndex - 1].resultImageHash
+          : '';
+      if (lastResultHash) {
+        this.evalDebounced(selectionIndex);
+      }
     }
+
+    this.selectOp(selection, selectionIndex);
     this.setState({ operations });
   };
 
@@ -152,13 +173,7 @@ class App extends Component<unknown, IAppState> {
     const options = {
       selectOnLineNumbers: true,
     };
-    const {
-      collapsed,
-      script,
-      operations,
-      selectedOp,
-      currentRetHash,
-    } = this.state;
+    const { collapsed, script, operations, selectedOp } = this.state;
     const { ControlPanel } = selectedOp;
     return (
       <ErrorBoundary>
@@ -171,7 +186,7 @@ class App extends Component<unknown, IAppState> {
             collapsedWidth="0"
             collapsed={collapsed}
             style={{
-              overflow: 'auto',
+              overflowY: 'auto',
               height: '100vh',
               position: 'sticky',
               top: 0,
@@ -210,7 +225,7 @@ class App extends Component<unknown, IAppState> {
             <Layout
               style={{
                 marginTop: 64,
-                height: 'calc(100vh - 64px - 110px)',
+                height: 'calc(100vh - 64px - 200px)',
               }}
             >
               <Content className="site-layout-background">
@@ -221,29 +236,30 @@ class App extends Component<unknown, IAppState> {
                 width={220}
                 collapsedWidth={0}
                 style={{
-                  overflow: 'auto',
+                  overflowY: 'auto',
                   padding: 10,
                 }}
               >
                 <ControlPanel
                   key={selectedOp.id}
                   selectedOp={selectedOp}
-                  onChange={this.evalOpSeq}
+                  onChange={this.evalDebounced}
                 />
               </Sider>
             </Layout>
             <Footer
               style={{
-                overflow: 'auto',
-                padding: 10,
-                height: 110,
+                overflowX: 'auto',
+                overflowY: 'hidden',
+                paddingLeft: 0,
+                paddingRight: 0,
+                paddingTop: 10,
+                paddingBottom: 0,
+                height: 200,
+                backgroundColor: '#fafafa',
               }}
             >
-              <Gallery
-                operations={operations}
-                selectedKey={selectedOp.id}
-                key={currentRetHash}
-              />
+              <Gallery operations={operations} selectedKey={selectedOp.id} />
             </Footer>
           </Layout>
         </Layout>

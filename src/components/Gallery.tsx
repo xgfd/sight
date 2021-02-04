@@ -27,9 +27,9 @@ export default function Gallery(props: IProps) {
     return (
       <Badge key={op.id} dot count={badgeCount}>
         <Image
-          key={op.id}
-          height={90}
-          width={90}
+          key={op.resultImageHash}
+          height={190}
+          width={190}
           src={
             op.resultImageHash
               ? path.join(IMAGE_CACHE, `${op.resultImageHash}.png`)

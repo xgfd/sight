@@ -1,4 +1,4 @@
-import { Input, InputNumber, Slider } from 'antd';
+import { Input, InputNumber, Slider, Switch } from 'antd';
 import React, { Component } from 'react';
 
 // cannot import from Operation due to circular dependency
@@ -26,7 +26,7 @@ export default class DefaultControls extends Component<
   OpControlsProp,
   OpControlsState
 > {
-  static defaultValues = [[50, 150] as [number, number], 3, 3, 0, 0, ''];
+  static defaultValues = [[50, 150] as [number, number], 3, 3, 0, 0, '', false];
 
   constructor(props: OpControlsProp) {
     super(props);
@@ -53,10 +53,10 @@ export default class DefaultControls extends Component<
         <h2>{name}</h2>
         <h4>Thresholds</h4>
         <Slider
-          range
+          range={{ draggableTrack: true }}
           max={360}
           value={args[0]}
-          onChange={(value) => this.updateArgs(0, value)}
+          onChange={(value: [number, number]) => this.updateArgs(0, value)}
         />
         <h4>Kernel row</h4>
         <InputNumber
@@ -94,6 +94,11 @@ export default class DefaultControls extends Component<
         <Input
           value={args[5]}
           onChange={(value) => this.updateArgs(5, value)}
+        />
+        <h4>Boolean flag</h4>
+        <Switch
+          checked={args[6]}
+          onChange={(checked) => this.updateArgs(6, checked)}
         />
       </>
     );
