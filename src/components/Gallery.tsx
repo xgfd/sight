@@ -28,11 +28,11 @@ export default function Gallery(props: IProps) {
       <Badge key={op.id} dot count={badgeCount}>
         <Image
           key={op.resultImageHash}
-          height={190}
-          width={190}
+          height={200}
+          width={200}
           src={
             op.resultImageHash
-              ? path.join(IMAGE_CACHE, `${op.resultImageHash}.png`)
+              ? path.join(IMAGE_CACHE, `${op.resultImageHash}.png`) // currently image format is hardcoded to png
               : ''
           }
           fallback={fallback}

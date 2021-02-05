@@ -251,7 +251,7 @@ class App extends Component<unknown, IAppState> {
             <Layout
               style={{
                 marginTop: 64,
-                height: 'calc(100vh - 64px - 200px)',
+                height: 'calc(100vh - 64px - 207px)', // header=64px, footer=207px, in sync with Footer.style.height
               }}
             >
               <Content className="site-layout-background">
@@ -286,9 +286,9 @@ class App extends Component<unknown, IAppState> {
                 overflowY: 'hidden',
                 paddingLeft: 0,
                 paddingRight: 0,
-                paddingTop: 10,
+                paddingTop: 7, // leave room for badge icons, it's the half hight of the clock icon
                 paddingBottom: 0,
-                height: 200,
+                height: 207,
                 backgroundColor: '#fafafa',
               }}
             >

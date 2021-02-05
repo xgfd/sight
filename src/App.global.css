@@ -12,6 +12,11 @@ body {
   overflow-y: hidden;
 }
 
+.ant-image-img,
+.ant-image-preview-img {
+  image-rendering: pixelated;
+}
+
 #root .trigger {
   font-size: 18px;
   line-height: 64px;
