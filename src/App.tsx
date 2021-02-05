@@ -23,7 +23,6 @@ loader.config({
 
 interface IAppState {
   collapsed: boolean;
-  script: string;
   selectedOp: Operation;
   selectionIndex: number;
   operations: Operation[];
@@ -40,7 +39,6 @@ class App extends Component<unknown, IAppState> {
     const selection = operations[selectionIndex];
     this.state = {
       collapsed: false,
-      script: selection.getScript(),
       selectedOp: selection,
       selectionIndex,
       operations,
@@ -101,7 +99,6 @@ class App extends Component<unknown, IAppState> {
     // notify('info', op.name, op.id);
     this.setState({
       selectedOp: op,
-      script: op.getScript(),
       selectionIndex: index,
     });
   };
@@ -182,7 +179,7 @@ class App extends Component<unknown, IAppState> {
   };
 
   render() {
-    const { collapsed, script, operations, selectedOp } = this.state;
+    const { collapsed, operations, selectedOp } = this.state;
     const { ControlPanel } = selectedOp;
     return (
       <ErrorBoundary>
@@ -258,10 +255,10 @@ class App extends Component<unknown, IAppState> {
                 <Editor
                   defaultLanguage="python"
                   language="python"
-                  value={script}
+                  value={selectedOp.script}
                   options={{ readOnly: selectedOp.package === 'builtin' }}
                   onChange={this.onEditorChange}
-                  onValidate={(marker) => console.log(marker)}
+                  // onValidate={(marker) => console.log(marker)}
                 />
               </Content>
               <Sider
