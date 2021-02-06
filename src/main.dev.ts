@@ -14,7 +14,9 @@ import path from 'path';
 import { app, BrowserWindow, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import fs from 'fs';
 import MenuBuilder from './menu';
+import { IMAGE_CACHE } from './constants';
 
 export default class AppUpdater {
   constructor() {
@@ -70,7 +72,7 @@ const createWindow = async () => {
   mainWindow = new BrowserWindow({
     show: false,
     width: 1224,
-    height: 1024,
+    height: 900,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       nodeIntegration: true,
@@ -94,6 +96,7 @@ const createWindow = async () => {
   });
 
   mainWindow.on('closed', () => {
+    fs.rmdir(IMAGE_CACHE, { recursive: true }, () => null);
     mainWindow = null;
   });
 
