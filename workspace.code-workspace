@@ -6,7 +6,7 @@
     },
     {
       "name": "vision",
-      "path": "src/assets/vision"
+      "path": "vision"
     },
     {
       "name": "cv-fiddle",

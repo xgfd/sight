@@ -3,14 +3,29 @@ import fs from 'fs';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import createControlComponent from './components/ControlPanel';
-import { VISION } from './constants';
+import { BUILTIN, TEMPLATES, CUSTOM } from './constants';
 
 function sha256hash(data: string) {
   return crypto.createHash('sha256').update(data).digest('hex');
 }
 
 function loadScript(name: string, pack: 'builtin' | 'custom' | 'templates') {
-  const pyPath = path.join(VISION, pack, `${name}.py`);
+  let pyPath;
+
+  switch (pack) {
+    case 'builtin':
+      pyPath = path.join(BUILTIN, `${name}.py`);
+      break;
+    case 'custom':
+      pyPath = path.join(CUSTOM, `${name}.py`);
+      break;
+    case 'templates':
+      pyPath = path.join(TEMPLATES, `${name}.py`);
+      break;
+    default:
+      return '';
+  }
+
   let script;
   try {
     script = fs.readFileSync(pyPath, 'utf8');
@@ -25,8 +40,23 @@ function writeScript(
   pack: 'builtin' | 'custom' | 'templates',
   script: string
 ) {
-  const pyPath = path.join(VISION, pack, `${name}.py`);
-  // throw errors so App can catch it and display warnings
+  let pyPath;
+
+  switch (pack) {
+    case 'builtin':
+      pyPath = path.join(BUILTIN, `${name}.py`);
+      break;
+    case 'custom':
+      pyPath = path.join(CUSTOM, `${name}.py`);
+      break;
+    case 'templates':
+      pyPath = path.join(TEMPLATES, `${name}.py`);
+      break;
+    default:
+      return;
+  }
+
+  // intentionally not wrapped with try-catch so App can catch it and display warnings
   fs.writeFileSync(pyPath, script);
 }
 
@@ -45,6 +75,8 @@ class Operation {
   name: string;
 
   package: 'custom' | 'builtin';
+
+  inputImageHash: string;
 
   resultImageHash: string;
 
@@ -77,6 +109,7 @@ class Operation {
       this.scriptHash = sha256hash(this.script);
     }
 
+    this.inputImageHash = '';
     this.resultImageHash = '';
   }
 

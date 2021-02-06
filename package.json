@@ -1,7 +1,8 @@
 {
-  "name": "electron-react-boilerplate",
-  "productName": "ElectronReact",
-  "description": "Electron application boilerplate based on React, React Router, Webpack, React Fast Refresh for rapid application development",
+  "name": "sight",
+  "productName": "Sight",
+  "description": "See your computer vision algorithms live",
+  "version": "1.0.0",
   "scripts": {
     "build": "concurrently \"yarn build:main\" \"yarn build:renderer\"",
     "build:main": "cross-env NODE_ENV=production webpack --config ./.erb/configs/webpack.config.main.prod.babel.js",
@@ -30,11 +31,11 @@
     ]
   },
   "build": {
-    "productName": "ElectronReact",
-    "appId": "org.erb.ElectronReact",
+    "productName": "Sight",
+    "appId": "org.erb.Sight",
     "files": [
       "dist/",
-      "assets/",
+      "monaco/",
       "node_modules/",
       "index.html",
       "main.prod.js",
@@ -83,40 +84,41 @@
       "output": "release"
     },
     "extraResources": [
-      "./assets/**"
+      "./assets/**",
+      "./vision/*.py",
+      "./vision/builtin/",
+      "./vision/templates/",
+      "./vision/custom/__init__.py",
+      "!./vision/test.py",
+      "!**/{.DS_Store,.git,.gitignore,.gitattributes}",
+      "!**/{__pycache__,thumbs.db}"
     ],
     "publish": {
       "provider": "github",
-      "owner": "electron-react-boilerplate",
-      "repo": "electron-react-boilerplate"
+      "owner": "cv-fiddle",
+      "repo": "cv-fiddle"
     }
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/electron-react-boilerplate/electron-react-boilerplate.git"
+    "url": "git+https://github.com/xgfd/cv-fiddle.git"
   },
   "author": {
-    "name": "Electron React Boilerplate Maintainers",
-    "email": "electronreactboilerplate@gmail.com",
-    "url": "https://electron-react-boilerplate.js.org"
+    "name": "Xin Wang",
+    "email": "x.wang@sigmasquares.com"
   },
   "contributors": [
     {
-      "name": "Amila Welihinda",
-      "email": "amilajack@gmail.com",
-      "url": "https://github.com/amilajack"
-    },
-    {
-      "name": "John Tran",
-      "email": "jptran318@gmail.com",
-      "url": "https://github.com/jooohhn"
+      "name": "Chaohai Ding",
+      "email": "c.ding@sigmasquares.com"
     }
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/electron-react-boilerplate/electron-react-boilerplate/issues"
+    "url": "https://github.com/xgfd/cv-fiddle/issues"
   },
   "keywords": [
+    "computer vision",
     "electron",
     "boilerplate",
     "react",
@@ -127,7 +129,7 @@
     "hot",
     "reload"
   ],
-  "homepage": "https://github.com/electron-react-boilerplate/electron-react-boilerplate#readme",
+  "homepage": "https://github.com/xgfd/cv-fiddle/blob/main/README.md",
   "jest": {
     "testURL": "http://localhost/",
     "moduleNameMapper": {
@@ -229,6 +231,7 @@
     "husky": "^4.2.5",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^26.1.0",
+    "@types/lodash.debounce": "^4.0.6",
     "lint-staged": "^10.2.11",
     "mini-css-extract-plugin": "^1.3.1",
     "node-sass": "^5.0.0",
@@ -257,6 +260,8 @@
     "electron-updater": "^4.3.4",
     "fast-glob": "^3.2.5",
     "history": "^5.0.0",
+    "lodash.debounce": "^4.0.8",
+    "python-shell": "^2.0.3",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-router-dom": "^5.2.0",
@@ -295,10 +300,5 @@
     "baseBranches": [
       "next"
     ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
   }
 }

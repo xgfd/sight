@@ -1,5 +1,5 @@
 import { InputNumber, Slider, Switch } from 'antd';
-import React, { Component } from 'react';
+import React from 'react';
 import DefaultControls, { OpControlsProp } from './Default';
 
 export default class CannyControls extends DefaultControls {

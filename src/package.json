@@ -1,24 +1,24 @@
 {
-  "name": "electron-react-boilerplate",
-  "productName": "electron-react-boilerplate",
-  "version": "2.3.0",
-  "description": "Electron application boilerplate based on React, React Router, Webpack, React Hot Loader for rapid application development",
+  "name": "sight",
+  "productName": "Sight",
+  "version": "1.0.0",
+  "description": "See your computer vision algorithms live",
   "main": "./main.prod.js",
   "author": {
-    "name": "Electron React Boilerplate Maintainers",
-    "email": "electronreactboilerplate@gmail.com",
-    "url": "https://github.com/electron-react-boilerplate"
+    "name": "Xin Wang",
+    "email": "x.wang@sigmasquares.com"
   },
+  "contributors": [
+    {
+      "name": "Chaohai Ding",
+      "email": "c.ding@sigmasquares.com"
+    }
+  ],
   "scripts": {
     "electron-rebuild": "node -r ../.erb/scripts/BabelRegister.js ../.erb/scripts/ElectronRebuild.js",
     "postinstall": "yarn electron-rebuild"
   },
   "license": "MIT",
-  "dependencies": {
-    "lodash.debounce": "^4.0.8",
-    "python-shell": "^2.0.3"
-  },
-  "devDependencies": {
-    "@types/lodash.debounce": "^4.0.6"
-  }
+  "dependencies": {},
+  "devDependencies": {}
 }

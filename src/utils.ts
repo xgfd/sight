@@ -1,7 +1,7 @@
 import { PythonShell } from 'python-shell';
 import { notification } from 'antd';
 import fg from 'fast-glob';
-import { BUILTIN, CUSTOM, VISION } from './constants';
+import { BUILTIN, CUSTOM, VISION, IMAGE_CACHE } from './constants';
 import Operation from './Operation';
 
 function notify(
@@ -72,15 +72,15 @@ function run(
       if (error instanceof SyntaxError) {
         notify('info', message);
       } else {
-        console.error(error);
+        notify('warning', error);
       }
     }
   });
 
-  // end the input stream and allow the process to exit
+  // throw error to App
   shell.end((err) => {
     if (err) {
-      console.error(err.stack);
+      throw err;
     }
   });
 }

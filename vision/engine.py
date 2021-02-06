@@ -4,33 +4,36 @@ import hashlib
 import importlib
 import inspect
 import json
+import shutil
 import sys
 from pathlib import Path
 from threading import Thread
 from typing import Callable, List, Tuple, TypedDict, Union
 
-# import all builtin and custom submodules
-# see __init__.py of the two modules
+# import all builtin functions
+# custom functions are imported later after extending sys.path
+# built/__init__.py automatically imports all sub modules
 import builtin
 import custom
 from cv2 import IMREAD_UNCHANGED, IMWRITE_PNG_COMPRESSION, imread, imwrite
 
 # function shortcuts
 FUNCTIONS = {}
+
+# the following paths much be in sync with the main app (src/constants.ts)
+# they are initialised in _init()
+APP_DATA = (Path.home() / ".sight").absolute()
 # image cache folder
-CACHE = Path(__file__).parent / ".cache"
+CACHE = APP_DATA / "cache"
+BUILTIN = Path(".") / "builtin"
+CUSTOM = Path(".") / "custom"
 
-# def _export_fn(fn):
-#     """Export the main function as source code.
-#     Function name is replaced with the module name.
-
-#     Returns:
-#         str: Renamed main function source code.
-#     """
-
-#     fn_name = fn.__module__.split(".")[-1]
-#     source = inspect.getsource(fn)
-#     return source.replace("def main", f"def {fn_name}")
+# # add custom functions to search paths
+# CUSTOM.mkdir(parents=True, exist_ok=True)
+# sys.path.insert(0, str(APP_DATA))
+# # copy builtin/__inti__.py to CUSTOM to import all sub modules
+# shutil.copyfile(BUILTIN / "__init__.py", CUSTOM / "__init__.py")
+# # now it automatically imports all custom functions
 
 
 class Context(TypedDict):
@@ -163,6 +166,10 @@ def _respond(conn, rid: str, ret_hash: str, ret_image: object, save=True):
 
 
 def _init():
+    # make sure that image cache folder exists
+    # the main app will create these two folders too
+    CACHE.mkdir(parents=True, exist_ok=True)
+
     # initiate function shortcuts
     global FUNCTIONS
 
@@ -172,8 +179,6 @@ def _init():
         for sub_name in mod.__all__:
             full_sub_name = f"{module_name}.{sub_name}"
             FUNCTIONS[full_sub_name] = sys.modules[full_sub_name].main
-    # make sure that image cache folder exists
-    CACHE.mkdir(parents=True, exist_ok=True)
 
 
 def ls():

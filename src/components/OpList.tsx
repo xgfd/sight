@@ -138,7 +138,6 @@ class OpList extends Component<
             <Space size="middle">
               <Text ellipsis={{ tooltip: op.name }} style={{ width: 60 }}>
                 {op.name}
-                {op.resultImageHash}
               </Text>
               <div style={{ textAlign: 'center' }}>
                 <Dropdown

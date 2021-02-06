@@ -18,7 +18,7 @@ const { ErrorBoundary } = Alert;
 const { Header, Content, Footer, Sider } = Layout;
 
 loader.config({
-  paths: { vs: path.join(__dirname, 'assets', 'monaco', 'vs') },
+  paths: { vs: path.join(__dirname, 'monaco', 'vs') },
 });
 
 interface IAppState {
@@ -50,6 +50,9 @@ class App extends Component<unknown, IAppState> {
     if (index === undefined) {
       index = selectionIndex; // eslint-disable-line no-param-reassign
     }
+
+    const selection = operations[index];
+
     const refreshSeq = operations.slice(index);
 
     // use the last result hash as the input hash of this operation sequence
@@ -72,14 +75,29 @@ class App extends Component<unknown, IAppState> {
       op.loading = true;
     });
     this.setState({ operations });
+    try {
+      run(refreshSeq, lastResultHash, (op: Operation, result: string) => {
+        op.loading = false;
+        // op.resultImageHash should be already updated in `run`
+        // this line is a safe guard and for documentation
+        op.resultImageHash = result;
 
-    run(refreshSeq, lastResultHash, (op: Operation, result: string) => {
-      op.loading = false;
-      // op.resultImageHash should be already updated in `run`
-      // this line is a safe guard and for documentation
-      op.resultImageHash = result;
-      this.setState({ operations: [...operations] });
-    });
+        // get the immediate predecessor and assign its result hash to this op's inputImageHash
+        const lastOpIndex =
+          operations.findIndex((cand) => cand.id === op.id) - 1;
+        if (lastOpIndex >= 0 && op.name !== 'imread') {
+          op.inputImageHash = operations[lastOpIndex].resultImageHash;
+        }
+
+        this.setState({ operations });
+      });
+    } catch (e) {
+      refreshSeq.forEach((op: Operation) => {
+        op.loading = false;
+      });
+      this.setState({ operations });
+      notify('error', e);
+    }
   };
 
   evalDebounced: (index?: number) => void = debounce(this.execOperations, 200); // eslint-disable-line react/sort-comp
@@ -96,7 +114,6 @@ class App extends Component<unknown, IAppState> {
    * @param op The new selected operation.
    */
   selectOp = (op: Operation, index: number) => {
-    // notify('info', op.name, op.id);
     this.setState({
       selectedOp: op,
       selectionIndex: index,
@@ -152,7 +169,8 @@ class App extends Component<unknown, IAppState> {
         selectionIndex > 0
           ? operations[selectionIndex - 1].resultImageHash
           : '';
-      if (lastResultHash) {
+
+      if (lastResultHash && selection.inputImageHash !== lastResultHash) {
         this.evalDebounced(selectionIndex);
       }
     }
