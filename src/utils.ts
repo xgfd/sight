@@ -3,6 +3,7 @@ import { notification } from 'antd';
 import fg from 'fast-glob';
 import { BUILTIN, CUSTOM, VISION, IMAGE_CACHE } from './constants';
 import Operation from './Operation';
+import { createVerify } from 'crypto';
 
 function notify(
   type: 'success' | 'info' | 'warning' | 'error',
@@ -23,7 +24,7 @@ function notify(
 function run(
   operations: Operation[],
   lastHash: string,
-  cb: (op: Operation, result: string) => void
+  cb: (err: Error | null, op: Operation | null, result: string) => void
 ) {
   const instructions = operations.map((op, index) => {
     const opJson = op.toJson();
@@ -54,6 +55,7 @@ function run(
 
     try {
       const { rid, ret_hash: resultHash, error } = JSON.parse(message);
+
       const retOp = operations.find((op) => op.id === rid);
 
       if (retOp) {
@@ -64,14 +66,17 @@ function run(
         // in case of error the resultHash should be ""
         retOp.resultImageHash = resultHash;
         retOp.resultUpToDate = true;
-        cb(retOp, resultHash);
-      } else if (rid) {
-        notify('warning', `Operation ${rid} not found`);
+        cb(null, retOp, resultHash);
+      } else {
+        // shouldn't reach this point
+        notify('warning', `Operation with id: ${rid} not found`);
       }
     } catch (error) {
       if (error instanceof SyntaxError) {
+        // non-json outputs are general messages
         notify('info', message);
       } else {
+        // shouldn't reach this point
         notify('warning', error);
       }
     }
@@ -80,7 +85,7 @@ function run(
   // throw error to App
   shell.end((err) => {
     if (err) {
-      throw err;
+      cb(err, null, '');
     }
   });
 }

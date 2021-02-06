@@ -51,8 +51,6 @@ class App extends Component<unknown, IAppState> {
       index = selectionIndex; // eslint-disable-line no-param-reassign
     }
 
-    const selection = operations[index];
-
     const refreshSeq = operations.slice(index);
 
     // use the last result hash as the input hash of this operation sequence
@@ -71,26 +69,57 @@ class App extends Component<unknown, IAppState> {
     }
 
     // set all pending operations' loading flag before run
-    refreshSeq.forEach((op: Operation) => {
-      op.loading = true;
+    refreshSeq.forEach((o: Operation) => {
+      o.loading = true;
     });
     this.setState({ operations });
+
     try {
-      run(refreshSeq, lastResultHash, (op: Operation, result: string) => {
-        op.loading = false;
-        // op.resultImageHash should be already updated in `run`
-        // this line is a safe guard and for documentation
-        op.resultImageHash = result;
+      run(
+        refreshSeq,
+        lastResultHash,
+        (err: Error | null, op: Operation | null, result: string) => {
+          if (!op) {
+            // no op, should only occurs when the server failed
+            if (err) {
+              // server error if there's an error but no op
+              // notify and reset all loading operations
+              notify('error', err.message);
+              refreshSeq.forEach((o: Operation) => {
+                o.loading = false;
+              });
+              this.setState({ operations });
+            } else {
+              // shouldn't reach this point
+              // check the code of `run` if you see the following notification
+              notify('error', 'Response with no associated operation');
+            }
+          } else {
+            // this op finished execution whether it's successful or not
+            op.loading = false;
 
-        // get the immediate predecessor and assign its result hash to this op's inputImageHash
-        const lastOpIndex =
-          operations.findIndex((cand) => cand.id === op.id) - 1;
-        if (lastOpIndex >= 0 && op.name !== 'imread') {
-          op.inputImageHash = operations[lastOpIndex].resultImageHash;
+            if (err) {
+              // this op failed
+              notify('warning', `${op.name}: ${err.message}`);
+              // reset its own result hash and input hash
+              op.resultImageHash = '';
+              op.inputImageHash = '';
+            } else {
+              // everything's fine, update the result hash and if applicable the input hash
+
+              op.resultImageHash = result;
+              // get the immediate predecessor and update this op's inputImageHash
+              const selfIndx = operations.findIndex((p) => p.id === op.id);
+              const preIndx = selfIndx - 1;
+              if (preIndx >= 0 && op.name !== 'imread') {
+                op.inputImageHash = operations[preIndx].resultImageHash;
+              }
+            }
+          }
+          // all set, update operations' status
+          this.setState({ operations });
         }
-
-        this.setState({ operations });
-      });
+      );
     } catch (e) {
       refreshSeq.forEach((op: Operation) => {
         op.loading = false;
