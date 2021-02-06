@@ -37,8 +37,8 @@ export default class CannyControls extends DefaultControls {
         />
         <h4>Aperture size (odd only)</h4>
         <InputNumber
-          min={1}
-          max={255}
+          min={3}
+          max={7}
           step={2}
           value={args[1]}
           onChange={(value) => this.updateArgs(1, value)}

@@ -1,9 +1,8 @@
-import { PythonShell } from 'python-shell';
 import { notification } from 'antd';
 import fg from 'fast-glob';
-import { BUILTIN, CUSTOM, VISION, IMAGE_CACHE } from './constants';
+import { PythonShell } from 'python-shell';
+import { BUILTIN, CUSTOM, VISION } from './constants';
 import Operation from './Operation';
-import { createVerify } from 'crypto';
 
 function notify(
   type: 'success' | 'info' | 'warning' | 'error',
@@ -13,6 +12,25 @@ function notify(
   notification[type]({
     message,
     description,
+  });
+}
+
+function checkPyEnvironment() {
+  PythonShell.runString('import cv2', undefined, (err) => {
+    if (err) {
+      PythonShell.runString(
+        'import sys; print(sys.executable)',
+        undefined,
+        (_, res) => {
+          notify(
+            'error',
+            `opencv-python is not correctly installed for ${
+              (res as string[])[0]
+            }`
+          );
+        }
+      );
+    }
   });
 }
 
@@ -103,5 +121,7 @@ function listScripts() {
     .map((fileName) => fileName.split('.')[0]);
   return { builtin, custom };
 }
+
+checkPyEnvironment();
 
 export { listScripts, notify, run };

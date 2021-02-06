@@ -60,7 +60,7 @@ export default class DefaultControls extends Component<
         />
         <h4>Kernel row</h4>
         <InputNumber
-          min={1}
+          min={3}
           max={255}
           step={2}
           value={args[1]}
@@ -68,7 +68,7 @@ export default class DefaultControls extends Component<
         />
         <h4>Kernel column</h4>
         <InputNumber
-          min={1}
+          min={3}
           max={255}
           step={2}
           value={args[2]}
@@ -77,7 +77,7 @@ export default class DefaultControls extends Component<
         <h4>Int flag 1</h4>
         <InputNumber
           min={-1}
-          max={5}
+          max={255}
           step={1}
           value={args[3]}
           onChange={(value) => this.updateArgs(3, value)}
@@ -85,7 +85,7 @@ export default class DefaultControls extends Component<
         <h4>Int flag 2</h4>
         <InputNumber
           min={-1}
-          max={5}
+          max={255}
           step={1}
           value={args[4]}
           onChange={(value) => this.updateArgs(4, value)}

@@ -32,7 +32,7 @@
   },
   "build": {
     "productName": "Sight",
-    "appId": "org.erb.Sight",
+    "appId": "org.electron.Sight",
     "files": [
       "dist/",
       "monaco/",
