@@ -118,10 +118,12 @@ def _run_step(
     # before run we can predicate the result hash
     # there's no need to run the function if the result hash matches a cached image
     fn = FUNCTIONS[fn_name]
+    input_hash = "" if module_name == "imread" else input_hash
     ret_hash = _ret_hash(fn, input_hash, args)
     ret_image = _get_image(ret_hash)
+    error = None
 
-    if ret_hash and ret_image:
+    if not ret_hash or ret_image is None:
         # no cache, we need to run this function
 
         # insert the image object at the beginning for non-imread
@@ -139,15 +141,17 @@ def _run_step(
                 # cache the result image and send a response
                 Thread(
                     target=_respond_and_cache,
-                    args=(rid, ret_hash, ret_image),
+                    args=(rid, ret_hash, ret_image, error, True),
                 ).start()
             else:
-                # no need to use a thread if not saving image
-                _respond_and_cache(rid, ret_hash, ret_image, "Invalid result image")
+                error = "Invalid result image"
         except Exception as e:
             ret_image = None
             ret_hash = ""
-            _respond_and_cache(rid, ret_hash, ret_image, str(e))
+            error = str(e)
+
+    # no need to use a thread if not saving image
+    _respond_and_cache(rid, ret_hash, ret_image, error)
 
     return ret_image, ret_hash
 
@@ -186,7 +190,7 @@ def _get_image(hash: str) -> Union[None, object]:
 
 
 def _respond_and_cache(
-    rid: str, ret_hash: str, ret_image: object, error: str = None, conn=None
+    rid: str, ret_hash: str, ret_image: object, error: str = None, save=False, conn=None
 ):
     """Respond to a client and by default cache the result image.
 
@@ -194,12 +198,12 @@ def _respond_and_cache(
         rid (str): Request id.
         ret_hash (str): Result hash.
         ret_image (object): Result image.
-        save (bool, optional): Cache the result image under result hash. Defaults to True.
         error (str, optional): Optional error message. Defaults to None.
+        save (bool, optional): Cache the result image under result hash. Defaults to False.
         conn (object, optional): Connection with a client. Not used for now. Defaults to None.
     """
     res = {"rid": rid, "ret_hash": ret_hash, "error": error}
-    if ret_hash and ret_image:
+    if save and error is None and ret_hash and ret_image is not None:
         saved = _save_image(ret_hash, ret_image)
         if not saved:
             res["ret_hash"] = ""
