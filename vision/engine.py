@@ -123,6 +123,7 @@ def _run_step(
     ret_image = _get_image(ret_hash)
     error = None
 
+    save = False
     if not ret_hash or ret_image is None:
         # no cache, we need to run this function
 
@@ -137,12 +138,7 @@ def _run_step(
                 ret_image = ret_image[0]
 
             if ret_image is not None:
-
-                # cache the result image and send a response
-                Thread(
-                    target=_respond_and_cache,
-                    args=(rid, ret_hash, ret_image, error, True),
-                ).start()
+                save = True
             else:
                 error = "Invalid result image"
         except Exception as e:
@@ -150,8 +146,14 @@ def _run_step(
             ret_hash = ""
             error = str(e)
 
-    # no need to use a thread if not saving image
-    _respond_and_cache(rid, ret_hash, ret_image, error)
+    if save:
+        Thread(
+            target=_respond_and_cache,
+            args=(rid, ret_hash, ret_image, error, True),
+        ).start()
+    else:
+        # no need to use a thread if not saving image
+        _respond_and_cache(rid, ret_hash, ret_image, error)
 
     return ret_image, ret_hash
 
