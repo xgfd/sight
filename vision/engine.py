@@ -4,6 +4,7 @@ import hashlib
 import importlib
 import inspect
 import json
+import shlex
 import sys
 from pathlib import Path
 from threading import Thread
@@ -213,6 +214,17 @@ def _respond_and_cache(
     print(res_str, flush=True)
 
 
+def _parse_and_exec(line: str):
+    cmd, *args = shlex.split(line)
+    try:
+        ret = globals()[cmd](*args)
+        if ret is not None:
+            print(json.dumps(ret), flush=True)
+    except Exception as e:
+        print(e)
+        print(json.dumps(False))
+
+
 def _init():
     # make sure that image cache folder exists
     # the main app will create these two folders too
@@ -227,6 +239,10 @@ def _init():
         for sub_name in mod.__all__:
             full_sub_name = f"{module_name}.{sub_name}"
             FUNCTIONS[full_sub_name] = sys.modules[full_sub_name].main
+
+
+def echo(line):
+    print(line)
 
 
 def ls():
@@ -298,14 +314,12 @@ _init()
 
 if __name__ == "__main__":
 
-    cmd = sys.argv[1]
-    args = []
-    if len(sys.argv) > 2:
-        args = sys.argv[2:]
     try:
-        ret = globals()[cmd](*args)
-        if ret is not None:
-            print(json.dumps(ret))
-    except Exception as e:
-        print(e)
-        print(json.dumps(None))
+        for line in sys.stdin:
+            # strip off '\n'
+            line = line[:-1]
+            _parse_and_exec(line)
+
+    except KeyboardInterrupt:
+        sys.stdout.flush()
+        sys.exit()

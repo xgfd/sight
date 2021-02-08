@@ -4,34 +4,59 @@ import { PythonShell } from 'python-shell';
 import { BUILTIN, CUSTOM, VISION } from './constants';
 import Operation from './Operation';
 
+let CVSHELL: PythonShell;
+
 function notify(
   type: 'success' | 'info' | 'warning' | 'error',
   message: string,
-  description = ''
+  description?: string,
+  key?: string
 ) {
   notification[type]({
+    key,
     message,
     description,
   });
 }
 
-function checkPyEnvironment() {
-  PythonShell.runString('import cv2', undefined, (err) => {
-    if (err) {
+function initPyEnvironment() {
+  // notify if failed to start the Python engine
+  const startErrorHandler = (e: Error) => {
+    if (e.message.indexOf('ModuleNotFoundError') !== -1) {
+      const missingModule = e.message.replace(
+        'ModuleNotFoundError: No module named ',
+        ''
+      );
       PythonShell.runString(
         'import sys; print(sys.executable)',
         undefined,
         (_, res) => {
           notify(
             'error',
-            `opencv-python is not correctly installed for ${
+            `Missing module ${missingModule}`,
+            `Using ${
               (res as string[])[0]
-            }`
+            }. \nMake sure ${missingModule} is installed in this Python environment.`
           );
         }
       );
+    } else {
+      notify('error', e.message, e.stack);
     }
-  });
+  };
+
+  const options = {
+    mode: 'text' as const,
+    pythonOptions: ['-u'], // get print results in real-time
+    scriptPath: VISION,
+    cwd: VISION,
+  };
+  CVSHELL = new PythonShell('engine.py', options);
+
+  CVSHELL.send('echo "connect"');
+
+  CVSHELL.once('message', () => CVSHELL.removeAllListeners('error'));
+  CVSHELL.on('error', startErrorHandler);
 }
 
 /**
@@ -53,19 +78,23 @@ function run(
     return opJson;
   });
 
-  const options = {
-    mode: 'text' as 'json' | 'text',
-    pythonOptions: ['-u'], // get print results in real-time
-    scriptPath: VISION,
-    args: ['run', JSON.stringify(instructions)],
-    cwd: VISION,
-  };
-  const shell = new PythonShell('engine.py', options);
+  // const options = {
+  //   mode: 'text' as 'json' | 'text',
+  //   pythonOptions: ['-u'], // get print results in real-time
+  //   scriptPath: VISION,
+  //   args: ['run', JSON.stringify(instructions)],
+  //   cwd: VISION,
+  // };
+  // const shell = new PythonShell('engine.py', options);
 
   // send anything to trigger the call
-  shell.send('');
+  CVSHELL.send(`run '${JSON.stringify(instructions)}'`);
+  // notify('info', JSON.stringify(instructions));
 
-  shell.on('message', (message) => {
+  CVSHELL.removeAllListeners('message');
+  CVSHELL.removeAllListeners('error');
+
+  CVSHELL.on('message', (message) => {
     // ignore empty messages
     if (!message.trim()) {
       return;
@@ -87,7 +116,11 @@ function run(
         cb(null, retOp, resultHash);
       } else {
         // shouldn't reach this point
-        notify('warning', `Operation with id: ${rid} not found`);
+        notify(
+          'warning',
+          `Operation with id: ${rid} not found`,
+          JSON.stringify(instructions)
+        );
       }
     } catch (error) {
       if (error instanceof SyntaxError) {
@@ -100,12 +133,18 @@ function run(
     }
   });
 
-  // throw error to App
-  shell.end((err) => {
+  CVSHELL.on('error', (err) => {
     if (err) {
       cb(err, null, '');
     }
   });
+
+  // // throw error to App
+  // shell.end((err) => {
+  //   if (err) {
+  //     cb(err, null, '');
+  //   }
+  // });
 }
 
 /**
@@ -122,6 +161,6 @@ function listScripts() {
   return { builtin, custom };
 }
 
-checkPyEnvironment();
+initPyEnvironment();
 
 export { listScripts, notify, run };

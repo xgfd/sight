@@ -1,5 +1,6 @@
 import json
-from engine import run, ls
+import shlex
+from engine import run, ls, _parse_and_exec
 
 
 def test_ls():
@@ -30,6 +31,18 @@ def test_run():
     run(cmd_input)
 
 
+def test_parse_and_exec():
+    instructions = [
+        {"fn": "builtin.imread", "rid": "0", "args": ["test.png", 0]},
+        {"fn": "builtin.canny", "rid": "1", "args": [[80, 120], 3, False]},
+        {"fn": "builtin.imread", "rid": "2", "args": ["test.png", 0]},
+    ]
+    cmd = shlex.join(["run", json.dumps(instructions)])
+    print("cmd", cmd)
+    _parse_and_exec(cmd)
+
+
 if __name__ == "__main__":
     test_ls()
-    test_run()
+    # test_run()
+    test_parse_and_exec()
