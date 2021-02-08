@@ -129,7 +129,7 @@ class App extends Component<unknown, IAppState> {
     }
   };
 
-  evalDebounced: (index?: number) => void = debounce(this.execOperations, 200); // eslint-disable-line react/sort-comp
+  evalDebounced: (index?: number) => void = debounce(this.execOperations, 100); // eslint-disable-line react/sort-comp
 
   toggleOpList = () => {
     const { collapsed } = this.state;

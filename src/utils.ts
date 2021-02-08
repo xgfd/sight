@@ -78,22 +78,11 @@ function run(
     return opJson;
   });
 
-  // const options = {
-  //   mode: 'text' as 'json' | 'text',
-  //   pythonOptions: ['-u'], // get print results in real-time
-  //   scriptPath: VISION,
-  //   args: ['run', JSON.stringify(instructions)],
-  //   cwd: VISION,
-  // };
-  // const shell = new PythonShell('engine.py', options);
-
-  // send anything to trigger the call
   CVSHELL.send(`run '${JSON.stringify(instructions)}'`);
   // notify('info', JSON.stringify(instructions));
 
+  // make sure there's only one listener at all time
   CVSHELL.removeAllListeners('message');
-  CVSHELL.removeAllListeners('error');
-
   CVSHELL.on('message', (message) => {
     // ignore empty messages
     if (!message.trim()) {
@@ -133,6 +122,7 @@ function run(
     }
   });
 
+  CVSHELL.removeAllListeners('error');
   CVSHELL.on('error', (err) => {
     if (err) {
       cb(err, null, '');

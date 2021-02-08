@@ -46,10 +46,6 @@ class Op(TypedDict):
     args: List[Union[int, float, str]]
 
 
-class CacheError(Exception):
-    pass
-
-
 def _export_module(m):
     """Export a module's main function as source code.
     The main function is renamed to the module name.
@@ -193,7 +189,7 @@ def _get_image(hash: str) -> Union[None, object]:
 
 
 def _respond_and_cache(
-    rid: str, ret_hash: str, ret_image: object, error: str = None, save=False, conn=None
+    rid: str, ret_hash: str, ret_image: object, error: str = None, save=False
 ):
     """Respond to a client and by default cache the result image.
 
@@ -211,18 +207,18 @@ def _respond_and_cache(
         if not saved:
             res["ret_hash"] = ""
     res_str = json.dumps(res)
-    print(res_str, flush=True)
+    print(f"{res_str}\n", end="", flush=True)
 
 
 def _parse_and_exec(line: str):
     cmd, *args = shlex.split(line)
     try:
-        ret = globals()[cmd](*args)
-        if ret is not None:
-            print(json.dumps(ret), flush=True)
+        res = globals()[cmd](*args)
+        if res is not None:
+            res_str = json.dumps(res)
+            print(res_str, flush=True)
     except Exception as e:
         print(e)
-        print(json.dumps(False))
 
 
 def _init():
@@ -278,36 +274,35 @@ def run(req: str):
     # the operation sequence to be executed
     op_seq: List[Op] = json.loads(req)
 
-    try:
-        top_op = op_seq[0]
+    top_op = op_seq[0]
 
-        # if the current op is not imread, resume cached image and the input hash
-        if top_op["fn"].split(".")[-1] != "imread":
-            sequence_input_hash = top_op.get("last_hash", "")
+    # if the current op is not imread, resume cached image and the input hash
+    if top_op["fn"].split(".")[-1] != "imread":
+        sequence_input_hash = top_op.get("last_hash", "")
 
-            image = _get_image(sequence_input_hash)
-            input_hash = sequence_input_hash
+        image = _get_image(sequence_input_hash)
+        input_hash = sequence_input_hash
 
-            if image is None:
-                raise CacheError(f"{sequence_input_hash}.png not found")
+        if image is None:
+            _respond_and_cache(
+                top_op["rid"],
+                "",
+                None,
+                "Cached input image is missing. Run imread again.",
+            )
+            return
 
-        # image and input_hash might be empty if the previous iteration failed
-        # this doesn't mean all the followed operations fail
-        # since there might be an imread later
-        # _run_step takes care of it
-        for op in op_seq:
-            fn_name = op["fn"]
-            rid = op["rid"]
-            args = op["args"]
+    # image and input_hash might be empty if the previous iteration failed
+    # this doesn't mean all the followed operations fail
+    # since there might be an imread later
+    # _run_step takes care of it
+    for op in op_seq:
+        fn_name = op["fn"]
+        rid = op["rid"]
+        args = op["args"]
 
-            # execute and set input image and hash for the next iteration
-            image, input_hash = _run_step(fn_name, image, args, rid, input_hash)
-    except KeyError as e:
-        print(e)
-        print(json.dumps(False))
-    except CacheError as e:
-        print(e)
-        print(json.dumps(False))
+        # execute and set input image and hash for the next iteration
+        image, input_hash = _run_step(fn_name, image, args, rid, input_hash)
 
 
 _init()

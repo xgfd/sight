@@ -53,7 +53,7 @@ export default class DefaultControls extends Component<
         <h2>{name}</h2>
         <h4>Thresholds</h4>
         <Slider
-          range={{ draggableTrack: true }}
+          range
           max={360}
           value={args[0]}
           onChange={(value: [number, number]) => this.updateArgs(0, value)}
