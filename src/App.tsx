@@ -33,8 +33,9 @@ class App extends Component<unknown, IAppState> {
     super(props);
 
     const imread = new Operation('imread', 'builtin');
-    const canny = new Operation('canny', 'builtin');
-    const operations = [imread, canny];
+    const gaussian = new Operation('GaussianBlur', 'builtin');
+    const canny = new Operation('Canny', 'builtin');
+    const operations = [imread, gaussian, canny];
     const selectionIndex = 0;
     const selection = operations[selectionIndex];
     this.state = {
@@ -143,7 +144,6 @@ class App extends Component<unknown, IAppState> {
    * @param op The new selected operation.
    */
   selectOp = (op: Operation, index: number) => {
-    console.log('sel', index);
     this.setState({
       selectedOp: op,
       selectionIndex: index,
@@ -329,7 +329,6 @@ class App extends Component<unknown, IAppState> {
                   value={selectedOp.script}
                   options={{ readOnly: selectedOp.package === 'builtin' }}
                   onChange={this.onEditorChange}
-                  // onValidate={(marker) => console.log(marker)}
                 />
               </Content>
               <Sider
@@ -344,7 +343,10 @@ class App extends Component<unknown, IAppState> {
                 <ControlPanel
                   key={selectedOp.id}
                   selectedOp={selectedOp}
-                  onChange={this.evalDebounced}
+                  onChange={() => {
+                    this.evalDebounced();
+                    this.setState({ operations });
+                  }}
                 />
               </Sider>
             </Layout>

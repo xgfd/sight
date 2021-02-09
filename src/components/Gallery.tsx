@@ -25,9 +25,8 @@ export default function Gallery(props: IProps) {
       badgeCount = 0;
     }
     return (
-      <Badge key={op.id} dot count={badgeCount}>
+      <Badge key={op.resultImageHash} dot count={badgeCount}>
         <Image
-          key={op.resultImageHash}
           height={200}
           width={200}
           src={

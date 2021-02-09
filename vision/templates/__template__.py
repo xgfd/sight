@@ -6,13 +6,13 @@ import numpy as np
 def main(
     image: object,
     thresholds: Tuple[int, int],
-    ksize_row: int,
-    ksize_col: int,
-    flag1: int,
-    flag2: int,
-    flag3: str,
-    flag4: bool,
+    ksize_h: int,
+    ksize_w: int,
+    int_arg1: int,
+    int_arg2: int,
+    str_arg: str,
+    bool_arg: bool,
 ):
     threshold1, threshold2 = thresholds
-    canny_image = cv2.Canny(image, threshold1, threshold2, apertureSize=ksize_row)
+    canny_image = cv2.Canny(image, threshold1, threshold2, apertureSize=ksize_h)
     return canny_image

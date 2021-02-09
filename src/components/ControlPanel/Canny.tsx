@@ -1,26 +1,9 @@
 import { InputNumber, Slider, Switch } from 'antd';
 import React from 'react';
-import DefaultControls, { OpControlsProp } from './Default';
+import DefaultControls from './Default';
 
 export default class CannyControls extends DefaultControls {
   static defaultValues = [[50, 150] as [number, number], 3, false];
-
-  constructor(props: OpControlsProp) {
-    super(props);
-    const { selectedOp } = props;
-    const { name, args } = selectedOp;
-    this.state = { name, args: [...args], live: true };
-  }
-
-  updateArgs(index: number, value: any) {
-    const { selectedOp, onChange } = this.props;
-    selectedOp.updateArgs(index, value);
-    this.setState({ name: selectedOp.name, args: selectedOp.args });
-    const { live } = this.state;
-    if (live) {
-      onChange();
-    }
-  }
 
   render() {
     const { name, args } = this.state;

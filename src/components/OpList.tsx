@@ -3,11 +3,16 @@ import {
   BuildOutlined,
   ControlOutlined,
   DeleteOutlined,
+  ExpandOutlined,
   FolderOpenOutlined,
   HeatMapOutlined,
   HighlightOutlined,
+  MergeCellsOutlined,
   PlusCircleOutlined,
   SlidersOutlined,
+  SplitCellsOutlined,
+  UngroupOutlined,
+  CalculatorOutlined,
 } from '@ant-design/icons';
 import {
   Button,
@@ -20,7 +25,7 @@ import {
 } from 'antd';
 import React, { Component } from 'react';
 import Operation from '../Operation';
-import { listScripts, upsert, rmScript } from '../utils';
+import { listScripts, rmScript, upsert } from '../utils';
 
 const customScripts = listScripts().custom.sort();
 // custom script name suffix
@@ -37,7 +42,17 @@ const { Text } = Typography;
 
 const iconMap: { [key: string]: React.ReactNode } = {
   imread: <FolderOpenOutlined />,
+  boxblur: <ExpandOutlined />,
+  filter2d: <BlockOutlined />,
+  dilate: <SplitCellsOutlined />,
+  erode: <MergeCellsOutlined />,
   canny: <ControlOutlined />,
+  crop: <ExpandOutlined />,
+  add: <CalculatorOutlined />,
+  subtract: <CalculatorOutlined />,
+  divide: <CalculatorOutlined />,
+  multiply: <CalculatorOutlined />,
+  gaussianblur: <UngroupOutlined />,
   annotation: <HighlightOutlined />,
   contours: <HeatMapOutlined />,
   filter: <BuildOutlined />,
@@ -52,7 +67,9 @@ function getIcon(op: Operation): React.ReactNode {
     icon = <SlidersOutlined />;
   } else {
     // for builtin functions read from the icon map or use its first letter
-    icon = iconMap[op.name] || <Text strong>{op.name[0].toUpperCase()}</Text>;
+    icon = iconMap[op.name.toLowerCase()] || (
+      <Text strong>{op.name[0].toUpperCase()}</Text>
+    );
   }
   return icon;
 }
