@@ -16,12 +16,18 @@ import {
   Popconfirm,
   Space,
   Spin,
-  Tooltip,
   Typography,
 } from 'antd';
 import React, { Component } from 'react';
 import Operation from '../Operation';
 import { listScripts, upsert, rmScript } from '../utils';
+
+const customScripts = listScripts().custom.sort();
+// custom script name suffix
+// incremented every time a new script is added
+let customNameCounter =
+  parseInt(customScripts[customScripts.length - 1].replace('custom', ''), 10) +
+  1;
 
 const { Text } = Typography;
 
@@ -51,20 +57,24 @@ interface IProps {
   operations: Operation[];
   selectedKey: string;
   resultUpToDate: boolean;
+  setOperations: (operations: Operation[]) => void;
   selectOp: (op: Operation, index: number) => void;
   insertOp: (op: Operation, index: number) => void;
   removeOp: (index: number) => void;
+  evalSequence: (index?: number) => void;
 }
 
 // this is a temporary hack
 function uniqueCustomName(existingNames: string[]) {
-  let name;
-  for (let i = 1; ; i++) {
-    name = `custom${i}`;
-    if (existingNames.indexOf(name) === -1) {
-      return name;
-    }
-  }
+  // let name;
+  // for (let i = 1; ; i++) {
+  //   name = `custom${i}`;
+  //   if (existingNames.indexOf(name) === -1) {
+  //     return name;
+  //   }
+  // }
+  const name = `custom${customNameCounter}`;
+  return name;
 }
 
 class OpList extends Component<
@@ -87,6 +97,8 @@ class OpList extends Component<
         if (!err) {
           insertOp(newOp, index);
           this.setState({ installedScripts: listScripts() });
+
+          customNameCounter += 1;
         }
       });
     } else {
@@ -100,8 +112,10 @@ class OpList extends Component<
       operations,
       selectedKey,
       resultUpToDate,
+      setOperations,
       selectOp,
       removeOp,
+      evalSequence,
     } = this.props;
 
     const { installedScripts } = this.state;
@@ -132,6 +146,25 @@ class OpList extends Component<
         </Menu.ItemGroup>
       </Menu>
     );
+
+    const removeScript = (op: Operation) => {
+      rmScript(op.package, op.name);
+      const firstOccurrence = operations.findIndex((o) => o.name === op.name);
+      const reducedOperations = operations.filter((o) => o.name !== op.name);
+      setOperations(reducedOperations);
+      this.setState({
+        installedScripts: listScripts(),
+      });
+
+      // the first occurrence is at the bottom
+      if (firstOccurrence >= reducedOperations.length) {
+        const selectionIndex = reducedOperations.length - 1;
+        selectOp(reducedOperations[selectionIndex], selectionIndex);
+      } else {
+        evalSequence(firstOccurrence);
+        selectOp(reducedOperations[firstOccurrence], firstOccurrence);
+      }
+    };
 
     const opItems = operations.map((op, index) => {
       // Menu.Item.onClick and Popconfirm are mutually exclusive
@@ -172,32 +205,25 @@ class OpList extends Component<
                   size="small"
                   danger
                   disabled={index === 0}
-                  onClick={(e) => {
-                    e.stopPropagation();
+                  onClick={() => {
                     removeOp(index);
                   }}
                 >
                   -
                 </Button>
                 {op.package === 'custom' && (
-                  <Tooltip
-                    title={`Caution! Delete custom function ${op.name}.`}
+                  <Popconfirm
+                    title="Going to remove the script from disk and all its occurrences from the operation list. Are you sure?"
+                    onConfirm={(e) => {
+                      // important! otherwise will trigger Item's selection
+                      e?.stopPropagation();
+                      removeScript(op);
+                    }}
                   >
-                    <Button
-                      type="text"
-                      size="small"
-                      danger
-                      // icon={}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        rmScript(op.package, op.name);
-                        removeOp(index);
-                        this.setState({ installedScripts: listScripts() });
-                      }}
-                    >
+                    <Button type="text" size="small" danger>
                       <DeleteOutlined />
                     </Button>
-                  </Tooltip>
+                  </Popconfirm>
                 )}
                 {op.loading && <Spin size="small" />}
               </div>

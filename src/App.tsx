@@ -143,6 +143,7 @@ class App extends Component<unknown, IAppState> {
    * @param op The new selected operation.
    */
   selectOp = (op: Operation, index: number) => {
+    console.log('sel', index);
     this.setState({
       selectedOp: op,
       selectionIndex: index,
@@ -225,6 +226,25 @@ class App extends Component<unknown, IAppState> {
     this.setState({ selectedOp });
   };
 
+  onRunClicked = () => {
+    const { operations, selectedOp } = this.state;
+    upsert(selectedOp.package, selectedOp.name, (err) => {
+      if (!err) {
+        let firstOccurrence: number | undefined;
+        operations.forEach((o, index) => {
+          if (o.name === selectedOp.name) {
+            if (firstOccurrence === undefined) {
+              firstOccurrence = index;
+            }
+            o.updateScript(selectedOp.script);
+          }
+        });
+        this.evalDebounced(firstOccurrence);
+        this.setState({ operations });
+      }
+    });
+  };
+
   render() {
     const { collapsed, operations, selectedOp } = this.state;
     const { ControlPanel } = selectedOp;
@@ -250,9 +270,13 @@ class App extends Component<unknown, IAppState> {
               selectedKey={selectedOp.id}
               resultUpToDate={selectedOp.resultUpToDate}
               operations={operations}
+              setOperations={(newOpSequence: Operation[]) =>
+                this.setState({ operations: newOpSequence })
+              }
               selectOp={this.selectOp}
               insertOp={this.insertOp}
               removeOp={this.removeOp}
+              evalSequence={this.evalDebounced}
             />
           </Sider>
           <Layout className="site-layout">
@@ -284,13 +308,7 @@ class App extends Component<unknown, IAppState> {
                   <Tooltip title="Run">
                     <CaretRightOutlined
                       className="trigger"
-                      onClick={() => {
-                        upsert(selectedOp.package, selectedOp.name, (err) => {
-                          if (!err) {
-                            this.evalDebounced();
-                          }
-                        });
-                      }}
+                      onClick={this.onRunClicked}
                     />
                   </Tooltip>
                 </>
