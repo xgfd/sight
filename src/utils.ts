@@ -1,5 +1,7 @@
 import { notification } from 'antd';
 import fg from 'fast-glob';
+import fs from 'fs';
+import path from 'path';
 import { PythonShell } from 'python-shell';
 import { BUILTIN, CUSTOM, VISION } from './constants';
 import Operation from './Operation';
@@ -59,6 +61,28 @@ function initPyEnvironment() {
   CVSHELL.on('error', startErrorHandler);
 }
 
+function upsert(pack: string, module: string, cb: (err: boolean) => void) {
+  const fullModuleName = `${pack}.${module}`;
+  CVSHELL.send(`upsert ${JSON.stringify(fullModuleName)}`);
+
+  const onMessage = (message: string) => {
+    // the server upsert method returns stringified json boolean values
+    // simply compare it with the string 'true' or 'false' to save parsing
+    if (message === 'false') {
+      // failed to upsert
+      cb(true);
+      notify('error', `Failed to load ${fullModuleName}.`);
+    } else {
+      // set cb error to false when upsert succeeded
+      cb(false);
+    }
+
+    CVSHELL.removeListener('message', onMessage);
+  };
+
+  CVSHELL.on('message', onMessage);
+}
+
 /**
  * Execute a sequence of operations on the backend.
  * @param operations Operation sequence.
@@ -91,6 +115,11 @@ function run(
 
     try {
       const { rid, ret_hash: resultHash, error } = JSON.parse(message);
+
+      // not a run response
+      if (!rid) {
+        return;
+      }
 
       const retOp = operations.find((op) => op.id === rid);
 
@@ -128,13 +157,15 @@ function run(
       cb(err, null, '');
     }
   });
+}
 
-  // // throw error to App
-  // shell.end((err) => {
-  //   if (err) {
-  //     cb(err, null, '');
-  //   }
-  // });
+function rmScript(pack: string, module: string) {
+  if (pack === 'custom') {
+    fs.unlinkSync(path.join(CUSTOM, `${module}.py`));
+    return true;
+  }
+
+  return false;
 }
 
 /**
@@ -153,4 +184,4 @@ function listScripts() {
 
 initPyEnvironment();
 
-export { listScripts, notify, run };
+export { listScripts, notify, run, upsert, rmScript };

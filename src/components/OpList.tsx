@@ -2,6 +2,7 @@ import {
   BlockOutlined,
   BuildOutlined,
   ControlOutlined,
+  DeleteOutlined,
   FolderOpenOutlined,
   HeatMapOutlined,
   HighlightOutlined,
@@ -15,11 +16,12 @@ import {
   Popconfirm,
   Space,
   Spin,
+  Tooltip,
   Typography,
 } from 'antd';
 import React, { Component } from 'react';
 import Operation from '../Operation';
-import { listScripts } from '../utils';
+import { listScripts, upsert, rmScript } from '../utils';
 
 const { Text } = Typography;
 
@@ -54,6 +56,17 @@ interface IProps {
   removeOp: (index: number) => void;
 }
 
+// this is a temporary hack
+function uniqueCustomName(existingNames: string[]) {
+  let name;
+  for (let i = 1; ; i++) {
+    name = `custom${i}`;
+    if (existingNames.indexOf(name) === -1) {
+      return name;
+    }
+  }
+}
+
 class OpList extends Component<
   IProps,
   { installedScripts: { builtin: string[]; custom: string[] } }
@@ -66,16 +79,20 @@ class OpList extends Component<
   insertOp = (fullOpName: string, index: number) => {
     const { insertOp } = this.props;
     const [pack, name] = fullOpName.split('.');
-    let newOp;
-    // console.log('new op', name, pack);
+    let newOp: Operation;
     if (name.startsWith('__')) {
-      const trimUnderscores = name.substring(2);
-      newOp = new Operation(trimUnderscores, 'custom', true);
-      this.setState({ installedScripts: listScripts() });
+      const trimmedName = name.substring(2);
+      newOp = new Operation(trimmedName, 'custom', true);
+      upsert('custom', trimmedName, (err) => {
+        if (!err) {
+          insertOp(newOp, index);
+          this.setState({ installedScripts: listScripts() });
+        }
+      });
     } else {
       newOp = new Operation(name, pack as 'custom' | 'builtin');
+      insertOp(newOp, index);
     }
-    insertOp(newOp, index);
   };
 
   render() {
@@ -97,7 +114,9 @@ class OpList extends Component<
         }}
         style={{ width: 256 }}
       >
-        <Menu.Item key={`custom.__custom${installedScripts.custom.length + 1}`}>
+        <Menu.Item
+          key={`custom.__${uniqueCustomName(installedScripts.custom)}`}
+        >
           <PlusCircleOutlined />
           <Text strong>New</Text>
         </Menu.Item>
@@ -135,7 +154,7 @@ class OpList extends Component<
             title="Script not executed. Use the Run button to execute?"
             disabled={popconfirmDisabled}
           >
-            <Space size="middle">
+            <Space size="small">
               <Text ellipsis={{ tooltip: op.name }} style={{ width: 60 }}>
                 {op.name}
               </Text>
@@ -160,8 +179,28 @@ class OpList extends Component<
                 >
                   -
                 </Button>
+                {op.package === 'custom' && (
+                  <Tooltip
+                    title={`Caution! Delete custom function ${op.name}.`}
+                  >
+                    <Button
+                      type="text"
+                      size="small"
+                      danger
+                      // icon={}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        rmScript(op.package, op.name);
+                        removeOp(index);
+                        this.setState({ installedScripts: listScripts() });
+                      }}
+                    >
+                      <DeleteOutlined />
+                    </Button>
+                  </Tooltip>
+                )}
+                {op.loading && <Spin size="small" />}
               </div>
-              {op.loading && <Spin size="small" />}
             </Space>
           </Popconfirm>
         </Menu.Item>

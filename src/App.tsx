@@ -12,7 +12,7 @@ import './App.global.css';
 import Gallery from './components/Gallery';
 import OpList from './components/OpList';
 import Operation from './Operation';
-import { notify, run } from './utils';
+import { notify, run, upsert } from './utils';
 
 const { ErrorBoundary } = Alert;
 const { Header, Content, Footer, Sider } = Layout;
@@ -233,7 +233,7 @@ class App extends Component<unknown, IAppState> {
         <Layout>
           <Sider
             theme="light"
-            width={220}
+            width={235}
             trigger={null}
             collapsible
             collapsedWidth="0"
@@ -284,7 +284,13 @@ class App extends Component<unknown, IAppState> {
                   <Tooltip title="Run">
                     <CaretRightOutlined
                       className="trigger"
-                      onClick={() => this.evalDebounced()}
+                      onClick={() => {
+                        upsert(selectedOp.package, selectedOp.name, (err) => {
+                          if (!err) {
+                            this.evalDebounced();
+                          }
+                        });
+                      }}
                     />
                   </Tooltip>
                 </>

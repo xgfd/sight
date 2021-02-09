@@ -99,9 +99,10 @@ def _run_step(
         Tuple[Union[None, object], str]: Result image and hash for the next iteration.
     """
 
-    module_name = fn_name.split(".")[-1]
+    package, module_name = fn_name.split(".")
 
     # non-imread functions need a valid input image
+    # otherwise response and return
     if module_name != "imread" and image is None:
         # reset input image and hash
         ret_image = None
@@ -109,18 +110,30 @@ def _run_step(
         error = "No input image. The previous step probably failed."
         _respond_and_cache(rid, ret_hash, ret_image, error)
         return ret_image, ret_hash
+    # ************************
+
+    fn = None
+    save = False
+    # if the function is not loaded return early
+    try:
+        fn = FUNCTIONS[fn_name]
+    except KeyError:
+        ret_image = None
+        ret_hash = ""
+        error = f"{package} function {module_name} is not loaded."
+        _respond_and_cache(rid, ret_hash, ret_image, error)
+        return ret_image, ret_hash
+    # ************************
 
     # the result is determined by the function body (should be the module content) and arguments
     # the arguments consist of an input image (represent by the input_hash) followed by args
     # before run we can predicate the result hash
     # there's no need to run the function if the result hash matches a cached image
-    fn = FUNCTIONS[fn_name]
     input_hash = "" if module_name == "imread" else input_hash
     ret_hash = _ret_hash(fn, input_hash, args)
     ret_image = _get_image(ret_hash)
-    error = None
+    error: Union[str, None] = None
 
-    save = False
     if not ret_hash or ret_image is None:
         # no cache, we need to run this function
 
@@ -245,25 +258,36 @@ def ls():
     return list(FUNCTIONS.keys())
 
 
-def upsert(mod: str):
+def upsert(full_module_name: str):
     try:
-        # only allow new modules under custom
-        package = "custom"
-        full_module_name = package + "." + mod
+        pack_name, m_name = full_module_name.split(".")
 
-        if mod in custom.__all__:
-            m = importlib.reload(getattr(custom, mod))
-        else:
+        package = sys.modules[pack_name]
+
+        try:
+            # existing module?
+            m = sys.modules[full_module_name]
+            importlib.reload(m)
+        except KeyError:
+            # new module
             m = importlib.import_module(full_module_name)
-            custom.__all__.append(mod)
+            package.__all__.append(m_name)
 
         # update function shortcuts
         global FUNCTIONS
         FUNCTIONS[full_module_name] = m.main
         return True
-    except Exception as e:
-        print(e)
+    except Exception:
+        # print(e)
         return False
+
+
+def rm(full_module_name: str):
+    try:
+        del sys.modules[full_module_name]
+    except KeyError:
+        pass
+    return True
 
 
 def run(req: str):

@@ -41,8 +41,12 @@ def test_parse_and_exec():
     print("cmd", cmd)
     _parse_and_exec(cmd)
 
+    cmd = 'upsert "custom.custom1"'
+    print("cmd", cmd)
+    _parse_and_exec(cmd)
+
 
 if __name__ == "__main__":
-    test_ls()
+    # test_ls()
     # test_run()
     test_parse_and_exec()
