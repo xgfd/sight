@@ -8,11 +8,12 @@ import Operation from '../Operation';
 
 interface IProps {
   operations: Operation[];
-  selectedKey: string;
+  selectedOp: Operation;
 }
 
 export default function Gallery(props: IProps) {
-  const { operations, selectedKey } = props;
+  const { operations, selectedOp } = props;
+  const selectedKey = selectedOp.id;
   const imageComponents = operations.map((op) => {
     let badgeCount;
     if (op.id === selectedKey) {

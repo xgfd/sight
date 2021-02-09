@@ -1,17 +1,16 @@
-from typing import Tuple
 import cv2
 
 
 def main(
     image: object,
-    k_height: int,
-    k_width: int,
+    ksize_h: int,
+    ksize_w: int,
     sigmaX: int,
     sigmaY: int,
     borderType: int,
 ):
 
     blur = cv2.GaussianBlur(
-        image, (k_height, k_width), sigmaX=sigmaX, sigmaY=sigmaY, borderType=borderType
+        image, (ksize_h, ksize_w), sigmaX=sigmaX, sigmaY=sigmaY, borderType=borderType
     )
     return blur

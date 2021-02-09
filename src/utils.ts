@@ -175,10 +175,12 @@ function rmScript(pack: string, module: string) {
 function listScripts() {
   const builtin = fg
     .sync('*.py', { cwd: BUILTIN, ignore: ['__*.py'] })
-    .map((fileName) => fileName.split('.')[0]);
+    .map((fileName) => fileName.split('.')[0])
+    .sort((a, b) => (a.toLowerCase() >= b.toLowerCase() ? 1 : -1));
   const custom = fg
     .sync('*.py', { cwd: CUSTOM, ignore: ['__*.py'] })
-    .map((fileName) => fileName.split('.')[0]);
+    .map((fileName) => fileName.split('.')[0])
+    .sort((a, b) => (a.toLowerCase() >= b.toLowerCase() ? 1 : -1));
   return { builtin, custom };
 }
 

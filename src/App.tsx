@@ -345,7 +345,7 @@ class App extends Component<unknown, IAppState> {
                   selectedOp={selectedOp}
                   onChange={() => {
                     this.evalDebounced();
-                    this.setState({ operations });
+                    this.setState({ selectedOp });
                   }}
                 />
               </Sider>
@@ -362,7 +362,7 @@ class App extends Component<unknown, IAppState> {
                 backgroundColor: '#fafafa',
               }}
             >
-              <Gallery operations={operations} selectedKey={selectedOp.id} />
+              <Gallery operations={operations} selectedOp={selectedOp} />
             </Footer>
           </Layout>
         </Layout>

@@ -1,6 +1,7 @@
 import {
   BlockOutlined,
   BuildOutlined,
+  CalculatorOutlined,
   ControlOutlined,
   DeleteOutlined,
   ExpandOutlined,
@@ -8,11 +9,11 @@ import {
   HeatMapOutlined,
   HighlightOutlined,
   MergeCellsOutlined,
+  PauseOutlined,
   PlusCircleOutlined,
   SlidersOutlined,
   SplitCellsOutlined,
   UngroupOutlined,
-  CalculatorOutlined,
 } from '@ant-design/icons';
 import {
   Button,
@@ -43,6 +44,7 @@ const { Text } = Typography;
 const iconMap: { [key: string]: React.ReactNode } = {
   imread: <FolderOpenOutlined />,
   boxblur: <ExpandOutlined />,
+  bilateralfilter: <PauseOutlined />,
   filter2d: <BlockOutlined />,
   dilate: <SplitCellsOutlined />,
   erode: <MergeCellsOutlined />,
@@ -226,7 +228,8 @@ class OpList extends Component<
                   size="small"
                   danger
                   disabled={index === 0}
-                  onClick={() => {
+                  onClick={(e) => {
+                    e.stopPropagation();
                     removeOp(index);
                   }}
                 >
