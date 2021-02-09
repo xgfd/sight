@@ -26,8 +26,12 @@ const customScripts = listScripts().custom.sort();
 // custom script name suffix
 // incremented every time a new script is added
 let customNameCounter =
-  parseInt(customScripts[customScripts.length - 1].replace('custom', ''), 10) +
-  1;
+  customScripts.length > 0
+    ? parseInt(
+        customScripts[customScripts.length - 1].replace('custom', ''),
+        10
+      ) + 1
+    : 1;
 
 const { Text } = Typography;
 
