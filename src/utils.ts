@@ -103,7 +103,6 @@ function run(
   });
 
   CVSHELL.send(`run '${JSON.stringify(instructions)}'`);
-  // notify('info', JSON.stringify(instructions));
 
   // make sure there's only one listener at all time
   CVSHELL.removeAllListeners('message');
@@ -128,6 +127,7 @@ function run(
         if (error) {
           notify('warning', `${retOp.name}: ${error}`);
         }
+
         // in case of error the resultHash should be ""
         retOp.resultImageHash = resultHash;
         retOp.resultUpToDate = true;

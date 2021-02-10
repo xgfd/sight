@@ -156,14 +156,7 @@ def _run_step(
             ret_hash = ""
             error = str(e)
 
-    if save:
-        Thread(
-            target=_respond_and_cache,
-            args=(rid, ret_hash, ret_image, error, True),
-        ).start()
-    else:
-        # no need to use a thread if not saving image
-        _respond_and_cache(rid, ret_hash, ret_image, error)
+    _respond_and_cache(rid, ret_hash, ret_image, error, save)
 
     return ret_image, ret_hash
 
