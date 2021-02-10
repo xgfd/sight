@@ -1,7 +1,7 @@
 import {
-  CaretRightOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  SyncOutlined,
 } from '@ant-design/icons';
 import Editor, { loader } from '@monaco-editor/react';
 import { Alert, Divider, Layout, Tooltip } from 'antd';
@@ -34,8 +34,9 @@ class App extends Component<unknown, IAppState> {
 
     const imread = new Operation('imread', 'builtin');
     const gaussian = new Operation('GaussianBlur', 'builtin');
+    const threshold = new Operation('threshold', 'builtin');
     const canny = new Operation('Canny', 'builtin');
-    const operations = [imread, gaussian, canny];
+    const operations = [imread, gaussian, threshold, canny];
     const selectionIndex = 0;
     const selection = operations[selectionIndex];
     this.state = {
@@ -306,7 +307,7 @@ class App extends Component<unknown, IAppState> {
                 <>
                   <Divider type="vertical" />
                   <Tooltip title="Run">
-                    <CaretRightOutlined
+                    <SyncOutlined
                       className="trigger"
                       onClick={this.onRunClicked}
                     />

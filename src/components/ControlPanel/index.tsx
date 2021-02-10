@@ -1,22 +1,24 @@
+import AdaptiveThresholdControls from './AdaptiveThreshold';
 import BilateralControls from './BilateralFilter';
-import Blur from './Blur';
-import BoxFilter from './BoxFilter';
-import Canny from './Canny';
+import BlurControls from './Blur';
+import BoxFilterControls from './BoxFilter';
+import CannyControls from './Canny';
 import DefaultControls, { Operation } from './Default';
 import GaussianControls from './GaussianBlur';
-import ThresholdControls from './Threshold';
-import AdaptiveThresholdControls from './AdaptiveThreshold';
 import Imread from './Imread';
+import InRangeControls from './InRange';
 import MedianControls from './MedianBlur';
+import ThresholdControls from './Threshold';
 
 const controlComponents: { [key: string]: typeof DefaultControls } = {
   adaptivethreshold: AdaptiveThresholdControls,
-  blur: Blur,
-  boxfilter: BoxFilter,
+  blur: BlurControls,
+  boxfilter: BoxFilterControls,
   bilateralfilter: BilateralControls,
-  canny: Canny,
+  canny: CannyControls,
   gaussianblur: GaussianControls,
   imread: Imread,
+  inrange: InRangeControls,
   medianblur: MedianControls,
   threshold: ThresholdControls,
 };

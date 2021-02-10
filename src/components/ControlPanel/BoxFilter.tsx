@@ -4,7 +4,7 @@ import DefaultControls from './Default';
 
 const { Option } = Select;
 
-export default class BlurControls extends DefaultControls {
+export default class BoxFilterControls extends DefaultControls {
   static defaultValues = [3, 3, true, 4];
 
   render() {
