@@ -31,7 +31,7 @@ export default class BlurControls extends DefaultControls {
           checked={args[2]}
           onChange={(checked) => this.updateArgs(2, checked)}
         />
-        <h4>Border Type</h4>
+        <h4>Border type</h4>
         <Select
           value={args[3]}
           showSearch

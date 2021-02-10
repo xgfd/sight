@@ -38,7 +38,7 @@ export default class GaussianControls extends DefaultControls {
           value={args[3]}
           onChange={(value) => this.updateArgs(3, value)}
         />
-        <h4>Border Type</h4>
+        <h4>Border type</h4>
         <Select
           value={args[4]}
           showSearch

@@ -4,17 +4,21 @@ import BoxFilter from './BoxFilter';
 import Canny from './Canny';
 import DefaultControls, { Operation } from './Default';
 import GaussianControls from './GaussianBlur';
+import ThresholdControls from './Threshold';
+import AdaptiveThresholdControls from './AdaptiveThreshold';
 import Imread from './Imread';
 import MedianControls from './MedianBlur';
 
 const controlComponents: { [key: string]: typeof DefaultControls } = {
-  imread: Imread,
+  adaptivethreshold: AdaptiveThresholdControls,
   blur: Blur,
   boxfilter: BoxFilter,
   bilateralfilter: BilateralControls,
-  medianblur: MedianControls,
   canny: Canny,
   gaussianblur: GaussianControls,
+  imread: Imread,
+  medianblur: MedianControls,
+  threshold: ThresholdControls,
 };
 
 export default function createControlComponent(op: Operation) {

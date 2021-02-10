@@ -74,7 +74,7 @@ export default class DefaultControls extends Component<
           value={args[2]}
           onChange={(value) => this.updateArgs(2, value)}
         />
-        <h4>Int flag 1</h4>
+        <h4>Int arg 1</h4>
         <InputNumber
           min={-1}
           max={255}
@@ -82,7 +82,7 @@ export default class DefaultControls extends Component<
           value={args[3]}
           onChange={(value) => this.updateArgs(3, value)}
         />
-        <h4>Int flag 2</h4>
+        <h4>Int arg 2</h4>
         <InputNumber
           min={-1}
           max={255}
@@ -90,12 +90,12 @@ export default class DefaultControls extends Component<
           value={args[4]}
           onChange={(value) => this.updateArgs(4, value)}
         />
-        <h4>Str flag</h4>
+        <h4>Str arg</h4>
         <Input
           value={args[5]}
           onChange={(value) => this.updateArgs(5, value)}
         />
-        <h4>Boolean flag</h4>
+        <h4>Boolean arg</h4>
         <Switch
           checked={args[6]}
           onChange={(checked) => this.updateArgs(6, checked)}

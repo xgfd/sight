@@ -7,7 +7,7 @@ import DefaultControls, { OpControlsProp } from './Default';
 
 const { Option } = Select;
 export default class Imread extends DefaultControls {
-  static defaultValues = ['', -1];
+  static defaultValues = ['', 0];
 
   constructor(props: OpControlsProp) {
     super(props);

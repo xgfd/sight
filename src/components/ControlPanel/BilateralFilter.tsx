@@ -19,19 +19,19 @@ export default class BilateralControls extends DefaultControls {
           value={args[0]}
           onChange={(value) => this.updateArgs(0, value)}
         />
-        <h4>Sigma Colour</h4>
+        <h4>Sigma colour</h4>
         <InputNumber
           min={0}
           value={args[1]}
           onChange={(value) => this.updateArgs(1, value)}
         />
-        <h4>Sigma Space</h4>
+        <h4>Sigma space</h4>
         <InputNumber
           min={0}
           value={args[2]}
           onChange={(value) => this.updateArgs(2, value)}
         />
-        <h4>Border Type</h4>
+        <h4>Border type</h4>
         <Select
           value={args[3]}
           showSearch
