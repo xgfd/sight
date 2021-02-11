@@ -4,8 +4,10 @@ import {
   CalculatorOutlined,
   ColumnHeightOutlined,
   DeleteOutlined,
+  DownloadOutlined,
   ExpandOutlined,
   FieldBinaryOutlined,
+  FileImageOutlined,
   GlobalOutlined,
   HeatMapOutlined,
   HighlightOutlined,
@@ -14,8 +16,6 @@ import {
   PlusCircleOutlined,
   SlidersOutlined,
   SplitCellsOutlined,
-  SubnodeOutlined,
-  FileImageOutlined,
   UngroupOutlined,
 } from '@ant-design/icons';
 import {
@@ -29,7 +29,7 @@ import {
 } from 'antd';
 import React, { Component } from 'react';
 import Operation from '../Operation';
-import { listScripts, rmScript, upsert } from '../utils';
+import { listScripts, rmScript, upsert, exportScript } from '../utils';
 
 const customScripts = listScripts().custom.sort();
 // custom script name suffix
@@ -104,6 +104,18 @@ function uniqueCustomName(existingNames: string[]) {
   // }
   const name = `custom${customNameCounter}`;
   return name;
+}
+
+function exportAsPython(operations: Operation[]) {
+  exportScript(operations, async (filepath) => {
+    const response = await fetch(filepath);
+    const content = await response.blob();
+    const element = document.createElement('a');
+    const file = new Blob([content], { type: 'application/zip' });
+    element.href = URL.createObjectURL(file);
+    element.download = 'archive.zip';
+    element.click();
+  });
 }
 
 class OpList extends Component<
@@ -269,6 +281,15 @@ class OpList extends Component<
         selectedKeys={[selectedKey]}
       >
         {opItems}
+        <Menu.Item>
+          <Button
+            style={{ width: '100%' }}
+            onClick={() => exportAsPython(operations)}
+            icon={<DownloadOutlined />}
+          >
+            Export
+          </Button>
+        </Menu.Item>
       </Menu>
     );
   }

@@ -1,6 +1,6 @@
 import json
 import shlex
-from engine import run, ls, _parse_and_exec
+from engine import run, ls, _parse_and_exec, export
 
 
 def test_ls():
@@ -31,6 +31,17 @@ def test_run():
     run(cmd_input)
 
 
+def test_export():
+    operations = [
+        {"fn": "builtin.GaussianBlur", "args": [3, 3, 0, 0, 0]},
+        {
+            "fn": "custom.custom3",
+            "args": [[50, 150], 3, 3, 0, 0, "a", False],
+        },
+    ]
+    export(operations)
+
+
 def test_parse_and_exec():
     instructions = [
         {"fn": "builtin.imread", "rid": "0", "args": ["test.png", 0]},
@@ -49,4 +60,5 @@ def test_parse_and_exec():
 if __name__ == "__main__":
     # test_ls()
     # test_run()
-    test_parse_and_exec()
+    # test_parse_and_exec()
+    test_export()

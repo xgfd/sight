@@ -83,6 +83,24 @@ function upsert(pack: string, module: string, cb: (err: boolean) => void) {
   CVSHELL.on('message', onMessage);
 }
 
+function exportScript(operations: Operation[], cb: (filepath: string) => void) {
+  const instructions = operations.map((op) => op.toJson());
+  CVSHELL.send(`export '${JSON.stringify(instructions)}'`);
+
+  const onMessage = (message: string) => {
+    try {
+      const archivePath = JSON.parse(message);
+      cb(archivePath);
+    } catch (e) {
+      console.log(e);
+    }
+
+    CVSHELL.removeListener('message', onMessage);
+  };
+
+  CVSHELL.on('message', onMessage);
+}
+
 /**
  * Execute a sequence of operations on the backend.
  * @param operations Operation sequence.
@@ -186,4 +204,4 @@ function listScripts() {
 
 initPyEnvironment();
 
-export { listScripts, notify, run, upsert, rmScript };
+export { listScripts, notify, run, upsert, rmScript, exportScript };

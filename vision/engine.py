@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from zipfile import ZipFile
 import hashlib
 import importlib
 import inspect
@@ -44,19 +45,6 @@ class Op(TypedDict):
     fn: str
     last_hash: str
     args: List[Union[int, float, str]]
-
-
-def _export_module(m):
-    """Export a module's main function as source code.
-    The main function is renamed to the module name.
-
-    Returns:
-        str: Renamed module main function source code.
-    """
-
-    fn_name = m.__name__.split(".")[-1]
-    source = inspect.getsource(m)
-    return source.replace("def main", f"def {fn_name}")
 
 
 def _ret_hash(fn: Callable, inputhash: str, args: List) -> str:
@@ -245,6 +233,45 @@ def _init():
 
 def echo(line):
     print(line)
+
+
+def export(req: str):
+    """Export a sequence of operations as a Python package archive.
+
+    Returns:
+        str: Path to the exported archive.
+    """
+    operations: List[Op] = json.loads(req)
+    config = {}
+    index_imports = ["import json"]
+
+    main_header = """
+def main(image):
+    with open("config.json") as c:
+        config = json.load(c)
+"""
+    index_main = [main_header]
+    main_body = []
+    with ZipFile("archive.zip", "w") as zip:
+        # remove imread on top
+        if operations[0]["fn"] == "builtin.imread":
+            operations = operations[1:]
+        for op in operations:
+            package, module = op["fn"].split(".")
+            scriptfile = Path(package) / f"{module}.py"
+            zip.write(scriptfile)
+            index_imports.append(f'from {op["fn"]} import main as {module}')
+            main_body.append(f'args = config["{module}"]')
+            main_body.append(f"image, *data = {module}(image, *args)")
+            config[module] = op["args"]
+        main_body.append("return data")
+        import_str = "\n".join(index_imports)
+        index_main.extend(main_body)
+        main_str = "\n\n    ".join(index_main)
+        zip.writestr("index.py", f"{import_str}\n\n{main_str}\n")
+        zip.writestr("config.json", json.dumps(config))
+
+    return str(Path("archive.zip").resolve())
 
 
 def ls():
