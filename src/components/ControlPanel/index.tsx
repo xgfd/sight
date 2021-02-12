@@ -8,7 +8,9 @@ import GaussianControls from './GaussianBlur';
 import Imread from './Imread';
 import InRangeControls from './InRange';
 import MedianControls from './MedianBlur';
+import MorphologyExControls from './MorphologyEx';
 import ThresholdControls from './Threshold';
+import FindContoursControls from './FindContours';
 
 const controlComponents: { [key: string]: typeof DefaultControls } = {
   adaptivethreshold: AdaptiveThresholdControls,
@@ -16,10 +18,12 @@ const controlComponents: { [key: string]: typeof DefaultControls } = {
   boxfilter: BoxFilterControls,
   bilateralfilter: BilateralControls,
   canny: CannyControls,
+  findcontours: FindContoursControls,
   gaussianblur: GaussianControls,
   imread: Imread,
   inrange: InRangeControls,
   medianblur: MedianControls,
+  morphologyex: MorphologyExControls,
   threshold: ThresholdControls,
 };
 

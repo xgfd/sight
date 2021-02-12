@@ -85,12 +85,13 @@
       "output": "release"
     },
     "extraResources": [
-      "./assets/**",
-      "./vision/*.py",
-      "./vision/builtin/",
-      "./vision/templates/",
-      "./vision/custom/__init__.py",
-      "!./vision/test.py",
+      "assets/**",
+      "vision/*.py",
+      "vision/builtin/",
+      "vision/templates/",
+      "vision/custom/*.py",
+      "!vision/custom/custom*.py",
+      "!vision/test.py",
       "!**/{.DS_Store,.git,.gitignore,.gitattributes}",
       "!**/{__pycache__,thumbs.db}"
     ],

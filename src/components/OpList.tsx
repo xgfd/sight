@@ -255,7 +255,13 @@ class OpList extends Component<
                 </Button>
                 {op.package === 'custom' && (
                   <Popconfirm
-                    title="Going to remove the script from disk and all its occurrences from the operation list. Are you sure?"
+                    title={
+                      <Text>
+                        Permanently delete {op.name}?
+                        <br />
+                        All occurrences on the list will be removed too.
+                      </Text>
+                    }
                     onConfirm={(e) => {
                       // important! otherwise will trigger Item's selection
                       e?.stopPropagation();

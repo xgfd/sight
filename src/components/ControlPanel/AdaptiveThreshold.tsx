@@ -50,6 +50,7 @@ export default class AdaptiveThresholdControls extends DefaultControls {
         <h4>Block size</h4>
         <InputNumber
           min={3}
+          step={2}
           value={args[3]}
           onChange={(value) => this.updateArgs(3, value)}
         />
