@@ -31,7 +31,9 @@ import React, { Component } from 'react';
 import Operation from '../Operation';
 import { listScripts, rmScript, upsert, exportScript } from '../utils';
 
-const customScripts = listScripts().custom.sort();
+const customScripts = listScripts()
+  .custom.filter((n) => n.includes('custom'))
+  .sort();
 // custom script name suffix
 // incremented every time a new script is added
 let customNameCounter =
