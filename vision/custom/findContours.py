@@ -1,32 +1,26 @@
-from typing import Tuple, Literal
+from typing import Tuple
 import cv2
+import numpy as np
 
 
 def main(
     image: object,
     contour_mode: int,
     method: int,
-    area_range: Tuple[int, int],
-    bound_area_range: Tuple[int, int],
-    length_range: Tuple[int, int],
+    area_range: Tuple[float, float],
+    bound_area_range: Tuple[float, float],
+    length_range: Tuple[float, float],
     aspect_range: Tuple[float, float],
-    intensity_range: Tuple[int, int],
-    offset_x=0,
-    offset_y=0,
+    intensity_range: Tuple[float, float],
     line_thickness=2,
-    draw_on_original=False,
+    contour_only=False,
 ):
-    if not draw_on_original:
-        colour_image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
-
-    contours, _ = cv2.findContours(
-        image, mode=contour_mode, method=method, offset=(offset_x, offset_y)
-    )
+    contours, _ = cv2.findContours(image, mode=contour_mode, method=method)
 
     area_l, area_h = area_range
-    aspect_l, aspect_h = aspect_range
-    length_l, length_h = length_range
     bound_area_l, bound_area_h = bound_area_range
+    length_l, length_h = length_range
+    aspect_l, aspect_h = aspect_range
 
     selected = []
 
@@ -41,17 +35,17 @@ def main(
         aspect = width / length
         # TODO add intensity
         if (
-            (area_l < area <= area_h)
-            and (bound_area_l < bound_area <= bound_area_h)
-            and (length_l < length <= length_h)
-            and (aspect_l < aspect <= aspect_h)
+            (area_l <= area <= area_h)
+            and (bound_area_l <= bound_area <= bound_area_h)
+            and (length_l <= length <= length_h)
+            and (aspect_l <= aspect <= aspect_h)
         ):
             selected.append(cont)
-    if draw_on_original:
-        cv2.drawContours(image, selected, -1, 255, line_thickness)
-        ret_image = image
+    if contour_only:
+        ret_image = np.zeros_like(image)
+        cv2.drawContours(ret_image, selected, -1, 255, line_thickness)
     else:
-        cv2.drawContours(colour_image, selected, -1, (255, 255, 0), line_thickness)
-        ret_image = colour_image
+        ret_image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+        cv2.drawContours(ret_image, selected, -1, (255, 255, 0), line_thickness)
 
     return ret_image

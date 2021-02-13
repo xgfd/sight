@@ -22,17 +22,17 @@ interface OpControlsState {
 
 export { OpControlsProp, OpControlsState, Operation };
 
-export default class DefaultControls extends Component<
-  OpControlsProp,
-  OpControlsState
-> {
+export default class DefaultControls<
+  T extends OpControlsProp = OpControlsProp, // generic parameter defaults introduced in TS v2.3
+  K extends OpControlsState = OpControlsState
+> extends Component<T, K> {
   static defaultValues = [[50, 150] as [number, number], 3, 3, 0, 0, '', false];
 
-  constructor(props: OpControlsProp) {
+  constructor(props: T) {
     super(props);
     const { selectedOp } = props;
     const { name, args } = selectedOp;
-    this.state = { name, args: [...args], live: true };
+    this.state = { name, args: [...args], live: true } as K;
   }
 
   updateArgs(index: number, value: any) {
