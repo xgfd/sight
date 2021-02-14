@@ -8,7 +8,7 @@ import shlex
 import sys
 import traceback
 from pathlib import Path
-from typing import Callable, List, Tuple, TypedDict, Union
+from typing import Callable, List, Tuple, TypedDict, Union, Dict
 from zipfile import ZipFile
 
 import builtin  # import all builtin functions, see __init__.py
@@ -18,7 +18,8 @@ import numpy as np
 
 # function shortcuts
 # FUNCTIONS: {pack.module: Callable}
-FUNCTIONS = {}
+FUNCTIONS: Dict[str, Callable] = {}
+SIGNATURES: Dict[str, inspect.Signature] = {}
 
 # the following paths much be in sync with the main app (src/constants.ts)
 # they are initialised in _init()
@@ -134,11 +135,19 @@ def _run_step(
     if not ret_hash or ret_image is None:
         # no cache, we need to run this function
         try:
-            if module_name == "imread":
-                # imread takes no input image
-                result = fn(*data, *control_args)
+            sig = SIGNATURES[fn_name]
+            fn_arg_count = len(sig.parameters)
+            ctrl_arg_count = len(control_args)
+
+            if fn_arg_count == ctrl_arg_count:
+                # all args come from controls, i.e. imread
+                result = fn(*control_args)
+            elif fn_arg_count == ctrl_arg_count + 1:
+                # take an image plus control args, i.e. Canny, blur
+                result = fn(image, *control_args)
             else:
-                # insert the image object at the beginning for non-imread
+                # take an image, other data from the last step and control args
+                # i.e. warpPolar
                 result = fn(image, *data, *control_args)
             # function returned multiple values
             if type(result) is tuple:
@@ -166,7 +175,7 @@ def _run_step(
     return ret_image, ret_data, ret_hash
 
 
-def _save_result(hash: str, image: object, data: Union[None, Tuple] = None) -> bool:
+def _save_result(hash: str, image: object, data: Tuple = ()) -> bool:
     """Save a result image and other data to cache.
 
     Args:
@@ -201,7 +210,7 @@ def _get_result(hash: str) -> Union[Tuple[None, None], Tuple[object, Tuple]]:
     imagepath = str(CACHE / f"{hash}.png")
     image = None
     datapath = str(CACHE / f"{hash}.npy")
-    data = []
+    data = ()
     try:
         image = cv2.imread(imagepath, cv2.IMREAD_UNCHANGED)
         data = np.load(datapath)
@@ -257,13 +266,17 @@ def _init():
 
     # initiate function shortcuts
     global FUNCTIONS
+    global SIGNATURES
 
-    modules = [builtin, custom]
-    for mod in modules:
-        module_name = mod.__name__
-        for sub_name in mod.__all__:
-            full_sub_name = f"{module_name}.{sub_name}"
-            FUNCTIONS[full_sub_name] = sys.modules[full_sub_name].main
+    packages = [builtin, custom]
+    for pack in packages:
+        package_name = pack.__name__
+        for module_name in pack.__all__:
+            full_module_name = f"{package_name}.{module_name}"
+            fn = sys.modules[full_module_name].main
+            FUNCTIONS[full_module_name] = fn
+            sig = inspect.signature(fn)
+            SIGNATURES[full_module_name] = sig
 
 
 def echo(line):
@@ -282,6 +295,7 @@ def export(req: str):
 
     main_header = """
 def main(image):
+    data = ()
     with open("config.json") as c:
         config = json.load(c)
 """
@@ -297,7 +311,7 @@ def main(image):
             zip.write(scriptfile)
             index_imports.append(f'from {op["fn"]} import main as {module}')
             main_body.append(f'args = config["{module}"]')
-            main_body.append(f"image, *data = {module}(image, *args)")
+            main_body.append(f"image, *data = {module}(image, *data, *args)")
             config[module] = op["args"]
         main_body.append("return data")
         import_str = "\n".join(index_imports)
@@ -343,7 +357,10 @@ def upsert(full_module_name: str) -> bool:
 
         # update function shortcuts
         global FUNCTIONS
+        global SIGNATURES
         FUNCTIONS[full_module_name] = m.main
+        sig = inspect.signature(m.main)
+        SIGNATURES[full_module_name] = sig
         return True
     except Exception:
         # print(e)

@@ -48,4 +48,4 @@ def main(
         ret_image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
         cv2.drawContours(ret_image, selected, -1, (255, 255, 0), line_thickness)
 
-    return ret_image
+    return ret_image, selected
