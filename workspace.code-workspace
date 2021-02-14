@@ -23,6 +23,10 @@
     "javascript.validate.enable": false,
     "javascript.format.enable": false,
     "typescript.format.enable": false,
-    "cSpell.words": ["Sider", "imwrite"]
+    "cSpell.words": [
+      "Sider",
+      "imwrite"
+    ],
+    "python.pythonPath": "/usr/local/bin/python3"
   }
 }

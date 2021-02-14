@@ -3,16 +3,18 @@ import BilateralControls from './BilateralFilter';
 import BlurControls from './Blur';
 import BoxFilterControls from './BoxFilter';
 import CannyControls from './Canny';
+import ControlsBase from './ControlsBase';
 import DefaultControls, { Operation } from './Default';
+import FindContoursControls from './FindContours';
 import GaussianControls from './GaussianBlur';
 import Imread from './Imread';
 import InRangeControls from './InRange';
+import InscribedCircleControls from './InscribedCircle';
 import MedianControls from './MedianBlur';
 import MorphologyExControls from './MorphologyEx';
 import ThresholdControls from './Threshold';
-import FindContoursControls from './FindContours';
 
-const controlComponents: { [key: string]: typeof DefaultControls } = {
+const controlComponents: { [key: string]: typeof ControlsBase } = {
   adaptivethreshold: AdaptiveThresholdControls,
   blur: BlurControls,
   boxfilter: BoxFilterControls,
@@ -22,6 +24,7 @@ const controlComponents: { [key: string]: typeof DefaultControls } = {
   gaussianblur: GaussianControls,
   imread: Imread,
   inrange: InRangeControls,
+  inscribedcircle: InscribedCircleControls,
   medianblur: MedianControls,
   morphologyex: MorphologyExControls,
   threshold: ThresholdControls,

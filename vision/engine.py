@@ -8,12 +8,11 @@ import json
 import shlex
 import sys
 from pathlib import Path
-from threading import Thread
 from typing import Callable, List, Tuple, TypedDict, Union
+import cv2
 
 import builtin  # import all builtin functions, see __init__.py
 import custom  # import all builtin functions, see __init__.py
-from cv2 import IMREAD_UNCHANGED, IMWRITE_PNG_COMPRESSION, imread, imwrite
 
 # function shortcuts
 # FUNCTIONS: {pack.module: Callable}
@@ -161,7 +160,7 @@ def _save_image(hash: str, image: object) -> bool:
     """
     filepath = CACHE / f"{hash}.png"
     # save as loseless png
-    return imwrite(str(filepath.resolve()), image, [int(IMWRITE_PNG_COMPRESSION), 0])
+    return cv2.imwrite(str(filepath.resolve()), image, [int(cv2.IMWRITE_PNG_COMPRESSION), 0])
 
 
 def _get_image(hash: str) -> Union[None, object]:
@@ -176,7 +175,7 @@ def _get_image(hash: str) -> Union[None, object]:
     filepath = CACHE / f"{hash}.png"
     image = None
     try:
-        image = imread(str(filepath.resolve()), IMREAD_UNCHANGED)
+        image = cv2.imread(str(filepath.resolve()), cv2.IMREAD_UNCHANGED)
     except Exception:
         pass
     return image
