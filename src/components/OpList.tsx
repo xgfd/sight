@@ -11,6 +11,7 @@ import {
   GlobalOutlined,
   HeatMapOutlined,
   HighlightOutlined,
+  LogoutOutlined,
   MergeCellsOutlined,
   PauseOutlined,
   PlusCircleOutlined,
@@ -29,7 +30,7 @@ import {
 } from 'antd';
 import React, { Component } from 'react';
 import Operation from '../Operation';
-import { listScripts, rmScript, upsert, exportScript } from '../utils';
+import { exportScript, listScripts, rmScript, upsert } from '../utils';
 
 const customScripts = listScripts()
   .custom.filter((n) => n.includes('custom'))
@@ -55,7 +56,7 @@ const iconMap: { [key: string]: React.ReactNode } = {
   boxblur: <ExpandOutlined />,
   bilateralfilter: <PauseOutlined />,
   canny: <HeatMapOutlined />,
-  carttopolar: <GlobalOutlined />,
+  warppolar: <GlobalOutlined />,
   crop: <ExpandOutlined />,
   contours: <HeatMapOutlined />,
   dilate: <SplitCellsOutlined />,
@@ -66,6 +67,7 @@ const iconMap: { [key: string]: React.ReactNode } = {
   gaussianblur: <UngroupOutlined />,
   imread: <FileImageOutlined />,
   inrange: <ColumnHeightOutlined />,
+  inscribedcircle: <LogoutOutlined />,
   multiply: <CalculatorOutlined />,
   subtract: <CalculatorOutlined />,
   threshold: <FieldBinaryOutlined />,

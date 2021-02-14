@@ -1,18 +1,20 @@
 from __future__ import annotations
 
-from zipfile import ZipFile
 import hashlib
 import importlib
 import inspect
 import json
 import shlex
 import sys
+import traceback
 from pathlib import Path
 from typing import Callable, List, Tuple, TypedDict, Union
-import cv2
+from zipfile import ZipFile
 
 import builtin  # import all builtin functions, see __init__.py
 import custom  # import all builtin functions, see __init__.py
+import cv2
+import numpy as np
 
 # function shortcuts
 # FUNCTIONS: {pack.module: Callable}
@@ -22,7 +24,7 @@ FUNCTIONS = {}
 # they are initialised in _init()
 APP_DATA = (Path.home() / ".sight").absolute()
 # image cache folder
-CACHE = APP_DATA / "cache"
+CACHE = (APP_DATA / "cache").resolve()
 BUILTIN = Path(".") / "builtin"
 CUSTOM = Path(".") / "custom"
 
@@ -65,8 +67,13 @@ def _ret_hash(fn: Callable, inputhash: str, args: List) -> str:
 
 
 def _run_step(
-    fn_name: str, image: Union[None, object], args: List, rid: str, input_hash: str
-) -> Tuple[Union[None, object], str]:
+    fn_name: str,
+    image: Union[None, object],
+    data: Tuple,
+    control_args: List,
+    rid: str,
+    input_hash: str,
+) -> Tuple[Union[None, object], Union[None, Tuple], str]:
     """Run a single operation and always return an image and a result hash for the next iteration.
     The result image (if not None) is cached and a response is sent to the client.
 
@@ -78,7 +85,8 @@ def _run_step(
     Args:
         fn_name (str): The full function name (package.module).
         image (Union[None, object]): Input image.
-        args (List): Other input arguments apart from the input image.
+        data (Tuple): Other data returned from the last execution.
+        control_args (List): Input arguments from the frontend.
         rid (str): Request id of this run.
         input_hash (str): Input hash corresponding to the input image.
 
@@ -93,10 +101,11 @@ def _run_step(
     if module_name != "imread" and image is None:
         # reset input image and hash
         ret_image = None
+        ret_data = ()
         ret_hash = ""
         error = "No input image. The previous step probably failed."
-        _respond_and_cache(rid, ret_hash, ret_image, error)
-        return ret_image, ret_hash
+        _respond_and_cache(rid, ret_hash, ret_image, ret_data, error)
+        return ret_image, ret_data, ret_hash
     # ************************
 
     fn = None
@@ -106,10 +115,11 @@ def _run_step(
         fn = FUNCTIONS[fn_name]
     except KeyError:
         ret_image = None
+        ret_data = ()
         ret_hash = ""
         error = f"{package} function {module_name} is not loaded."
-        _respond_and_cache(rid, ret_hash, ret_image, error)
-        return ret_image, ret_hash
+        _respond_and_cache(rid, ret_hash, ret_image, ret_data, error)
+        return ret_image, ret_data, ret_hash
     # ************************
 
     # the result is determined by the function body (should be the module content) and arguments
@@ -117,19 +127,26 @@ def _run_step(
     # before run we can predicate the result hash
     # there's no need to run the function if the result hash matches a cached image
     input_hash = "" if module_name == "imread" else input_hash
-    ret_hash = _ret_hash(fn, input_hash, args)
-    ret_image = _get_image(ret_hash)
+    ret_hash = _ret_hash(fn, input_hash, control_args)
+    ret_image, ret_data = _get_result(ret_hash)
     error: Union[str, None] = None
 
     if not ret_hash or ret_image is None:
         # no cache, we need to run this function
-
-        # insert the image object at the beginning for non-imread
-        if module_name != "imread":
-            args = (image, *args)
-
         try:
-            ret_image = fn(*args)
+            if module_name == "imread":
+                # imread takes no input image
+                result = fn(*data, *control_args)
+            else:
+                # insert the image object at the beginning for non-imread
+                result = fn(image, *data, *control_args)
+            # function returned multiple values
+            if type(result) is tuple:
+                ret_image, *ret_data = result
+            else:
+                ret_image = result
+                ret_data = ()
+
             # allow multiple returns but the first one should be an image
             if isinstance(ret_image, tuple):
                 ret_image = ret_image[0]
@@ -138,51 +155,68 @@ def _run_step(
                 save = True
             else:
                 error = "Invalid result image"
-        except Exception as e:
+        except Exception:
             ret_image = None
+            ret_data = ()
             ret_hash = ""
-            error = str(e)
+            error = str(traceback.format_exc())
 
-    _respond_and_cache(rid, ret_hash, ret_image, error, save)
+    _respond_and_cache(rid, ret_hash, ret_image, ret_data, error, save)
 
-    return ret_image, ret_hash
+    return ret_image, ret_data, ret_hash
 
 
-def _save_image(hash: str, image: object) -> bool:
-    """Save an image to cache.
+def _save_result(hash: str, image: object, data: Union[None, Tuple] = None) -> bool:
+    """Save a result image and other data to cache.
 
     Args:
         hash (str): Result hash used as the name of this image.
         image (object): Result image of a function call.
+        data (Tuple): Other result data as a tuple.
 
     Returns:
-        bool: True if the image is saved.
+        bool: True if the result is saved.
     """
-    filepath = CACHE / f"{hash}.png"
+    imagepath = str(CACHE / f"{hash}.png")
+    datapath = str(CACHE / f"{hash}.npy")
+    data = np.array(data)
     # save as loseless png
-    return cv2.imwrite(str(filepath.resolve()), image, [int(cv2.IMWRITE_PNG_COMPRESSION), 0])
+    try:
+        cv2.imwrite(imagepath, image, [int(cv2.IMWRITE_PNG_COMPRESSION), 0])
+        np.save(datapath, data)
+        return True
+    except Exception:
+        return False
 
 
-def _get_image(hash: str) -> Union[None, object]:
+def _get_result(hash: str) -> Union[Tuple[None, None], Tuple[object, Tuple]]:
     """Get an cached image.
 
     Args:
         hash (str): A result hash that identifies an image.
 
     Returns:
-        None or object: The image if it's found in cache. None otherwise.
+        None or Tuple: Cached image followed by optional data if it's found in cache. None otherwise.
     """
-    filepath = CACHE / f"{hash}.png"
+    imagepath = str(CACHE / f"{hash}.png")
     image = None
+    datapath = str(CACHE / f"{hash}.npy")
+    data = []
     try:
-        image = cv2.imread(str(filepath.resolve()), cv2.IMREAD_UNCHANGED)
+        image = cv2.imread(imagepath, cv2.IMREAD_UNCHANGED)
+        data = np.load(datapath)
     except Exception:
         pass
-    return image
+    return image, data
 
 
 def _respond_and_cache(
-    rid: str, ret_hash: str, ret_image: object, error: str = None, save=False
+    rid: str,
+    ret_hash: str,
+    ret_image: object,
+    ret_data: Tuple,
+    error: str = None,
+    save=False,
 ):
     """Respond to a client and by default cache the result image.
 
@@ -190,13 +224,14 @@ def _respond_and_cache(
         rid (str): Request id.
         ret_hash (str): Result hash.
         ret_image (object): Result image.
+        ret_data (Tuple): Other data returned by a function call.
         error (str, optional): Optional error message. Defaults to None.
         save (bool, optional): Cache the result image under result hash. Defaults to False.
         conn (object, optional): Connection with a client. Not used for now. Defaults to None.
     """
     res = {"rid": rid, "ret_hash": ret_hash, "error": error}
     if save and error is None and ret_hash and ret_image is not None:
-        saved = _save_image(ret_hash, ret_image)
+        saved = _save_result(ret_hash, ret_image, ret_data)
         if not saved:
             res["ret_hash"] = ""
     res_str = json.dumps(res)
@@ -215,6 +250,7 @@ def _parse_and_exec(line: str):
 
 
 def _init():
+    """Set up required folders and load builtin and custom functions."""
     # make sure that image cache folder exists
     # the main app will create these two folders too
     CACHE.mkdir(parents=True, exist_ok=True)
@@ -274,10 +310,23 @@ def main(image):
 
 
 def ls():
+    """List loaded functions.
+
+    Returns:
+        List[str]: List of function names.
+    """
     return list(FUNCTIONS.keys())
 
 
-def upsert(full_module_name: str):
+def upsert(full_module_name: str) -> bool:
+    """Load a new function or update a loaded function.
+
+    Args:
+        full_module_name (str): Function name "package.module".
+
+    Returns:
+        bool: True if the function is successfully loaded or updated.
+    """
     try:
         pack_name, m_name = full_module_name.split(".")
 
@@ -301,7 +350,15 @@ def upsert(full_module_name: str):
         return False
 
 
-def rm(full_module_name: str):
+def rm(full_module_name: str) -> bool:
+    """Unload a function.
+
+    Args:
+        full_module_name (str): Function name "package.module".
+
+    Returns:
+        bool: Always return True.
+    """
     try:
         del sys.modules[full_module_name]
     except KeyError:
@@ -310,8 +367,14 @@ def rm(full_module_name: str):
 
 
 def run(req: str):
+    """Execute a sequence of operations and respond for each operation.
+
+    Args:
+        req (str): Json string of the sequence of operations to be executed.
+    """
     # the input image and hash for each step, updated during each iteration
     image = None
+    data = []
     input_hash = ""
 
     # the operation sequence to be executed
@@ -323,13 +386,14 @@ def run(req: str):
     if top_op["fn"].split(".")[-1] != "imread":
         sequence_input_hash = top_op.get("last_hash", "")
 
-        image = _get_image(sequence_input_hash)
+        image, data = _get_result(sequence_input_hash)
         input_hash = sequence_input_hash
 
         if image is None:
             _respond_and_cache(
                 top_op["rid"],
                 "",
+                None,
                 None,
                 "Cached input image is missing. Run imread again.",
             )
@@ -342,10 +406,12 @@ def run(req: str):
     for op in op_seq:
         fn_name = op["fn"]
         rid = op["rid"]
-        args = op["args"]
+        control_args = op["args"]
 
         # execute and set input image and hash for the next iteration
-        image, input_hash = _run_step(fn_name, image, args, rid, input_hash)
+        image, data, input_hash = _run_step(
+            fn_name, image, data, control_args, rid, input_hash
+        )
 
 
 _init()
