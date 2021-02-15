@@ -7,6 +7,7 @@ import CircleROIControls from './CircleROI';
 import ControlsBase from './ControlsBase';
 import DefaultControls, { Operation } from './Default';
 import FindContoursControls from './FindContours';
+import FitEllipsesControls from './FitEllipses';
 import GaussianControls from './GaussianBlur';
 import ImreadControls from './Imread';
 import InRangeControls from './InRange';
@@ -25,6 +26,7 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   canny: CannyControls,
   circleroi: CircleROIControls,
   findcontours: FindContoursControls,
+  fitellipses: FitEllipsesControls,
   gaussianblur: GaussianControls,
   imread: ImreadControls,
   inrange: InRangeControls,

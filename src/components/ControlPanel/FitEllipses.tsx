@@ -4,7 +4,7 @@ import DefaultControls from './Default';
 
 const { Option } = Select;
 
-export default class MinEnclosingCirclesControls extends DefaultControls {
+export default class FitEllipsesControls extends DefaultControls {
   static defaultValues = [2, 1];
 
   render() {
