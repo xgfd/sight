@@ -188,7 +188,6 @@ def _save_result(hash: str, image: object, data: Tuple = ()) -> bool:
     """
     imagepath = str(CACHE / f"{hash}.png")
     datapath = str(CACHE / f"{hash}.npy")
-    data = np.array(data)
     # save as loseless png
     try:
         cv2.imwrite(imagepath, image, [int(cv2.IMWRITE_PNG_COMPRESSION), 0])
@@ -213,7 +212,7 @@ def _get_result(hash: str) -> Union[Tuple[None, None], Tuple[object, Tuple]]:
     data = ()
     try:
         image = cv2.imread(imagepath, cv2.IMREAD_UNCHANGED)
-        data = np.load(datapath)
+        data = np.load(datapath, allow_pickle=True)
     except Exception:
         pass
     return image, data

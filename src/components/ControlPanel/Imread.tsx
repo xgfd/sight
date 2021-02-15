@@ -6,7 +6,7 @@ import React from 'react';
 import DefaultControls, { OpControlsProp } from './Default';
 
 const { Option } = Select;
-export default class Imread extends DefaultControls {
+export default class ImreadControls extends DefaultControls {
   static defaultValues = ['', 0];
 
   constructor(props: OpControlsProp) {

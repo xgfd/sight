@@ -7,53 +7,56 @@ def main(
     image: object,
     contour_mode: int,
     method: int,
-    area_range: Tuple[float, float],
     bound_area_range: Tuple[float, float],
-    length_range: Tuple[float, float],
-    aspect_range: Tuple[float, float],
-    intensity_range: Tuple[float, float],
+    aspect: float,
     line_thickness=2,
     return_image_mode=0,
 ):
     contours, _ = cv2.findContours(image, mode=contour_mode, method=method)
 
-    area_l, area_h = area_range
     bound_area_l, bound_area_h = bound_area_range
-    length_l, length_h = length_range
-    aspect_l, aspect_h = aspect_range
 
-    selected_contours = []
+    selected = []
 
     for cont in contours:
-        area = cv2.contourArea(cont)
         _, (w, h), _ = cv2.minAreaRect(cont)
         bound_area = w * h
         length = max(w, h)
         width = min(w, h)
         if length == 0:
             continue
-        aspect = width / length
-        # TODO add intensity
-        if (
-            (area_l <= area <= area_h)
-            and (bound_area_l <= bound_area <= bound_area_h)
-            and (length_l <= length <= length_h)
-            and (aspect_l <= aspect <= aspect_h)
+        if (bound_area_l <= bound_area <= bound_area_h) and (
+            aspect <= (width / length)
         ):
-            selected_contours.append(cont)
+            selected.append(cont)
+    if len(selected) > 0:
+        selected.sort(key=lambda cont: cv2.boundingRect(cont)[2])
+        centre, radius = cv2.minEnclosingCircle(selected[-1])
+    else:
+        centre, radius = (0, 0), 0
 
     if return_image_mode == 0:
         # colour image with shape overlay
         ret_image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
-        cv2.drawContours(
-            ret_image, selected_contours, -1, (255, 255, 0), line_thickness
+        cv2.circle(
+            ret_image,
+            (int(centre[0]), int(centre[1])),
+            int(radius),
+            (255, 255, 0),
+            line_thickness,
         )
     elif return_image_mode == 1:
         # shape on black background
         ret_image = np.zeros_like(image)
-        cv2.drawContours(ret_image, selected_contours, -1, 255, line_thickness)
+        cv2.circle(
+            ret_image,
+            (int(centre[0]), int(centre[1])),
+            int(radius),
+            255,
+            line_thickness,
+        )
     else:
         # pass on the input image
         ret_image = image
 
-    return ret_image, selected_contours
+    return ret_image, (centre, radius)
