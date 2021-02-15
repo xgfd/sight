@@ -18,7 +18,7 @@ const { ErrorBoundary } = Alert;
 const { Header, Content, Footer, Sider } = Layout;
 
 loader.config({
-  paths: { vs: path.join(__dirname, 'monaco', 'vs') },
+  paths: { vs: path.join(__dirname, 'monaco', 'min', 'vs') },
 });
 
 interface IAppState {
