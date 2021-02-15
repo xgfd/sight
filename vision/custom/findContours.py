@@ -13,7 +13,7 @@ def main(
     aspect_range: Tuple[float, float],
     intensity_range: Tuple[float, float],
     line_thickness=2,
-    return_image_mode=0,
+    return_image_mode=3,  # controls what image to return 0=colour image with shape overlay; 1=shape on black background; 3=pass on the input image
 ):
     contours, _ = cv2.findContours(image, mode=contour_mode, method=method)
 

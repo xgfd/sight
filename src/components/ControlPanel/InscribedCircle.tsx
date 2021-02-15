@@ -5,7 +5,7 @@ import DefaultControls from './Default';
 const { Option } = Select;
 
 export default class InscribedCircleControls extends DefaultControls {
-  static defaultValues = [2, 3, 2, false];
+  static defaultValues = [2, 3, 2, 1];
 
   render() {
     const { name, args } = this.state;
@@ -48,11 +48,18 @@ export default class InscribedCircleControls extends DefaultControls {
           value={args[2]}
           onChange={(value) => this.updateArgs(2, value)}
         />
-        <h4>Circle only</h4>
-        <Switch
-          checked={args[3]}
-          onChange={(checked) => this.updateArgs(3, checked)}
-        />
+        <h4>Return image</h4>
+        <Select
+          value={args[3]}
+          showSearch
+          optionFilterProp="children"
+          style={{ width: '100%' }}
+          onChange={(value) => this.updateArgs(3, value)}
+        >
+          <Option value={0}>Overlay (Colour)</Option>
+          <Option value={1}>Contours only</Option>
+          <Option value={2}>Original image</Option>
+        </Select>
       </>
     );
   }

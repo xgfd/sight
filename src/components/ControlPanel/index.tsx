@@ -12,6 +12,7 @@ import ImreadControls from './Imread';
 import InRangeControls from './InRange';
 import InscribedCircleControls from './InscribedCircle';
 import MedianControls from './MedianBlur';
+import MinEnclosingCirclesControls from './MinEnclosingCircle';
 import MorphologyExControls from './MorphologyEx';
 import ThresholdControls from './Threshold';
 import WarpPolarControls from './WarpPolar';
@@ -28,6 +29,7 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   imread: ImreadControls,
   inrange: InRangeControls,
   inscribedcircle: InscribedCircleControls,
+  minenclosingcircles: MinEnclosingCirclesControls,
   medianblur: MedianControls,
   morphologyex: MorphologyExControls,
   threshold: ThresholdControls,

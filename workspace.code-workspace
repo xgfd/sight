@@ -27,6 +27,6 @@
       "Sider",
       "imwrite"
     ],
-    "python.pythonPath": "/Users/xgfd/.pyenv/shims/python"
+    "python.pythonPath": "/usr/local/bin/python3"
   }
 }

@@ -2,6 +2,8 @@ from typing import Tuple
 import cv2
 import numpy as np
 
+Circle = Tuple[Tuple[float, float], float]
+
 
 def main(
     image: object,
@@ -10,8 +12,8 @@ def main(
     bound_area_range: Tuple[float, float],
     aspect: float,
     line_thickness=2,
-    return_image_mode=0,
-):
+    return_image_mode=3,  # controls what image to return 0=colour image with shape overlay; 1=shape on black background; 3=pass on the input image
+) -> Tuple[object, Circle]:
     contours, _ = cv2.findContours(image, mode=contour_mode, method=method)
 
     bound_area_l, bound_area_h = bound_area_range
