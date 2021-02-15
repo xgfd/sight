@@ -35,11 +35,18 @@ def test_export():
     operations = [
         {"fn": "builtin.GaussianBlur", "args": [3, 3, 0, 0, 0]},
         {
-            "fn": "custom.custom3",
-            "args": [[50, 150], 3, 3, 0, 0, "a", False],
+            "fn": "builtin.circleROI",
+            "args": [
+                3,
+                2,
+                [1000000, 1500000],
+                0.6,
+                2,
+                1,
+            ],
         },
     ]
-    export(operations)
+    export(json.dumps(operations))
 
 
 def test_parse_and_exec():
@@ -59,6 +66,6 @@ def test_parse_and_exec():
 
 if __name__ == "__main__":
     # test_ls()
-    test_run()
+    # test_run()
     # test_parse_and_exec()
-    # test_export()
+    test_export()

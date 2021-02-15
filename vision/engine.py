@@ -149,16 +149,13 @@ def _run_step(
                 # take an image, other data from the last step and control args
                 # i.e. warpPolar
                 result = fn(image, *data, *control_args)
+
             # function returned multiple values
-            if type(result) is tuple:
+            if isinstance(result, tuple):
                 ret_image, *ret_data = result
             else:
                 ret_image = result
                 ret_data = ()
-
-            # allow multiple returns but the first one should be an image
-            if isinstance(ret_image, tuple):
-                ret_image = ret_image[0]
 
             if ret_image is not None:
                 save = True
@@ -296,8 +293,8 @@ def export(req: str):
 def main(image):
     data = ()
     with open("config.json") as c:
-        config = json.load(c)
-"""
+        config = json.load(c)"""
+
     index_main = [main_header]
     main_body = []
     with ZipFile("archive.zip", "w") as zip:
@@ -305,13 +302,47 @@ def main(image):
         if operations[0]["fn"] == "builtin.imread":
             operations = operations[1:]
         for op in operations:
-            package, module = op["fn"].split(".")
+            fn_name = op["fn"]
+            package, module = fn_name.split(".")
             scriptfile = Path(package) / f"{module}.py"
             zip.write(scriptfile)
+
+            # import statement
             index_imports.append(f'from {op["fn"]} import main as {module}')
+
+            # function invocation statement
+            # line to read args
             main_body.append(f'args = config["{module}"]')
-            main_body.append(f"image, *data = {module}(image, *data, *args)")
-            config[module] = op["args"]
+
+            # construct the actual call depending on the return annotation
+            # and the number of accepted parameters of the function
+            args = op["args"]
+            config[module] = args
+            sig = SIGNATURES[fn_name]
+            fn_arg_count = len(sig.parameters)
+            ctrl_arg_count = len(args)
+
+            fn_call_left = ""
+            fn_call_right = ""
+
+            if getattr(sig.return_annotation, "_name", "") == "Tuple":
+                fn_call_left = "image, *data"
+            else:
+                fn_call_left = "image"
+
+            if fn_arg_count == ctrl_arg_count:
+                # all args come from controls, i.e. imread
+                fn_call_right = f"{module}(*args)"
+            elif fn_arg_count == ctrl_arg_count + 1:
+                # take an image plus control args, i.e. Canny, blur
+                fn_call_right = f"{module}(image, *args)"
+            else:
+                # take an image, other data from the last step and control args
+                # i.e. warpPolar
+                fn_call_right = f"{module}(image, *data, *args)"
+
+            main_body.append(f"{fn_call_left} = {fn_call_right}")
+
         main_body.append("return data")
         import_str = "\n".join(index_imports)
         index_main.extend(main_body)
