@@ -5,6 +5,7 @@ import BoxFilterControls from './BoxFilter';
 import CannyControls from './Canny';
 import CircleROIControls from './CircleROI';
 import ControlsBase from './ControlsBase';
+import ConvexHullsControls from './ConvexHulls';
 import DefaultControls, { Operation } from './Default';
 import FindContoursControls from './FindContours';
 import FitEllipsesControls from './FitEllipses';
@@ -24,6 +25,7 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   boxfilter: BoxFilterControls,
   bilateralfilter: BilateralControls,
   canny: CannyControls,
+  convexhulls: ConvexHullsControls,
   circleroi: CircleROIControls,
   findcontours: FindContoursControls,
   fitellipses: FitEllipsesControls,

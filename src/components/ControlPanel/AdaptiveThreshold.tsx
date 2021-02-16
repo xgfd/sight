@@ -40,12 +40,6 @@ export default class AdaptiveThresholdControls extends DefaultControls {
         >
           <Option value={0}>BINARY</Option>
           <Option value={1}>BINARY_INV</Option>
-          <Option value={2}>TRUNC</Option>
-          <Option value={3}>TOZERO</Option>
-          <Option value={4}>TOZERO_INV</Option>
-          <Option value={7}>THRESH_MASK</Option>
-          <Option value={8}>THRESH_OTSU</Option>
-          <Option value={16}>TRIANGLE</Option>
         </Select>
         <h4>Block size</h4>
         <InputNumber
