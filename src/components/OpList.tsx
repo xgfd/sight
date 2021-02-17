@@ -1,26 +1,7 @@
 import {
-  BarChartOutlined,
-  BlockOutlined,
-  BuildOutlined,
-  CalculatorOutlined,
-  ColumnHeightOutlined,
   DeleteOutlined,
   DownloadOutlined,
-  ExpandOutlined,
-  FieldBinaryOutlined,
-  FileImageOutlined,
-  GlobalOutlined,
-  HeatMapOutlined,
-  HighlightOutlined,
-  LoginOutlined,
-  LogoutOutlined,
-  MergeCellsOutlined,
-  PauseOutlined,
   PlusCircleOutlined,
-  RiseOutlined,
-  SlidersOutlined,
-  SplitCellsOutlined,
-  UngroupOutlined,
 } from '@ant-design/icons';
 import {
   Button,
@@ -34,6 +15,7 @@ import {
 import React, { Component } from 'react';
 import Operation from '../Operation';
 import { exportScript, listScripts, rmScript, upsert } from '../utils';
+import getIcon from './Icons';
 
 const customScripts = listScripts()
   .custom.filter((n) => n.includes('custom'))
@@ -49,48 +31,6 @@ let customNameCounter =
     : 1;
 
 const { Text } = Typography;
-
-const iconMap: { [key: string]: React.ReactNode } = {
-  add: <CalculatorOutlined />,
-  annotation: <HighlightOutlined />,
-  bitwise_and: <BlockOutlined />,
-  bitwise_or: <BlockOutlined />,
-  bitwise_xor: <BlockOutlined />,
-  boxblur: <ExpandOutlined />,
-  bilateralfilter: <PauseOutlined />,
-  canny: <HeatMapOutlined />,
-  convertscaleabs: <RiseOutlined />,
-  warppolar: <GlobalOutlined />,
-  crop: <ExpandOutlined />,
-  contours: <HeatMapOutlined />,
-  dilate: <SplitCellsOutlined />,
-  divide: <CalculatorOutlined />,
-  erode: <MergeCellsOutlined />,
-  equalizehist: <BarChartOutlined />,
-  filter2d: <BlockOutlined />,
-  filter: <BuildOutlined />,
-  gaussianblur: <UngroupOutlined />,
-  imread: <FileImageOutlined />,
-  inrange: <ColumnHeightOutlined />,
-  inscribedcircle: <LogoutOutlined />,
-  minenclosingcircles: <LoginOutlined />,
-  multiply: <CalculatorOutlined />,
-  subtract: <CalculatorOutlined />,
-  threshold: <FieldBinaryOutlined />,
-};
-
-function getIcon(op: Operation): React.ReactNode {
-  let icon;
-  if (op.package === 'custom') {
-    icon = <SlidersOutlined />;
-  } else {
-    // for builtin functions read from the icon map or use its first letter
-    icon = iconMap[op.name.toLowerCase()] || (
-      <Text strong>{op.name[0].toUpperCase()}</Text>
-    );
-  }
-  return icon;
-}
 
 interface IProps {
   operations: Operation[];
