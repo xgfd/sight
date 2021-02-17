@@ -40,7 +40,7 @@ export default class NormalizeControls extends DefaultControls {
           <Option value={4}>NORM_L2</Option>
           <Option value={32}>NORM_MINMAX</Option>
         </Select>
-        <h4>Dtype</h4>
+        <h4>Output type (dtype)</h4>
         <Select
           value={args[3]}
           showSearch
