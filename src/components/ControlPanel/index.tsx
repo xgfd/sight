@@ -5,8 +5,10 @@ import BoxFilterControls from './BoxFilter';
 import CannyControls from './Canny';
 import CircleROIControls from './CircleROI';
 import ControlsBase from './ControlsBase';
+import ConvertScaleAbsControls from './ConvertScaleAbs';
 import ConvexHullsControls from './ConvexHulls';
 import DefaultControls, { Operation } from './Default';
+import EqualizeHistControls from './EqualizeHist';
 import FindContoursControls from './FindContours';
 import FitEllipsesControls from './FitEllipses';
 import GaussianControls from './GaussianBlur';
@@ -25,8 +27,10 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   boxfilter: BoxFilterControls,
   bilateralfilter: BilateralControls,
   canny: CannyControls,
+  convertscaleabs: ConvertScaleAbsControls,
   convexhulls: ConvexHullsControls,
   circleroi: CircleROIControls,
+  euqalizehist: EqualizeHistControls,
   findcontours: FindContoursControls,
   fitellipses: FitEllipsesControls,
   gaussianblur: GaussianControls,
