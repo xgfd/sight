@@ -11,6 +11,7 @@ import DefaultControls, { Operation } from './Default';
 import EqualizeHistControls from './EqualizeHist';
 import FindContoursControls from './FindContours';
 import FitEllipsesControls from './FitEllipses';
+import GammaCorrectionControls from './GammaCorrection';
 import GaussianControls from './GaussianBlur';
 import ImreadControls from './Imread';
 import InRangeControls from './InRange';
@@ -18,6 +19,7 @@ import InscribedCircleControls from './InscribedCircle';
 import MedianControls from './MedianBlur';
 import MinEnclosingCirclesControls from './MinEnclosingCircle';
 import MorphologyExControls from './MorphologyEx';
+import NormalizeControls from './Normalize';
 import ThresholdControls from './Threshold';
 import WarpPolarControls from './WarpPolar';
 
@@ -34,9 +36,11 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   findcontours: FindContoursControls,
   fitellipses: FitEllipsesControls,
   gaussianblur: GaussianControls,
+  gammacorrection: GammaCorrectionControls,
   imread: ImreadControls,
   inrange: InRangeControls,
   inscribedcircle: InscribedCircleControls,
+  normalize: NormalizeControls,
   minenclosingcircles: MinEnclosingCirclesControls,
   medianblur: MedianControls,
   morphologyex: MorphologyExControls,
