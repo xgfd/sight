@@ -11,6 +11,7 @@ import React, { Component } from 'react';
 import './App.global.css';
 import Gallery from './components/Gallery';
 import OpList from './components/OpList';
+import t from './monaco/min/vs/language/css/cssMode';
 import Operation from './Operation';
 import { notify, run, upsert } from './utils';
 
@@ -49,6 +50,16 @@ class App extends Component<unknown, IAppState> {
       operations,
     };
   }
+
+  setOperations = (operations: Operation[], selectionIndex?: number) => {
+    selectionIndex = selectionIndex || this.state.selectionIndex || 0; // eslint-disable-line
+    const selection = operations[selectionIndex];
+    this.setState({
+      selectedOp: selection,
+      selectionIndex,
+      operations,
+    });
+  };
 
   execOperations = (index?: number) => {
     const { operations, selectionIndex } = this.state;
@@ -274,9 +285,7 @@ class App extends Component<unknown, IAppState> {
               selectedKey={selectedOp.id}
               resultUpToDate={selectedOp.resultUpToDate}
               operations={operations}
-              setOperations={(newOpSequence: Operation[]) =>
-                this.setState({ operations: newOpSequence })
-              }
+              setOperations={this.setOperations}
               selectOp={this.selectOp}
               insertOp={this.insertOp}
               removeOp={this.removeOp}

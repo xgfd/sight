@@ -1,4 +1,4 @@
-import { InputNumber, Select } from 'antd';
+import { InputNumber, Select, Slider } from 'antd';
 import React from 'react';
 import DefaultControls from './Default';
 
@@ -14,10 +14,12 @@ export default class ThresholdControls extends DefaultControls {
       <>
         <h2>{name}</h2>
         <h4>Threshold</h4>
-        <InputNumber
+        <Slider
+          marks={{ 0: '0', 255: '255' }}
           min={0}
+          max={255}
           value={args[0]}
-          onChange={(value) => this.updateArgs(0, value)}
+          onChange={(value: number) => this.updateArgs(0, value)}
         />
         <h4>Max value</h4>
         <InputNumber

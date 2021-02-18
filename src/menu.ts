@@ -84,6 +84,32 @@ export default class MenuBuilder {
         },
       ],
     };
+    const subMenuFile: DarwinMenuItemConstructorOptions = {
+      label: 'File',
+      submenu: [
+        {
+          label: 'Open',
+          accelerator: 'Command+O',
+          click: () => {
+            this.mainWindow.webContents.send('OPEN');
+          },
+        },
+        {
+          label: 'Save Operations',
+          accelerator: 'Command+S',
+          click: () => {
+            this.mainWindow.webContents.send('SAVE');
+          },
+        },
+        {
+          label: 'Save As Python',
+          accelerator: 'Shift+Command+S',
+          click: () => {
+            this.mainWindow.webContents.send('EXPORT_PYTHON');
+          },
+        },
+      ],
+    };
     const subMenuEdit: DarwinMenuItemConstructorOptions = {
       label: 'Edit',
       submenu: [
@@ -136,6 +162,13 @@ export default class MenuBuilder {
             this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
           },
         },
+        {
+          label: 'Toggle Developer Tools',
+          accelerator: 'Alt+Command+I',
+          click: () => {
+            this.mainWindow.webContents.toggleDevTools();
+          },
+        },
       ],
     };
     const subMenuWindow: DarwinMenuItemConstructorOptions = {
@@ -183,7 +216,14 @@ export default class MenuBuilder {
         ? subMenuViewDev
         : subMenuViewProd;
 
-    return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
+    return [
+      subMenuAbout,
+      subMenuFile,
+      // subMenuEdit,
+      subMenuView,
+      subMenuWindow,
+      subMenuHelp,
+    ];
   }
 
   buildDefaultTemplate() {
@@ -194,12 +234,22 @@ export default class MenuBuilder {
           {
             label: '&Open',
             accelerator: 'Ctrl+O',
+            click: () => {
+              this.mainWindow.webContents.send('OPEN');
+            },
           },
           {
-            label: '&Close',
-            accelerator: 'Ctrl+W',
+            label: '&Save Operations',
+            accelerator: 'Ctrl+S',
             click: () => {
-              this.mainWindow.close();
+              this.mainWindow.webContents.send('SAVE');
+            },
+          },
+          {
+            label: 'Save &As Python',
+            accelerator: 'Shift+Ctrl+S',
+            click: () => {
+              this.mainWindow.webContents.send('EXPORT_PYTHON');
             },
           },
         ],
@@ -235,6 +285,13 @@ export default class MenuBuilder {
                 },
               ]
             : [
+                {
+                  label: '&Reload',
+                  accelerator: 'Ctrl+R',
+                  click: () => {
+                    this.mainWindow.webContents.reload();
+                  },
+                },
                 {
                   label: 'Toggle &Full Screen',
                   accelerator: 'F11',

@@ -61,6 +61,13 @@ function writeScript(
 }
 
 class Operation {
+  static fromJson(opJson: { fn: string; args: [] }) {
+    const [pack, name] = opJson.fn.split('.');
+    const op = new Operation(name, pack as 'builtin' | 'custom');
+    op.args = opJson.args;
+    return op;
+  }
+
   readonly id: string;
 
   readonly script: string;

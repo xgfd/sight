@@ -12,6 +12,7 @@ import {
   Spin,
   Typography,
 } from 'antd';
+import { ipcRenderer } from 'electron';
 import React, { Component } from 'react';
 import Operation from '../Operation';
 import { exportScript, listScripts, rmScript, upsert } from '../utils';
@@ -36,7 +37,7 @@ interface IProps {
   operations: Operation[];
   selectedKey: string;
   resultUpToDate: boolean;
-  setOperations: (operations: Operation[]) => void;
+  setOperations: (operations: Operation[], selectionIndex?: number) => void;
   selectOp: (op: Operation, index: number) => void;
   insertOp: (op: Operation, index: number) => void;
   removeOp: (index: number) => void;
@@ -44,28 +45,9 @@ interface IProps {
 }
 
 // this is a temporary hack
-function uniqueCustomName(existingNames: string[]) {
-  // let name;
-  // for (let i = 1; ; i++) {
-  //   name = `custom${i}`;
-  //   if (existingNames.indexOf(name) === -1) {
-  //     return name;
-  //   }
-  // }
+function uniqueCustomName() {
   const name = `custom${customNameCounter}`;
   return name;
-}
-
-function exportAsPython(operations: Operation[]) {
-  exportScript(operations, async (filepath) => {
-    const response = await fetch(filepath);
-    const content = await response.blob();
-    const element = document.createElement('a');
-    const file = new Blob([content], { type: 'application/zip' });
-    element.href = URL.createObjectURL(file);
-    element.download = 'archive.zip';
-    element.click();
-  });
 }
 
 class OpList extends Component<
@@ -76,6 +58,64 @@ class OpList extends Component<
     super(props);
     this.state = { installedScripts: listScripts() };
   }
+
+  componentDidMount() {
+    ipcRenderer.on('OPEN', () => {
+      this.openOpList();
+    });
+
+    ipcRenderer.on('SAVE', () => {
+      this.saveOpList();
+    });
+
+    ipcRenderer.on('EXPORT_PYTHON', () => {
+      this.exportAsPython();
+    });
+  }
+
+  openOpList = () => {
+    const element = document.createElement('input');
+    element.type = 'file';
+    element.accept = 'application/json';
+    element.addEventListener('input', async () => {
+      const filepath = (element as any).files[0];
+      const response = await fetch(filepath.path);
+      const opListJson: [{ fn: string; args: [] }] = await response.json();
+      const operations = opListJson.map(Operation.fromJson);
+      const { setOperations } = this.props;
+      setOperations(operations);
+    });
+    element.click();
+  };
+
+  saveOpList = () => {
+    const { operations } = this.props;
+    const instructions = operations.map((op) => {
+      const opJson = op.toJson() as any;
+      delete opJson.rid;
+      return opJson;
+    });
+    const file = new Blob([JSON.stringify(instructions, null, 2)], {
+      type: 'application/json',
+    });
+    const element = document.createElement('a');
+    element.href = URL.createObjectURL(file);
+    element.download = 'operations.json';
+    element.click();
+  };
+
+  exportAsPython = () => {
+    const { operations } = this.props;
+    exportScript(operations, async (filepath) => {
+      const response = await fetch(filepath);
+      const content = await response.blob();
+      const file = new Blob([content], { type: 'application/zip' });
+      const element = document.createElement('a');
+      element.href = URL.createObjectURL(file);
+      element.download = 'archive.zip';
+      element.click();
+    });
+  };
 
   insertOp = (fullOpName: string, index: number) => {
     const { insertOp } = this.props;
@@ -119,9 +159,7 @@ class OpList extends Component<
         }}
         style={{ width: 256 }}
       >
-        <Menu.Item
-          key={`custom.__${uniqueCustomName(installedScripts.custom)}`}
-        >
+        <Menu.Item key={`custom.__${uniqueCustomName()}`}>
           <PlusCircleOutlined />
           <Text strong>New</Text>
         </Menu.Item>
@@ -142,7 +180,6 @@ class OpList extends Component<
       rmScript(op.package, op.name);
       const firstOccurrence = operations.findIndex((o) => o.name === op.name);
       const reducedOperations = operations.filter((o) => o.name !== op.name);
-      setOperations(reducedOperations);
       this.setState({
         installedScripts: listScripts(),
       });
@@ -150,10 +187,10 @@ class OpList extends Component<
       // the first occurrence is at the bottom
       if (firstOccurrence >= reducedOperations.length) {
         const selectionIndex = reducedOperations.length - 1;
-        selectOp(reducedOperations[selectionIndex], selectionIndex);
+        setOperations(reducedOperations, selectionIndex);
       } else {
+        setOperations(reducedOperations, firstOccurrence);
         evalSequence(firstOccurrence);
-        selectOp(reducedOperations[firstOccurrence], firstOccurrence);
       }
     };
 
@@ -237,15 +274,6 @@ class OpList extends Component<
         selectedKeys={[selectedKey]}
       >
         {opItems}
-        <Menu.Item>
-          <Button
-            style={{ width: '100%' }}
-            onClick={() => exportAsPython(operations)}
-            icon={<DownloadOutlined />}
-          >
-            Export
-          </Button>
-        </Menu.Item>
       </Menu>
     );
   }
