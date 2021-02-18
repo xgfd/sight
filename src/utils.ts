@@ -55,7 +55,7 @@ function initPyEnvironment() {
   };
   CVSHELL = new PythonShell('engine.py', options);
 
-  CVSHELL.send('echo "connect"');
+  CVSHELL.send('echo ""');
 
   CVSHELL.once('message', () => CVSHELL.removeAllListeners('error'));
   CVSHELL.on('error', startErrorHandler);

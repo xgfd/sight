@@ -1,15 +1,14 @@
-import {
-  DeleteOutlined,
-  DownloadOutlined,
-  PlusCircleOutlined,
-} from '@ant-design/icons';
+import { DeleteOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import {
   Button,
+  Drawer,
   Dropdown,
+  Form,
   Menu,
   Popconfirm,
   Space,
   Spin,
+  Input,
   Typography,
 } from 'antd';
 import { ipcRenderer } from 'electron';
@@ -17,19 +16,6 @@ import React, { Component } from 'react';
 import Operation from '../Operation';
 import { exportScript, listScripts, rmScript, upsert } from '../utils';
 import getIcon from './Icons';
-
-const customScripts = listScripts()
-  .custom.filter((n) => n.includes('custom'))
-  .sort();
-// custom script name suffix
-// incremented every time a new script is added
-let customNameCounter =
-  customScripts.length > 0
-    ? parseInt(
-        customScripts[customScripts.length - 1].replace('custom', ''),
-        10
-      ) + 1
-    : 1;
 
 const { Text } = Typography;
 
@@ -44,19 +30,36 @@ interface IProps {
   evalSequence: (index?: number) => void;
 }
 
-// this is a temporary hack
-function uniqueCustomName() {
-  const name = `custom${customNameCounter}`;
-  return name;
+interface IStates {
+  installedScripts: { builtin: string[]; custom: string[] };
+  drawerOn: boolean;
+  insertionIndex: number;
+  formValid: boolean;
 }
 
-class OpList extends Component<
-  IProps,
-  { installedScripts: { builtin: string[]; custom: string[] } }
-> {
+/**
+ * Group strings by their upper case first letter.
+ * @param names
+ */
+function groupByFirstChar(names: string[]) {
+  return names.reduce((group, name) => {
+    const firstChar = name[0].toUpperCase();
+    const charGroup = group[firstChar] || [];
+    charGroup.push(name);
+    group[firstChar] = charGroup;
+    return group;
+  }, {} as { [key: string]: string[] });
+}
+
+class OpList extends Component<IProps, IStates> {
   constructor(props: IProps) {
     super(props);
-    this.state = { installedScripts: listScripts() };
+    this.state = {
+      installedScripts: listScripts(),
+      drawerOn: false,
+      insertionIndex: 0,
+      formValid: false,
+    };
   }
 
   componentDidMount() {
@@ -71,6 +74,12 @@ class OpList extends Component<
     ipcRenderer.on('EXPORT_PYTHON', () => {
       this.exportAsPython();
     });
+  }
+
+  componentWillUnmount() {
+    ipcRenderer.removeAllListeners('OPEN');
+    ipcRenderer.removeAllListeners('SAVE');
+    ipcRenderer.removeAllListeners('EXPORT_PYTHON');
   }
 
   openOpList = () => {
@@ -128,8 +137,6 @@ class OpList extends Component<
         if (!err) {
           insertOp(newOp, index);
           this.setState({ installedScripts: listScripts() });
-
-          customNameCounter += 1;
         }
       });
     } else {
@@ -138,36 +145,137 @@ class OpList extends Component<
     }
   };
 
+  removeScript = (rmop: Operation) => {
+    const { operations, setOperations, evalSequence } = this.props;
+
+    rmScript(rmop.package, rmop.name);
+    const firstOccurrence = operations.findIndex(
+      (o) => o.package === rmop.package && o.name === rmop.name
+    );
+    const reducedOperations = operations.filter(
+      (o) => o.package !== rmop.package || o.name !== rmop.name
+    );
+    this.setState({
+      installedScripts: listScripts(),
+    });
+
+    // the first occurrence is at the bottom
+    if (firstOccurrence >= reducedOperations.length) {
+      const selectionIndex = reducedOperations.length - 1;
+      setOperations(reducedOperations, selectionIndex);
+    } else {
+      setOperations(reducedOperations, firstOccurrence);
+      evalSequence(firstOccurrence);
+    }
+  };
+
+  toggleDrawer = () => this.setState({ drawerOn: false });
+
   render() {
     const {
       operations,
       selectedKey,
       resultUpToDate,
-      setOperations,
       selectOp,
       removeOp,
-      evalSequence,
     } = this.props;
 
-    const { installedScripts } = this.state;
+    const { installedScripts, drawerOn, formValid } = this.state;
 
+    const builtinItemGroup = Object.entries(
+      groupByFirstChar(installedScripts.builtin)
+    ).map(([char, names]) => (
+      <Menu.ItemGroup key={char} title={char}>
+        {names.map((m_name) => (
+          <Menu.Item key={`builtin.${m_name}`}>{m_name}</Menu.Item>
+        ))}
+      </Menu.ItemGroup>
+    ));
+
+    // drawer component to create a new custom function
+    const newOpDrawer = (
+      <Drawer
+        title="Create a new custom function"
+        width={300}
+        onClose={this.toggleDrawer}
+        visible={drawerOn}
+        bodyStyle={{ paddingBottom: 80 }}
+      >
+        <Form
+          name="new"
+          onFinish={(values) => {
+            const { insertionIndex } = this.state;
+            this.insertOp(`custom.__${values.name}` as string, insertionIndex);
+          }}
+        >
+          <Form.Item
+            label="Name"
+            name="name"
+            rules={[
+              () => ({
+                validator: (_, value: string) => {
+                  const pattern = /^[A-Za-z_]\w+$/;
+
+                  if (!pattern.test(value)) {
+                    this.setState({ formValid: false });
+                    return Promise.reject(
+                      new Error('Invalid Python module name!')
+                    );
+                  }
+
+                  if (installedScripts.builtin.indexOf(value) !== -1) {
+                    this.setState({ formValid: false });
+                    return Promise.reject(
+                      new Error('Same name as a builtin function!')
+                    );
+                  }
+
+                  if (installedScripts.custom.indexOf(value) !== -1) {
+                    this.setState({ formValid: false });
+                    return Promise.reject(
+                      new Error('Same name as a custom function!')
+                    );
+                  }
+
+                  this.setState({ formValid: true });
+                  return Promise.resolve();
+                },
+              }),
+            ]}
+          >
+            <Input placeholder="A valid Python name" />
+          </Form.Item>
+          <Form.Item>
+            <Button
+              onClick={this.toggleDrawer}
+              disabled={!formValid}
+              htmlType="submit"
+              type="primary"
+            >
+              Submit
+            </Button>
+          </Form.Item>
+        </Form>
+      </Drawer>
+    );
+
+    // dropdown menu for the "+" button
     const dropdownMenu = (index: number) => (
       <Menu
         onClick={(info) => {
           info.domEvent.stopPropagation();
-          this.insertOp(info.key as string, index);
+          if (info.key === 'new') {
+            this.setState({ drawerOn: true, insertionIndex: index });
+          } else {
+            this.insertOp(info.key as string, index);
+          }
         }}
-        style={{ width: 256 }}
       >
-        <Menu.Item key={`custom.__${uniqueCustomName()}`}>
+        <Menu.Item key="new">
           <PlusCircleOutlined />
           <Text strong>New</Text>
         </Menu.Item>
-        <Menu.ItemGroup key="0" title="Builtins">
-          {installedScripts.builtin.map((m_name) => (
-            <Menu.Item key={`builtin.${m_name}`}>{m_name}</Menu.Item>
-          ))}
-        </Menu.ItemGroup>
+        {builtinItemGroup}
         <Menu.ItemGroup key="1" title="Custom">
           {installedScripts.custom.map((m_name) => (
             <Menu.Item key={`custom.${m_name}`}>{m_name}</Menu.Item>
@@ -176,24 +284,7 @@ class OpList extends Component<
       </Menu>
     );
 
-    const removeScript = (op: Operation) => {
-      rmScript(op.package, op.name);
-      const firstOccurrence = operations.findIndex((o) => o.name === op.name);
-      const reducedOperations = operations.filter((o) => o.name !== op.name);
-      this.setState({
-        installedScripts: listScripts(),
-      });
-
-      // the first occurrence is at the bottom
-      if (firstOccurrence >= reducedOperations.length) {
-        const selectionIndex = reducedOperations.length - 1;
-        setOperations(reducedOperations, selectionIndex);
-      } else {
-        setOperations(reducedOperations, firstOccurrence);
-        evalSequence(firstOccurrence);
-      }
-    };
-
+    // operations
     const opItems = operations.map((op, index) => {
       // Menu.Item.onClick and Popconfirm are mutually exclusive
       // only show Popconfirm when moving away from a unsaved op.
@@ -223,6 +314,11 @@ class OpList extends Component<
                 <Dropdown
                   disabled={!op.resultImageHash}
                   overlay={dropdownMenu(index)}
+                  overlayStyle={{
+                    width: 256,
+                    maxHeight: '100vh',
+                    overflowY: 'auto',
+                  }}
                 >
                   <Button type="text" size="small">
                     +
@@ -252,7 +348,7 @@ class OpList extends Component<
                     onConfirm={(e) => {
                       // important! otherwise will trigger Item's selection
                       e?.stopPropagation();
-                      removeScript(op);
+                      this.removeScript(op);
                     }}
                   >
                     <Button type="text" size="small" danger>
@@ -268,13 +364,16 @@ class OpList extends Component<
       );
     });
     return (
-      <Menu
-        mode="inline"
-        style={{ minHeight: '100%' }}
-        selectedKeys={[selectedKey]}
-      >
-        {opItems}
-      </Menu>
+      <>
+        <Menu
+          mode="inline"
+          style={{ minHeight: '100%' }}
+          selectedKeys={[selectedKey]}
+        >
+          {opItems}
+        </Menu>
+        {newOpDrawer}
+      </>
     );
   }
 }
