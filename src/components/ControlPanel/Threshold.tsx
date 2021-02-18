@@ -15,7 +15,7 @@ export default class ThresholdControls extends DefaultControls {
         <h2>{name}</h2>
         <h4>Threshold</h4>
         <Slider
-          marks={{ 0: '0', 255: '255' }}
+          marks={{ 0: '0', 127: '127', 255: '255' }}
           min={0}
           max={255}
           value={args[0]}

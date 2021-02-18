@@ -1,4 +1,4 @@
-import { InputNumber, Select, Switch } from 'antd';
+import { InputNumber, Select } from 'antd';
 import React from 'react';
 import DefaultControls from './Default';
 

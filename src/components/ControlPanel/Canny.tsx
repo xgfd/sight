@@ -13,18 +13,24 @@ export default class CannyControls extends DefaultControls {
         <h2>{name}</h2>
         <h4>Thresholds</h4>
         <Slider
+          marks={{ 0: '0', 180: '180', 360: '360' }}
           range
           max={360}
           value={args[0]}
           onChange={(value: [number, number]) => this.updateArgs(0, value)}
         />
-        <h4>Aperture size (odd only)</h4>
-        <InputNumber
+        <h4>Aperture size</h4>
+        <Slider
+          marks={{
+            3: '3',
+            5: '5',
+            7: '7',
+          }}
           min={3}
           max={7}
           step={2}
           value={args[1]}
-          onChange={(value) => this.updateArgs(1, value)}
+          onChange={(value: number) => this.updateArgs(1, value)}
         />
         <h4>High accuracy (L2gradient)</h4>
         <Switch

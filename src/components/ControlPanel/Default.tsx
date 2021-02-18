@@ -54,6 +54,7 @@ export default class DefaultControls<
         <h2>{name}</h2>
         <h4>Thresholds</h4>
         <Slider
+          marks={{ 0: '0', 180: '180', 360: '360' }}
           range
           max={360}
           value={args[0]}

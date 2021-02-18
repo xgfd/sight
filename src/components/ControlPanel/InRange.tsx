@@ -13,6 +13,7 @@ export default class InRangeControls extends DefaultControls {
         <h2>{name}</h2>
         <h4>Thresholds</h4>
         <Slider
+          marks={{ 0: '0', 255: '255' }}
           range
           min={0}
           max={255}

@@ -7,13 +7,6 @@ const { Option } = Select;
 export default class SobelControls extends DefaultControls {
   static defaultValues = [-1, 1, 0, 3, 1, 0];
 
-  marks = {
-    1: '1',
-    3: '3',
-    5: '5',
-    7: '7',
-  };
-
   render() {
     const { name, args } = this.state;
 
@@ -63,7 +56,12 @@ export default class SobelControls extends DefaultControls {
         />
         <h4>K-Size</h4>
         <Slider
-          marks={this.marks}
+          marks={{
+            1: '1',
+            3: '3',
+            5: '5',
+            7: '7',
+          }}
           min={1}
           max={7}
           step={2}

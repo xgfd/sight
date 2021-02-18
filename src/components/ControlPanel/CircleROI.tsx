@@ -93,6 +93,7 @@ export default class CircleROIControls extends DefaultControls<
         </Row>
         <h4>Aspect range</h4>
         <Slider
+          marks={{ 0: '0', 1: '1' }}
           max={1}
           step={0.01}
           value={args[3]}

@@ -20,6 +20,7 @@ export default class ConvertScaleAbsControls extends DefaultControls {
         />
         <h4>Beta (brightness)</h4>
         <Slider
+          marks={{ 0: '0', 127: '127', 255: '255' }}
           max={255}
           value={args[1]}
           onChange={(value: number) => this.updateArgs(1, value)}

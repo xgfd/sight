@@ -13,6 +13,7 @@ export default class GammaCorrectionControls extends DefaultControls {
         <h2>{name}</h2>
         <h4>Gamma</h4>
         <Slider
+          marks={{ 0.01: '.01', 10: '10' }}
           min={0.01}
           max={10}
           step={0.01}

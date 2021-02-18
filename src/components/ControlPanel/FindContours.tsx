@@ -78,6 +78,7 @@ export default class FindContoursControls extends DefaultControls<
         <Row>
           <Col span={15}>
             <Slider
+              marks={{ 0: '0' }}
               range
               max={areaMax}
               value={args[2]}
@@ -100,6 +101,7 @@ export default class FindContoursControls extends DefaultControls<
         <Row>
           <Col span={15}>
             <Slider
+              marks={{ 0: '0' }}
               range
               max={boundAreaMax}
               value={args[3]}
@@ -124,6 +126,7 @@ export default class FindContoursControls extends DefaultControls<
         <Row>
           <Col span={15}>
             <Slider
+              marks={{ 0: '0' }}
               range
               max={lengthMax}
               value={args[4]}
@@ -146,6 +149,7 @@ export default class FindContoursControls extends DefaultControls<
         </Row>
         <h4>Aspect range</h4>
         <Slider
+          marks={{ 0: '0', 0.5: '.5', 1: '1' }}
           range
           max={1}
           step={0.01}
@@ -154,6 +158,7 @@ export default class FindContoursControls extends DefaultControls<
         />
         <h4>Intensity range</h4>
         <Slider
+          marks={{ 0: '0', 127: '127', 255: '255' }}
           range
           max={255}
           value={args[6]}
