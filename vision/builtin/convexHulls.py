@@ -9,8 +9,8 @@ from . import Contour
 def main(
     image: object,
     _contours: List[Contour],
-    line_thickness: int,
-    return_image_mode=3,  # controls what image to return 0=colour image with shape overlay; 1=shape on black background; 3=pass on the input image
+    line_thickness=2,
+    return_image_mode=1,  # controls what image to return 0=colour image with shape overlay; 1=shape on black background; 3=pass on the input image
 ) -> Tuple[object, List[Contour]]:
 
     hulls: List[Contour] = []

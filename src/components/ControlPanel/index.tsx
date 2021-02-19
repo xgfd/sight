@@ -23,6 +23,7 @@ import MedianControls from './MedianBlur';
 import MinEnclosingCirclesControls from './MinEnclosingCircle';
 import MorphologyExControls from './MorphologyEx';
 import NormalizeControls from './Normalize';
+import ReduceContoursControls from './ReduceContours';
 import SobelControls from './Sobel';
 import ThresholdControls from './Threshold';
 import WarpPolarControls from './WarpPolar';
@@ -51,6 +52,7 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   minenclosingcircles: MinEnclosingCirclesControls,
   medianblur: MedianControls,
   morphologyex: MorphologyExControls,
+  reducecontours: ReduceContoursControls,
   sobel: SobelControls,
   threshold: ThresholdControls,
   warppolar: WarpPolarControls,

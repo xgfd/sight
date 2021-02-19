@@ -15,7 +15,7 @@ def main(
     intensity_range: Tuple[float, float],
     line_thickness=2,
     return_image_mode=3,  # controls what image to return 0=colour image with shape overlay; 1=shape on black background; 3=pass on the input image
-)-> Tuple[object, List[Contour]]:
+) -> Tuple[object, List[Contour]]:
 
     area_l, area_h = area_range
     bound_area_l, bound_area_h = bound_area_range

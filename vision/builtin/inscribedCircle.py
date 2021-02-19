@@ -3,17 +3,24 @@ from typing import Tuple
 import cv2
 import numpy as np
 
-from builtin import Circle
+from builtin import Circle, Contour
 
 
 def main(
     image: object,
+    _contour: Contour,
     distanceType: int,
     maskSize: int,
     line_thickness: int,
-    return_image_mode=3,  # controls what image to return 0=colour image with shape overlay; 1=shape on black background; 3=pass on the input image
+    return_image_mode=1,  # controls what image to return 0=colour image with shape overlay; 1=shape on black background; 3=pass on the input image
 ) -> Tuple[object, Circle]:
-    dist = cv2.distanceTransform(image, distanceType=distanceType, maskSize=maskSize)
+
+    shape_image = np.zeros_like(image)
+    cv2.drawContours(shape_image, [_contour], -1, 255, -1)
+
+    dist = cv2.distanceTransform(
+        shape_image, distanceType=distanceType, maskSize=maskSize
+    )
     _, radius, _, center = cv2.minMaxLoc(dist)
     radius = int(radius)
 

@@ -4,8 +4,8 @@ import DefaultControls from './Default';
 
 const { Option } = Select;
 
-export default class InscribedCircleControls extends DefaultControls {
-  static defaultValues = [2, 3, 0, 1];
+export default class ReduceContoursControls extends DefaultControls {
+  static defaultValues = ['max', 'contourArea', 2, 1];
 
   render() {
     const { name, args } = this.state;
@@ -13,7 +13,7 @@ export default class InscribedCircleControls extends DefaultControls {
     return (
       <>
         <h2>{name}</h2>
-        <h4>Distance type</h4>
+        <h4>Method</h4>
         <Select
           value={args[0]}
           showSearch
@@ -21,11 +21,12 @@ export default class InscribedCircleControls extends DefaultControls {
           style={{ width: '100%' }}
           onChange={(value) => this.updateArgs(0, value)}
         >
-          <Option value={1}>L1</Option>
-          <Option value={2}>L2</Option>
-          <Option value={3}>C</Option>
+          <Option value="max">max</Option>
+          <Option value="min">min</Option>
+          <Option value="first">first</Option>
+          <Option value="last">last</Option>
         </Select>
-        <h4>Distance type</h4>
+        <h4>Order by</h4>
         <Select
           value={args[1]}
           showSearch
@@ -33,9 +34,10 @@ export default class InscribedCircleControls extends DefaultControls {
           style={{ width: '100%' }}
           onChange={(value) => this.updateArgs(1, value)}
         >
-          <Option value={3}>MASK_3</Option>
-          <Option value={5}>MASK_5</Option>
-          <Option value={0}>MASK_PRECISE</Option>
+          <Option value="contourArea">contourArea</Option>
+          <Option value="minAreaRect">minAreaRect</Option>
+          <Option value="length">length</Option>
+          <Option value="aspect">aspect</Option>
         </Select>
         <h4>Line thickness</h4>
         <InputNumber
