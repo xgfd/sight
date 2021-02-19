@@ -12,7 +12,7 @@ def main(
     distanceType: int,
     maskSize: int,
     line_thickness: int,
-    return_image_mode=1,  # controls what image to return 0=colour image with shape overlay; 1=shape on black background; 3=pass on the input image
+    return_image_mode=1,  # controls what image to return 0=colour image with shape overlay; 1=shape on black background; 2=pass on the input image
 ) -> Tuple[object, Circle]:
 
     shape_image = np.zeros_like(image)

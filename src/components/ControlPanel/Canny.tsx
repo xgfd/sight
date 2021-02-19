@@ -1,4 +1,4 @@
-import { InputNumber, Slider, Switch } from 'antd';
+import { Slider, Switch } from 'antd';
 import React from 'react';
 import DefaultControls from './Default';
 

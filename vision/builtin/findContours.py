@@ -10,7 +10,7 @@ def main(
     contour_mode: int,
     method: int,
     line_thickness=2,
-    return_image_mode=1,  # controls what image to return 0=colour image with shape overlay; 1=shape on black background; 3=pass on the input image
+    return_image_mode=1,  # controls what image to return 0=colour image with shape overlay; 1=shape on black background; 2=pass on the input image
 ) -> Tuple[object, List[Contour]]:
     contours, _ = cv2.findContours(image, mode=contour_mode, method=method)
 

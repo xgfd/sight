@@ -44,7 +44,7 @@ def main(
         method (Literal["max", "min", "first", "last"]): Which contour to return.
         sort_by (Literal["contourArea", "minAreaRect", "length", "aspect"]): If `method` is min or max, sort contours by the given feature.
         line_thickness (int, optional): Line thickness when drawing shapes. Defaults to 2.
-        return_image_mode (int, optional): What image to return 0=colour image with shape overlay; 1=shape on black background; 3=pass on the input image. Defaults to 1.
+        return_image_mode (int, optional): What image to return 0=colour image with shape overlay; 1=shape on black background; 2=pass on the input image. Defaults to 1.
 
     Returns:
         Tuple[object, Contour]: Return image; selected contour.

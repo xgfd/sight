@@ -15,6 +15,7 @@ import FindContoursControls from './FindContours';
 import FitEllipsesControls from './FitEllipses';
 import GammaCorrectionControls from './GammaCorrection';
 import GaussianControls from './GaussianBlur';
+import HistogramControls from './Histogram';
 import ImreadControls from './Imread';
 import InRangeControls from './InRange';
 import InscribedCircleControls from './InscribedCircle';
@@ -44,6 +45,7 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   fitellipses: FitEllipsesControls,
   gaussianblur: GaussianControls,
   gammacorrection: GammaCorrectionControls,
+  histogram: HistogramControls,
   imread: ImreadControls,
   inrange: InRangeControls,
   inscribedcircle: InscribedCircleControls,
