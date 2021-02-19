@@ -33,13 +33,6 @@ CACHE = (APP_DATA / "cache").resolve()
 BUILTIN = Path(".") / "builtin"
 CUSTOM = Path(".") / "custom"
 
-# # add custom functions to search paths
-# CUSTOM.mkdir(parents=True, exist_ok=True)
-# sys.path.insert(0, str(APP_DATA))
-# # copy builtin/__inti__.py to CUSTOM to import all sub modules
-# shutil.copyfile(BUILTIN / "__init__.py", CUSTOM / "__init__.py")
-# # now it automatically imports all custom functions
-
 
 class Context(TypedDict):
     input_hash: str
@@ -191,7 +184,7 @@ def _save_result(hash: str, image: object, data: Tuple = ()) -> bool:
     datapath = str(CACHE / f"{hash}.npy")
     # save as loseless png
     try:
-        cv2.imwrite(imagepath, image, [int(cv2.IMWRITE_PNG_COMPRESSION), 0])
+        cv2.imwrite(imagepath, image)
         np.save(datapath, data)
         return True
     except Exception:
