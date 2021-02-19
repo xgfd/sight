@@ -11,32 +11,18 @@ def main(image: object, show_hist=True) -> Tuple[object, List[List[Tuple[int]]]]
     histogram = []
 
     is_colour = len(image.shape) == 3
-    colours = ("#3a86ff", "#06D6A0", "#EF476F") if is_colour else ("#577590",)
+    n_channel = 3 if is_colour else 1
 
-    for i, col in enumerate(colours):
-        channel_histr = cv2.calcHist([image], [i], None, [256], [0, 256])
-        histogram.append(channel_histr)
-
-        if show_hist:
-            x = np.arange(256)
-            h = np.zeros(256)
-            plt.fill_between(
-                x,
-                channel_histr.ravel(),
-                h,
-                alpha=0.3,
-                color=col,
-                aa=True,
-            )
-            # plt.plot(
-            #     channel_histr,
-            #     alpha=0.3,
-            #     color=col,
-            #     aa=True,
-            # )
-            plt.xlim(0, 255)
+    for i in range(n_channel):
+        channel_hist = cv2.calcHist([image], [i], None, [256], [0, 256])
+        histogram.append(channel_hist)
 
     if show_hist:
+        colours = ("#3a86ff", "#06D6A0", "#EF476F") if is_colour else ("#577590",)
+        x = range(256)
+        for i, hist in enumerate(histogram):
+            plt.fill_between(x, hist.ravel(), 0, alpha=0.3, color=colours[i], aa=True)
+        plt.xlim(0, 255)
         buf = io.BytesIO()
         plt.savefig(buf, format="png", dpi=200)
         plt.close()
