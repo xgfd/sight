@@ -1,7 +1,8 @@
 from typing import Tuple
+
 import cv2
 
-Circle = Tuple[Tuple[float, float], float]
+from builtin import Circle
 
 
 def main(

@@ -7,7 +7,9 @@ import {
   ExpandOutlined,
   FieldBinaryOutlined,
   FileImageOutlined,
+  FilterOutlined,
   FunctionOutlined,
+  ToolOutlined,
   GlobalOutlined,
   HeatMapOutlined,
   HighlightOutlined,
@@ -15,6 +17,7 @@ import {
   LogoutOutlined,
   MergeCellsOutlined,
   PauseOutlined,
+  RadarChartOutlined,
   RiseOutlined,
   SplitCellsOutlined,
   UngroupOutlined,
@@ -44,10 +47,13 @@ const IconMap: { [key: string]: React.ReactNode } = {
   equalizehist: <BarChartOutlined />,
   filter2d: <BlockOutlined />,
   filter: <BuildOutlined />,
+  findcontours: <RadarChartOutlined />,
+  filtercontours: <FilterOutlined />,
   gaussianblur: <UngroupOutlined />,
   imread: <FileImageOutlined />,
   inrange: <ColumnHeightOutlined />,
   inscribedcircle: <LogoutOutlined />,
+  mapcontours: <FunctionOutlined />,
   minenclosingcircles: <LoginOutlined />,
   multiply: <CalculatorOutlined />,
   subtract: <CalculatorOutlined />,
@@ -57,7 +63,7 @@ const IconMap: { [key: string]: React.ReactNode } = {
 export default function getIcon(op: Operation): React.ReactNode {
   let icon;
   if (op.package === 'custom') {
-    icon = <FunctionOutlined />;
+    icon = <ToolOutlined />;
   } else {
     // for builtin functions read from the icon map or use its first letter
     icon = IconMap[op.name.toLowerCase()] || (

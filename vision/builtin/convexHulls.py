@@ -1,11 +1,9 @@
-from typing import Tuple, List, Union
+from typing import List, Tuple
+
 import cv2
 import numpy as np
 
-Point1 = Tuple[float, float]
-Point2 = Tuple[Tuple[float, float]]
-Point = Union[Point1, Point2]
-Contour = List[Point2]
+from . import Contour
 
 
 def main(

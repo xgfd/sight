@@ -1,12 +1,8 @@
-from typing import Tuple, List, Union
+from typing import Tuple, List
 import cv2
 import numpy as np
 
-Circle = Tuple[Tuple[float, float], float]
-Point1 = Tuple[float, float]
-Point2 = Tuple[Tuple[float, float]]
-Point = Union[Point1, Point2]
-Contour = List[Point2]
+from builtin import Contour, Circle
 
 
 def main(

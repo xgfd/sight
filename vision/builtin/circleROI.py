@@ -1,8 +1,9 @@
 from typing import Tuple
+
 import cv2
 import numpy as np
 
-Circle = Tuple[Tuple[float, float], float]
+from . import Circle
 
 
 def main(

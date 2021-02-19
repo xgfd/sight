@@ -8,13 +8,17 @@ import shlex
 import sys
 import traceback
 from pathlib import Path
-from typing import Callable, List, Tuple, TypedDict, Union, Dict
+from typing import Callable, Dict, List, Tuple, TypedDict, Union
 from zipfile import ZipFile
 
-import builtin  # import all builtin functions, see __init__.py
-import custom  # import all builtin functions, see __init__.py
+import builtin
+import custom
 import cv2
 import numpy as np
+
+# import all built/custom functions, see __init__.py of each package
+from builtin import *  # noqa: F401 F403
+from custom import *  # noqa: F401 F403
 
 # function shortcuts
 # FUNCTIONS: {pack.module: Callable}

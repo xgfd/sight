@@ -25,7 +25,8 @@
     "typescript.format.enable": false,
     "cSpell.words": [
       "Sider",
-      "imwrite"
+      "imwrite",
+      "upsert"
     ],
     "python.pythonPath": "/usr/local/bin/python3"
   }

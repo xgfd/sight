@@ -1,12 +1,9 @@
-from typing import Tuple, List, Union
+from typing import List, Tuple
+
 import cv2
 import numpy as np
 
-Ellipse = Tuple[Tuple[float, float], Tuple[float, float], float]
-Point1 = Tuple[float, float]
-Point2 = Tuple[Tuple[float, float]]
-Point = Union[Point1, Point2]
-Contour = List[Point2]
+from builtin import Contour, Ellipse
 
 
 def main(

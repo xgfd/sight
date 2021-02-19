@@ -1,12 +1,13 @@
-from typing import Tuple
+from typing import Tuple, List
 import cv2
 import numpy as np
+
+from builtin import Contour
 
 
 def main(
     image: object,
-    contour_mode: int,
-    method: int,
+    _contours: List[Contour],
     area_range: Tuple[float, float],
     bound_area_range: Tuple[float, float],
     length_range: Tuple[float, float],
@@ -14,8 +15,7 @@ def main(
     intensity_range: Tuple[float, float],
     line_thickness=2,
     return_image_mode=3,  # controls what image to return 0=colour image with shape overlay; 1=shape on black background; 3=pass on the input image
-):
-    contours, _ = cv2.findContours(image, mode=contour_mode, method=method)
+)-> Tuple[object, List[Contour]]:
 
     area_l, area_h = area_range
     bound_area_l, bound_area_h = bound_area_range
@@ -24,7 +24,7 @@ def main(
 
     selected_contours = []
 
-    for cont in contours:
+    for cont in _contours:
         area = cv2.contourArea(cont)
         _, (w, h), _ = cv2.minAreaRect(cont)
         bound_area = w * h

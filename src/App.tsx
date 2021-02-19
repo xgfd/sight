@@ -36,10 +36,16 @@ class App extends Component<unknown, IAppState> {
     const gaussian = new Operation('GaussianBlur', 'builtin');
     const threshold = new Operation('threshold', 'builtin');
     const morphology = new Operation('morphologyEx', 'builtin');
-    // const circleroi = new Operation('circleROI', 'builtin');
-    const findcontours = new Operation('findContours', 'custom');
-    // const canny = new Operation('Canny', 'builtin');
-    const operations = [imread, gaussian, threshold, morphology, findcontours];
+    const findcontours = new Operation('findContours', 'builtin');
+    const filtercontours = new Operation('filterContours', 'builtin');
+    const operations = [
+      imread,
+      gaussian,
+      threshold,
+      morphology,
+      findcontours,
+      filtercontours,
+    ];
     const selectionIndex = 0;
     const selection = operations[selectionIndex];
     this.state = {
