@@ -5,7 +5,7 @@ import os from 'os';
 const VISION =
   process.env.NODE_ENV !== 'development'
     ? path.join(process.resourcesPath, 'vision')
-    : path.join(process.resourcesPath, '../../../../../../vision');
+    : path.join(__dirname, '..', 'vision');
 
 const BUILTIN = path.join(VISION, 'builtin');
 const CUSTOM = path.join(VISION, 'custom');
@@ -18,5 +18,7 @@ const IMAGE_CACHE = path.join(APP_DATA, 'cache');
 fs.mkdir(IMAGE_CACHE, { recursive: true }, (err) => {
   if (err) console.error(err);
 });
+
+console.log({ VISION, BUILTIN, TEMPLATES, CUSTOM, IMAGE_CACHE });
 
 export { VISION, BUILTIN, TEMPLATES, CUSTOM, IMAGE_CACHE };
