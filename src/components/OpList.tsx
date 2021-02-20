@@ -4,20 +4,22 @@ import {
   Drawer,
   Dropdown,
   Form,
+  Input,
   Menu,
   Popconfirm,
   Space,
   Spin,
-  Input,
   Typography,
 } from 'antd';
-import { ipcRenderer } from 'electron';
+import { ipcRenderer, remote } from 'electron';
+import fs from 'fs';
 import React, { Component } from 'react';
 import Operation from '../Operation';
 import { exportScript, listScripts, rmScript, upsert } from '../utils';
 import getIcon from './Icons';
 
 const { Text } = Typography;
+const { dialog } = remote;
 
 interface IProps {
   operations: Operation[];
@@ -63,12 +65,12 @@ class OpList extends Component<IProps, IStates> {
   }
 
   componentDidMount() {
-    ipcRenderer.on('OPEN', () => {
-      this.openOpList();
+    ipcRenderer.on('OPEN', async () => {
+      await this.openOpList();
     });
 
-    ipcRenderer.on('SAVE', () => {
-      this.saveOpList();
+    ipcRenderer.on('SAVE', async () => {
+      await this.saveOpList();
     });
 
     ipcRenderer.on('EXPORT_PYTHON', () => {
@@ -82,35 +84,41 @@ class OpList extends Component<IProps, IStates> {
     ipcRenderer.removeAllListeners('EXPORT_PYTHON');
   }
 
-  openOpList = () => {
-    const element = document.createElement('input');
-    element.type = 'file';
-    element.accept = 'application/json';
-    element.addEventListener('input', async () => {
-      const filepath = (element as any).files[0];
-      const response = await fetch(filepath.path);
+  openOpList = async () => {
+    const options = {
+      filters: [{ name: 'json', extensions: ['json'] }],
+    };
+    const { canceled, filePaths } = await dialog.showOpenDialog(options);
+
+    if (!canceled) {
+      const filepath = filePaths[0];
+      const response = await fetch(filepath);
       const opListJson: [{ fn: string; args: [] }] = await response.json();
       const operations = opListJson.map(Operation.fromJson);
       const { setOperations } = this.props;
       setOperations(operations);
-    });
-    element.click();
+    }
   };
 
-  saveOpList = () => {
+  saveOpList = async () => {
     const { operations } = this.props;
     const instructions = operations.map((op) => {
       const opJson = op.toJson() as any;
       delete opJson.rid;
       return opJson;
     });
-    const file = new Blob([JSON.stringify(instructions, null, 2)], {
-      type: 'application/json',
+
+    const { canceled, filePath } = await dialog.showSaveDialog({
+      defaultPath: 'operations.json',
+      properties: ['createDirectory'],
     });
-    const element = document.createElement('a');
-    element.href = URL.createObjectURL(file);
-    element.download = 'operations.json';
-    element.click();
+
+    if (!canceled) {
+      fs.writeFileSync(
+        filePath as string,
+        JSON.stringify(instructions, null, 2)
+      );
+    }
   };
 
   exportAsPython = () => {
