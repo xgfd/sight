@@ -179,7 +179,11 @@ function run(
 
 function rmScript(pack: string, module: string) {
   if (pack === 'custom') {
-    fs.unlinkSync(path.join(CUSTOM, `${module}.py`));
+    try {
+      fs.unlinkSync(path.join(CUSTOM, `${module}.py`));
+    } catch {
+      return true;
+    }
     return true;
   }
 

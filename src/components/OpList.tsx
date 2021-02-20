@@ -1,4 +1,8 @@
-import { DeleteOutlined, PlusCircleOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  PlusCircleOutlined,
+  SyncOutlined,
+} from '@ant-design/icons';
 import {
   Button,
   Drawer,
@@ -311,7 +315,12 @@ class OpList extends Component<IProps, IStates> {
           }}
         >
           <Popconfirm
-            title="Script not executed. Use the Run button to execute?"
+            title={
+              <>
+                Script not executed. Use the Refresh <SyncOutlined /> button to
+                execute.
+              </>
+            }
             disabled={popconfirmDisabled}
           >
             <Space size="small">
@@ -348,7 +357,7 @@ class OpList extends Component<IProps, IStates> {
                   <Popconfirm
                     title={
                       <Text>
-                        Permanently delete {op.name}?
+                        Permanently delete &quot;{op.name}&quot;?
                         <br />
                         All occurrences on the list will be removed too.
                       </Text>
