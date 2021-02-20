@@ -96,7 +96,7 @@ const createWindow = async () => {
   });
 
   mainWindow.on('closed', () => {
-    fs.rmdir(IMAGE_CACHE, { recursive: true }, () => null);
+    fs.rmdirSync(IMAGE_CACHE, { recursive: true });
     mainWindow = null;
   });
 
