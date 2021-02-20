@@ -324,12 +324,13 @@ class OpList extends Component<IProps, IStates> {
             disabled={popconfirmDisabled}
           >
             <Space size="small">
-              <Text ellipsis={{ tooltip: op.name }} style={{ width: 60 }}>
+              <Text ellipsis={{ tooltip: op.name }} style={{ width: 70 }}>
                 {op.name}
               </Text>
-              <div style={{ textAlign: 'center' }}>
+              <div>
                 <Dropdown
                   disabled={!op.resultImageHash}
+                  trigger={['click']}
                   overlay={dropdownMenu(index)}
                   overlayStyle={{
                     width: 256,
@@ -337,7 +338,11 @@ class OpList extends Component<IProps, IStates> {
                     overflowY: 'auto',
                   }}
                 >
-                  <Button type="text" size="small">
+                  <Button
+                    type="text"
+                    size="small"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     +
                   </Button>
                 </Dropdown>

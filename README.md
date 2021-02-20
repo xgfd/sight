@@ -5,13 +5,14 @@ _Sight_ is a Python editor that allows you to see the output of every step of yo
 - Visually adjust algorithm parameters and see results in real time.
 - Export to production-ready Python algorithm package.
 
-![screenshot](screenshot.png)
+![screenshot](sight.png)
 
 <!-- TOC -->
 
-- [Using _Sight_](#using-_sight_)
-  - [Add a Custom Function](#add-a-custom-function)
-  - [Export as a Python Package](#export-as-a-python-package)
+- [Prepare Your Python Environment](#prepare-your-python-environment)
+- [Operations Panel](#operations-panel)
+- [File Menu](#file-menu)
+- [Add a New Custom Function](#add-a-new-custom-function)
 - [Developing _Sight_](#developing-_sight_)
   - [Add Builtin Functions](#add-builtin-functions)
   - [Refined Custom Functions](#refined-custom-functions)
@@ -19,15 +20,37 @@ _Sight_ is a Python editor that allows you to see the output of every step of yo
 
 <!-- /TOC -->
 
-## Using _Sight_
+## Prepare Your Python Environment
 
-### Add a Custom Function
+If you see the following warning make sure all required packages are installed for the Python environment.
 
-To create a function hover on the `+` button and select `New`:
+![module not found](module-not-found.png)
+
+## Operations Panel
+
+- **+** adds an operation to the list.
+
+- **-** removes an operation from the list.
+
+- **🗑** permanently deletes a custom function and removes all its occurrences from the list.
+
+![operation list](op-list.png)
+
+## File Menu
+
+- **Save Operations** Save the current operations to a file so you can load it back later.
+- **Save as Python** Save the operations as a Python package.
+- **Open** Load a previously save operation list.
+
+![file menu](filemenu.png)
+
+## Add a New Custom Function
+
+Click the `+` button and select `New`:
 
 ![new function](newfunction.png)
 
-A default name (read only) and control panel is provided. You can edit the code of the new function.
+A default control panel (readonly) is provided. You can edit the code of the new function.
 
 A function in Sight is a Python file (module) with a `main` function. The main function takes an image (except `imread`) and optionally other inputs from either the result of a previous function or the control panel (the right panel) in Sight. Every function returns an image and any number of data.
 
@@ -70,9 +93,9 @@ All custom functions are saved in the `resource/vision/custom` folder in the app
 
 You can rename the `.py` files to change functions' names but you need to reload Sight (`CMD+r` or `Ctrl+r`) to reflect the changes.
 
-### Export as a Python Package
+The "Refresh" (circle icon) button shows when you create or edit a custom function. Clicking it will run the function.
 
-Add a few functions in the left panel and press the `Export` button to save your image processing algorithm as a Python package. All current steps and control panel parameters are saved.
+![refresh button](refresh-button.png)
 
 ## Developing _Sight_
 
