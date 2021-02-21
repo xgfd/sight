@@ -160,9 +160,6 @@ class OperationPanel extends Component<IProps, IStates> {
     const { operations, setOperations } = this.props;
 
     rmScript(rmop.package, rmop.name);
-    const firstOccurrence = operations.findIndex(
-      (o) => o.package === rmop.package && o.name === rmop.name
-    );
     const reducedOperations = operations.filter(
       (o) => o.package !== rmop.package || o.name !== rmop.name
     );
@@ -170,13 +167,7 @@ class OperationPanel extends Component<IProps, IStates> {
       installedScripts: listScripts(),
     });
 
-    // the first occurrence is at the bottom
-    if (firstOccurrence >= reducedOperations.length) {
-      const selectionIndex = reducedOperations.length - 1;
-      setOperations(reducedOperations, selectionIndex);
-    } else {
-      setOperations(reducedOperations, firstOccurrence);
-    }
+    setOperations(reducedOperations);
   };
 
   toggleDrawer = () => this.setState({ drawerOn: false });

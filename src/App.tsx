@@ -28,6 +28,16 @@ interface IAppState {
   operations: Operation[];
 }
 
+function firstDiff(arr: Operation[], newArr: Operation[]) {
+  let i;
+  for (i = 0; i < arr.length; i += 1) {
+    if (arr[i].id !== (newArr[i] || {}).id) {
+      break;
+    }
+  }
+  return Math.min(i, newArr.length - 1);
+}
+
 class App extends Component<unknown, IAppState> {
   constructor(props: unknown) {
     super(props);
@@ -142,22 +152,14 @@ class App extends Component<unknown, IAppState> {
 
   evalDebounced: (index?: number) => void = debounce(this.execOperations, 100); // eslint-disable-line react/sort-comp
 
-  toggleOpList = () => {
-    const { collapsed } = this.state;
-    this.setState({
-      collapsed: !collapsed,
-    });
-  };
-
   /**
    * Set the operation list and selected operation. Evaluate the selected operation and its successors if needed.
    * @param operations New operation list.
    * @param selectionIndex Selected operation index.
    */
-  setOperations = (
-    operations: Operation[],
-    selectionIndex = this.state.selectionIndex // eslint-disable-line
-  ) => {
+  setOperations = (operations: Operation[]) => {
+    const { operations: preOperations } = this.state;
+    const selectionIndex = firstDiff(preOperations, operations);
     const selection = operations[selectionIndex];
     this.setState({
       selectedOp: selection,
@@ -201,9 +203,9 @@ class App extends Component<unknown, IAppState> {
    */
   insertOp = (op: Operation, index: number) => {
     const { operations } = this.state;
-    const selectionIndex = index + 1;
-    operations.splice(selectionIndex, 0, op);
-    this.setOperations(operations, selectionIndex);
+    const newOperations = [...operations];
+    newOperations.splice(index + 1, 0, op);
+    this.setOperations(newOperations);
   };
 
   /**
@@ -213,10 +215,16 @@ class App extends Component<unknown, IAppState> {
    */
   removeOp = (index: number) => {
     const { operations } = this.state;
-    operations.splice(index, 1);
-    // prevent index overflow if the removed op was the last one
-    const selectionIndex = Math.min(index, operations.length - 1);
-    this.setOperations(operations, selectionIndex);
+    const newOperations = [...operations];
+    newOperations.splice(index, 1);
+    this.setOperations(newOperations);
+  };
+
+  toggleOpList = () => {
+    const { collapsed } = this.state;
+    this.setState({
+      collapsed: !collapsed,
+    });
   };
 
   onEditorChange = (script: string | undefined) => {
