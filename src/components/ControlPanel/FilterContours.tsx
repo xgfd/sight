@@ -28,9 +28,9 @@ export default class FilterContoursControls extends DefaultControls<
     super(props);
     const { selectedOp } = props;
     const { args } = selectedOp;
-    const areaHigh = args[2][1];
-    const boundHigh = args[3][1];
-    const lengthHigh = args[4][1];
+    const areaHigh = args[0][1];
+    const boundHigh = args[1][1];
+    const lengthHigh = args[2][1];
     this.state = {
       ...this.state,
       areaMax: Math.ceil(areaHigh / 1000) * 2 * 1000,
