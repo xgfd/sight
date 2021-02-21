@@ -10,7 +10,7 @@ import path from 'path';
 import React, { Component } from 'react';
 import './App.global.css';
 import Gallery from './components/Gallery';
-import OpList from './components/OpList';
+import OperationPanel from './components/OperationPanel';
 import Operation from './Operation';
 import { notify, run, upsert } from './utils';
 
@@ -288,7 +288,7 @@ class App extends Component<unknown, IAppState> {
               left: 0,
             }}
           >
-            <OpList
+            <OperationPanel
               selectedKey={selectedOp.id}
               resultUpToDate={selectedOp.resultUpToDate}
               operations={operations}

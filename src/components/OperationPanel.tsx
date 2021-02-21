@@ -57,7 +57,7 @@ function groupByFirstChar(names: string[]) {
   }, {} as { [key: string]: string[] });
 }
 
-class OpList extends Component<IProps, IStates> {
+class OperationPanel extends Component<IProps, IStates> {
   constructor(props: IProps) {
     super(props);
     this.state = {
@@ -194,6 +194,7 @@ class OpList extends Component<IProps, IStates> {
 
     const { installedScripts, drawerOn, formValid } = this.state;
 
+    // item group for builtin functions
     const builtinItemGroup = Object.entries(
       groupByFirstChar(installedScripts.builtin)
     ).map(([char, names]) => (
@@ -204,7 +205,7 @@ class OpList extends Component<IProps, IStates> {
       </Menu.ItemGroup>
     ));
 
-    // drawer component to create a new custom function
+    // drawer component for creating a new custom function
     const newOpDrawer = (
       <Drawer
         title="Create a new custom function"
@@ -296,7 +297,7 @@ class OpList extends Component<IProps, IStates> {
       </Menu>
     );
 
-    // operations
+    // operation list consisting of builtin and custom function item groups
     const opItems = operations.map((op, index) => {
       // Menu.Item.onClick and Popconfirm are mutually exclusive
       // only show Popconfirm when moving away from a unsaved op.
@@ -329,7 +330,7 @@ class OpList extends Component<IProps, IStates> {
               </Text>
               <div>
                 <Dropdown
-                  disabled={!op.resultImageHash}
+                  // disabled={!op.resultImageHash}
                   trigger={['click']}
                   overlay={dropdownMenu(index)}
                   overlayStyle={{
@@ -400,4 +401,4 @@ class OpList extends Component<IProps, IStates> {
   }
 }
 
-export default OpList;
+export default OperationPanel;

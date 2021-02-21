@@ -1,4 +1,4 @@
-import {
+import Icon, {
   BarChartOutlined,
   BlockOutlined,
   BuildOutlined,
@@ -68,7 +68,7 @@ export default function getIcon(op: Operation): React.ReactNode {
   } else {
     // for builtin functions read from the icon map or use its first letter
     icon = IconMap[op.name.toLowerCase()] || (
-      <Text strong>{op.name[0].toUpperCase()}</Text>
+      <Icon component={() => <Text strong>{op.name[0].toUpperCase()}</Text>} />
     );
   }
   return icon;
