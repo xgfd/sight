@@ -33,7 +33,6 @@ interface IProps {
   selectOp: (op: Operation, index: number) => void;
   insertOp: (op: Operation, index: number) => void;
   removeOp: (index: number) => void;
-  evalSequence: (index?: number) => void;
 }
 
 interface IStates {
@@ -158,7 +157,7 @@ class OperationPanel extends Component<IProps, IStates> {
   };
 
   removeScript = (rmop: Operation) => {
-    const { operations, setOperations, evalSequence } = this.props;
+    const { operations, setOperations } = this.props;
 
     rmScript(rmop.package, rmop.name);
     const firstOccurrence = operations.findIndex(
@@ -177,7 +176,6 @@ class OperationPanel extends Component<IProps, IStates> {
       setOperations(reducedOperations, selectionIndex);
     } else {
       setOperations(reducedOperations, firstOccurrence);
-      evalSequence(firstOccurrence);
     }
   };
 

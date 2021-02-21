@@ -56,18 +56,6 @@ class App extends Component<unknown, IAppState> {
     };
   }
 
-  setOperations = (
-    operations: Operation[],
-    selectionIndex = this.state.selectionIndex // eslint-disable-line
-  ) => {
-    const selection = operations[selectionIndex];
-    this.setState({
-      selectedOp: selection,
-      selectionIndex,
-      operations,
-    });
-  };
-
   execOperations = (index?: number) => {
     const { operations, selectionIndex } = this.state;
     if (index === undefined) {
@@ -162,6 +150,38 @@ class App extends Component<unknown, IAppState> {
   };
 
   /**
+   * Set the operation list and selected operation. Evaluate the selected operation and its successors if needed.
+   * @param operations New operation list.
+   * @param selectionIndex Selected operation index.
+   */
+  setOperations = (
+    operations: Operation[],
+    selectionIndex = this.state.selectionIndex // eslint-disable-line
+  ) => {
+    const selection = operations[selectionIndex];
+    this.setState({
+      selectedOp: selection,
+      selectionIndex,
+      operations,
+    });
+
+    // execute the new selected operation and its successors if
+    // 1) it's not imread, and
+    // 2) its immediate predecessor is evaluated, and
+    // 3) its input hash is different from the predecessor's output hash.
+    if (selection.name !== 'imread') {
+      const preResultHash =
+        selectionIndex > 0
+          ? operations[selectionIndex - 1].resultImageHash
+          : '';
+
+      if (preResultHash && selection.inputImageHash !== preResultHash) {
+        this.evalDebounced(selectionIndex);
+      }
+    }
+  };
+
+  /**
    * Change the currently selected operation and the corresponding index.
    * @param op The new selected operation.
    */
@@ -182,23 +202,8 @@ class App extends Component<unknown, IAppState> {
   insertOp = (op: Operation, index: number) => {
     const { operations } = this.state;
     const selectionIndex = index + 1;
-    const selection = op;
     operations.splice(selectionIndex, 0, op);
-
-    // automatically execute the new selected operation and its successors
-    // if it's not imread and its immediate predecessor is evaluated
-    if (selection.name !== 'imread') {
-      const lastResultHash =
-        selectionIndex > 0
-          ? operations[selectionIndex - 1].resultImageHash
-          : '';
-      if (lastResultHash) {
-        this.evalDebounced(selectionIndex);
-      }
-    }
-
-    this.selectOp(op, selectionIndex);
-    this.setState({ operations });
+    this.setOperations(operations, selectionIndex);
   };
 
   /**
@@ -209,26 +214,9 @@ class App extends Component<unknown, IAppState> {
   removeOp = (index: number) => {
     const { operations } = this.state;
     operations.splice(index, 1);
-
     // prevent index overflow if the removed op was the last one
     const selectionIndex = Math.min(index, operations.length - 1);
-    const selection = operations[selectionIndex];
-
-    // automatically execute the new selected operation and its successors
-    // if it's not imread and its immediate predecessor is evaluated
-    if (selection.name !== 'imread') {
-      const lastResultHash =
-        selectionIndex > 0
-          ? operations[selectionIndex - 1].resultImageHash
-          : '';
-
-      if (lastResultHash && selection.inputImageHash !== lastResultHash) {
-        this.evalDebounced(selectionIndex);
-      }
-    }
-
-    this.selectOp(selection, selectionIndex);
-    this.setState({ operations });
+    this.setOperations(operations, selectionIndex);
   };
 
   onEditorChange = (script: string | undefined) => {
@@ -296,7 +284,6 @@ class App extends Component<unknown, IAppState> {
               selectOp={this.selectOp}
               insertOp={this.insertOp}
               removeOp={this.removeOp}
-              evalSequence={this.evalDebounced}
             />
           </Sider>
           <Layout className="site-layout">
