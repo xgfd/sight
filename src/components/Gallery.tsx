@@ -14,7 +14,7 @@ interface IProps {
 export default function Gallery(props: IProps) {
   const { operations, selectedOp } = props;
   const selectedKey = selectedOp.id;
-  const imageComponents = operations.map((op) => {
+  const imageComponents = operations.map((op, index) => {
     let badgeCount;
     if (op.id === selectedKey) {
       badgeCount = op.loading ? (
@@ -26,7 +26,9 @@ export default function Gallery(props: IProps) {
       badgeCount = 0;
     }
     return (
-      <Badge key={op.resultImageHash} dot count={badgeCount}>
+      // somehow providing `key` to each Image casuses preview images are ordered by the order that the images are updated, not by the order of the thumbnails
+      // eslint-disable-next-line react/no-array-index-key
+      <Badge key={index} dot count={badgeCount}>
         <Image
           height={200}
           width={200}
