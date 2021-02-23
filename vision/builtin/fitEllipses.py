@@ -3,7 +3,7 @@ from typing import List, Tuple
 import cv2
 import numpy as np
 
-from builtin import Contour, Ellipse
+from . import Contour, Ellipse
 
 
 def main(

@@ -2,7 +2,7 @@ from typing import List, Tuple, Literal
 
 import cv2
 import numpy as np
-from builtin import Contour
+from . import Contour
 
 
 def _minAreaRectArea(contour: Contour) -> float:

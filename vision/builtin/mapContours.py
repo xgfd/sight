@@ -2,7 +2,7 @@ from typing import Literal, List, Tuple
 import cv2
 import numpy as np
 
-from builtin import Contour, Circle, Shape, Rectangle, Point1
+from . import Contour, Circle, Shape, Rectangle, Point1
 
 
 def _minEnclosingCircleInt(contour: Contour) -> Circle:

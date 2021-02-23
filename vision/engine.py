@@ -284,37 +284,45 @@ def export(req: str):
     """
     operations: List[Op] = json.loads(req)
     config = {}
-    index_imports = ["import json"]
+    index_imports = ["import json", "from os import path"]
 
     main_header = """
 def main(image):
     data = ()
-    with open("config.json") as c:
+    with open(path.join(path.dirname(__file__), "config.json")) as c:
         config = json.load(c)"""
 
     index_main = [main_header]
     main_body = []
     with ZipFile("archive.zip", "w") as zip:
+        hasbuiltin = False
+        hascustom = False
         # remove imread on top
         if operations[0]["fn"] == "builtin.imread":
             operations = operations[1:]
-        for op in operations:
+        for index, op in enumerate(operations):
             fn_name = op["fn"]
             package, module = fn_name.split(".")
-            scriptfile = Path(package) / f"{module}.py"
-            zip.write(scriptfile)
+            if package == "builtin":
+                hasbuiltin = True
+            if package == "custom":
+                hascustom = True
+            scriptfile = Path(__file__).parent / package / f"{module}.py"
+            arcname = Path(package) / f"{module}.py"
+            zip.write(scriptfile, arcname)
 
             # import statement
-            index_imports.append(f'from {op["fn"]} import main as {module}')
+            index_imports.append(f'from .{op["fn"]} import main as {module}')
 
             # function invocation statement
             # line to read args
-            main_body.append(f'args = config["{module}"]')
+            config_key = f"{module}_{index}"
+            main_body.append(f'args = config["{config_key}"]')
 
             # construct the actual call depending on the return annotation
             # and the number of accepted parameters of the function
             args = op["args"]
-            config[module] = args
+            config[config_key] = args
             sig = SIGNATURES[fn_name]
             fn_arg_count = len(sig.parameters)
             ctrl_arg_count = len(args)
@@ -339,13 +347,21 @@ def main(image):
                 fn_call_right = f"{module}(image, *data, *args)"
 
             main_body.append(f"{fn_call_left} = {fn_call_right}")
+        if hasbuiltin:
+            initfile = Path(__file__).parent / "builtin" / "__init__.py"
+            arcname = Path("builtin") / "__init__.py"
+            zip.write(initfile, arcname)
+        if hascustom:
+            initfile = Path(__file__).parent / "custom" / "__init__.py"
+            arcname = Path("custom") / "__init__.py"
+            zip.write(initfile, arcname)
 
         main_body.append("return data")
         import_str = "\n".join(index_imports)
         index_main.extend(main_body)
         main_str = "\n\n    ".join(index_main)
         zip.writestr("index.py", f"{import_str}\n\n{main_str}\n")
-        zip.writestr("config.json", json.dumps(config))
+        zip.writestr("config.json", json.dumps(config, indent=4))
 
     return str(Path("archive.zip").resolve())
 

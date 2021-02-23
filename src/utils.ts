@@ -92,7 +92,7 @@ function exportScript(operations: Operation[], cb: (filepath: string) => void) {
       const archivePath = JSON.parse(message);
       cb(archivePath);
     } catch (e) {
-      console.log(e);
+      console.error(message);
     }
 
     CVSHELL.removeListener('message', onMessage);

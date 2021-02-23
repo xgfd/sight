@@ -2,7 +2,7 @@ from typing import Tuple, List
 import cv2
 import numpy as np
 
-from builtin import Contour
+from . import Contour
 
 
 def main(

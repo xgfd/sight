@@ -2,7 +2,7 @@ from typing import Tuple
 
 import cv2
 
-from builtin import Circle
+from . import Circle
 
 
 def main(
