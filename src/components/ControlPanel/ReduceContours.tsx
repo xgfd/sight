@@ -25,6 +25,7 @@ export default class ReduceContoursControls extends DefaultControls {
           <Option value="min">min</Option>
           <Option value="first">first</Option>
           <Option value="last">last</Option>
+          <Option value="concatenate">concatenate</Option>
         </Select>
         <h4>Order by</h4>
         <Select

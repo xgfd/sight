@@ -6,13 +6,14 @@ import CannyControls from './Canny';
 import CircleROIControls from './CircleROI';
 import ControlsBase from './ControlsBase';
 import ConvertScaleAbsControls from './ConvertScaleAbs';
-import ConvexHullsControls from './ConvexHulls';
+import ConvexHullControls from './ConvexHull';
 import CustomFindContours from './CustomFindContours';
 import DefaultControls, { Operation } from './Default';
 import EqualizeHistControls from './EqualizeHist';
+import ExpandDimensionControls from './ExpandDimension';
 import FilterContoursControls from './FilterContours';
 import FindContoursControls from './FindContours';
-import FitEllipsesControls from './FitEllipses';
+import FitEllipseControls from './FitEllipse';
 import GammaCorrectionControls from './GammaCorrection';
 import GaussianControls from './GaussianBlur';
 import HistogramControls from './Histogram';
@@ -21,7 +22,7 @@ import InRangeControls from './InRange';
 import InscribedCircleControls from './InscribedCircle';
 import MapContoursControls from './MapContours';
 import MedianControls from './MedianBlur';
-import MinEnclosingCirclesControls from './MinEnclosingCircle';
+import MinEnclosingCircleControls from './MinEnclosingCircle';
 import MorphologyExControls from './MorphologyEx';
 import NormalizeControls from './Normalize';
 import ReduceContoursControls from './ReduceContours';
@@ -36,13 +37,14 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   bilateralfilter: BilateralControls,
   canny: CannyControls,
   convertscaleabs: ConvertScaleAbsControls,
-  convexhulls: ConvexHullsControls,
+  convexhull: ConvexHullControls,
   customfindcontours: CustomFindContours,
   circleroi: CircleROIControls,
   euqalizehist: EqualizeHistControls,
+  expanddimension: ExpandDimensionControls,
   findcontours: FindContoursControls,
   filtercontours: FilterContoursControls,
-  fitellipses: FitEllipsesControls,
+  fitellipse: FitEllipseControls,
   gaussianblur: GaussianControls,
   gammacorrection: GammaCorrectionControls,
   histogram: HistogramControls,
@@ -51,7 +53,7 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   inscribedcircle: InscribedCircleControls,
   normalize: NormalizeControls,
   mapcontours: MapContoursControls,
-  minenclosingcircles: MinEnclosingCirclesControls,
+  minenclosingcircle: MinEnclosingCircleControls,
   medianblur: MedianControls,
   morphologyex: MorphologyExControls,
   reducecontours: ReduceContoursControls,

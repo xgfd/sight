@@ -4,7 +4,7 @@ import DefaultControls from './Default';
 
 const { Option } = Select;
 
-export default class FitEllipsesControls extends DefaultControls {
+export default class ConvexHullControls extends DefaultControls {
   static defaultValues = [2, 1];
 
   render() {

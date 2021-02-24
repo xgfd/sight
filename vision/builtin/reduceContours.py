@@ -1,4 +1,4 @@
-from typing import List, Tuple, Literal
+from typing import List, Tuple, Literal, Union
 
 import cv2
 import numpy as np
@@ -31,11 +31,11 @@ FEATURES = {
 def main(
     image: object,
     _contours: List[Contour],
-    method: Literal["max", "min", "first", "last"],
+    method: Literal["max", "min", "first", "last", "concatenate"],
     order_by: Literal["contourArea", "minAreaRect", "length", "aspect"],
     line_thickness=2,
     return_image_mode=1,
-) -> Tuple[object, Contour]:
+) -> Tuple[object, Union[Contour, None]]:
     """Reduce contours to a single contour.
 
     Args:
@@ -47,8 +47,11 @@ def main(
         return_image_mode (int, optional): What image to return 0=colour image with shape overlay; 1=shape on black background; 2=pass on the input image. Defaults to 1.
 
     Returns:
-        Tuple[object, Contour]: Return image; selected contour.
+        Tuple[object, Union[Contour, None]]: Return image; selected contour or None if _contours is empty.
     """
+
+    if len(_contours) == 0:
+        return image, None
 
     if method == "first":
         ret_contour = _contours[0]
@@ -62,6 +65,9 @@ def main(
 
     if method == "min":
         ret_contour = min(_contours, key=FEATURES[order_by])
+
+    if method == "concatenate":
+        ret_contour = np.concatenate(tuple(_contours), axis=0)
 
     if return_image_mode == 0:
         # colour image with shape overlay

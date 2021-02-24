@@ -20,6 +20,7 @@ import Icon, {
   RadarChartOutlined,
   RiseOutlined,
   SplitCellsOutlined,
+  PartitionOutlined,
   UngroupOutlined,
 } from '@ant-design/icons';
 import { Typography } from 'antd';
@@ -38,7 +39,6 @@ const IconMap: { [key: string]: React.ReactNode } = {
   bilateralfilter: <PauseOutlined />,
   canny: <HeatMapOutlined />,
   convertscaleabs: <RiseOutlined />,
-  warppolar: <GlobalOutlined />,
   crop: <ExpandOutlined />,
   contours: <HeatMapOutlined />,
   dilate: <SplitCellsOutlined />,
@@ -55,10 +55,12 @@ const IconMap: { [key: string]: React.ReactNode } = {
   inrange: <ColumnHeightOutlined />,
   inscribedcircle: <LogoutOutlined />,
   mapcontours: <FunctionOutlined />,
-  minenclosingcircles: <LoginOutlined />,
+  minenclosingcircle: <LoginOutlined />,
   multiply: <CalculatorOutlined />,
+  reducecontours: <PartitionOutlined rotate={180} />,
   subtract: <CalculatorOutlined />,
   threshold: <FieldBinaryOutlined />,
+  warppolar: <GlobalOutlined />,
 };
 
 export default function getIcon(op: Operation): React.ReactNode {
