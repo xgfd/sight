@@ -7,7 +7,6 @@ import CircleROIControls from './CircleROI';
 import ControlsBase from './ControlsBase';
 import ConvertScaleAbsControls from './ConvertScaleAbs';
 import ConvexHullControls from './ConvexHull';
-import CustomFindContours from './CustomFindContours';
 import DefaultControls, { Operation } from './Default';
 import EqualizeHistControls from './EqualizeHist';
 import ExpandDimensionControls from './ExpandDimension';
@@ -38,7 +37,6 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   canny: CannyControls,
   convertscaleabs: ConvertScaleAbsControls,
   convexhull: ConvexHullControls,
-  customfindcontours: CustomFindContours,
   circleroi: CircleROIControls,
   euqalizehist: EqualizeHistControls,
   expanddimension: ExpandDimensionControls,

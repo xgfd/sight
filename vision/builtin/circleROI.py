@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Union
 
 import cv2
 import numpy as np
@@ -14,7 +14,7 @@ def main(
     aspect: float,
     line_thickness=2,
     return_image_mode=1,  # controls what image to return 0=colour image with shape overlay; 1=shape on black background; 2=pass on the input image
-) -> Tuple[object, Circle]:
+) -> Tuple[object, Union[Circle, None]]:
     contours, _ = cv2.findContours(image, mode=contour_mode, method=method)
 
     bound_area_l, bound_area_h = bound_area_range
@@ -32,6 +32,7 @@ def main(
             aspect <= (width / length)
         ):
             selected.append(cont)
+
     if len(selected) > 0:
         selected.sort(key=lambda cont: cv2.boundingRect(cont)[2])
         centre, radius = cv2.minEnclosingCircle(selected[-1])
@@ -62,4 +63,6 @@ def main(
         # pass on the input image
         ret_image = image
 
-    return ret_image, (centre, radius)
+    circle = None if radius <= 0 else (centre, radius)
+
+    return ret_image, circle

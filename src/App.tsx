@@ -85,7 +85,7 @@ class App extends Component<unknown, IAppState> {
       refreshSeq[0].name !== 'imread' &&
       !lastResultHash
     ) {
-      notify('warning', 'Please execute Imread first.');
+      // notify('warning', 'Please execute Imread first.');
       return;
     }
 

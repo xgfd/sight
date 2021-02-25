@@ -4,120 +4,58 @@ import DefaultControls, { OpControlsProp, OpControlsState } from './Default';
 
 const { Option } = Select;
 
-interface FCState extends OpControlsState {
-  areaMax: number;
-  boundAreaMax: number;
-  lengthMax: number;
-}
-
 export default class FilterContoursControls extends DefaultControls<
-  OpControlsProp,
-  FCState
+  OpControlsProp
 > {
   static defaultValues = [
-    [25, 500] as [number, number],
-    [25, 500] as [number, number],
-    [5, 100] as [number, number],
+    [25, 5_000_000] as [number, number],
+    [25, 5_000_000] as [number, number],
+    [5, 3_000] as [number, number],
     [0.01, 1] as [number, number],
     [0, 128] as [number, number],
     2,
     1,
   ];
 
-  constructor(props: OpControlsProp) {
-    super(props);
-    const { selectedOp } = props;
-    const { args } = selectedOp;
-    const areaHigh = args[0][1];
-    const boundHigh = args[1][1];
-    const lengthHigh = args[2][1];
-    this.state = {
-      ...this.state,
-      areaMax: Math.ceil(areaHigh / 1000) * 2 * 1000,
-      boundAreaMax: Math.ceil(boundHigh / 1000) * 2 * 1000,
-      lengthMax: Math.ceil(lengthHigh / 200) * 2 * 200,
-    };
-  }
+  RangeComponent = (index: number, [lower, upper]: [number, number]) => (
+    <Row>
+      <Col span={12}>
+        <InputNumber
+          size="small"
+          style={{ width: 85 }}
+          step={10}
+          value={lower}
+          onChange={(newLow) => {
+            this.updateArgs(index, [newLow, Math.max(newLow as number, upper)]);
+          }}
+        />
+      </Col>
+      <Col span={12}>
+        <InputNumber
+          size="small"
+          style={{ width: 85 }}
+          step={10}
+          value={upper}
+          onChange={(newUp) => {
+            this.updateArgs(index, [Math.min(lower, newUp as number), newUp]);
+          }}
+        />
+      </Col>
+    </Row>
+  );
 
   render() {
-    const { name, args, areaMax, boundAreaMax, lengthMax } = this.state;
+    const { name, args } = this.state;
 
     return (
       <>
         <h2>{name}</h2>
         <h4>Area range</h4>
-        <Row>
-          <Col span={15}>
-            <Slider
-              marks={{ 0: '0' }}
-              range
-              max={areaMax}
-              value={args[0]}
-              onChange={(value: [number, number]) => this.updateArgs(0, value)}
-            />
-          </Col>
-          <Col span={9}>
-            <InputNumber
-              size="small"
-              style={{ width: 85 }}
-              min={1000}
-              step={1000}
-              bordered={false}
-              defaultValue={areaMax}
-              onChange={(value) => this.setState({ areaMax: value as number })}
-            />
-          </Col>
-        </Row>
+        {this.RangeComponent(0, args[0])}
         <h4>Bound area range</h4>
-        <Row>
-          <Col span={15}>
-            <Slider
-              marks={{ 0: '0' }}
-              range
-              max={boundAreaMax}
-              value={args[1]}
-              onChange={(value: [number, number]) => this.updateArgs(1, value)}
-            />
-          </Col>
-          <Col span={9}>
-            <InputNumber
-              size="small"
-              style={{ width: 85 }}
-              min={1000}
-              step={1000}
-              bordered={false}
-              defaultValue={boundAreaMax}
-              onChange={(value) =>
-                this.setState({ boundAreaMax: value as number })
-              }
-            />
-          </Col>
-        </Row>
+        {this.RangeComponent(1, args[1])}
         <h4>Length range</h4>
-        <Row>
-          <Col span={15}>
-            <Slider
-              marks={{ 0: '0' }}
-              range
-              max={lengthMax}
-              value={args[2]}
-              onChange={(value: [number, number]) => this.updateArgs(2, value)}
-            />
-          </Col>
-          <Col span={9}>
-            <InputNumber
-              size="small"
-              style={{ width: 85 }}
-              min={200}
-              step={200}
-              bordered={false}
-              defaultValue={lengthMax}
-              onChange={(value) =>
-                this.setState({ lengthMax: value as number })
-              }
-            />
-          </Col>
-        </Row>
+        {this.RangeComponent(2, args[2])}
         <h4>Aspect range</h4>
         <Slider
           marks={{ 0: '0', 0.5: '.5', 1: '1' }}
@@ -129,6 +67,7 @@ export default class FilterContoursControls extends DefaultControls<
         />
         <h4>Intensity range</h4>
         <Slider
+          disabled
           marks={{ 0: '0', 127: '127', 255: '255' }}
           range
           max={255}
