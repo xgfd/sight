@@ -102,6 +102,7 @@ def _run_step(
         ret_data = ()
         ret_hash = ""
         error = "No input image. The previous step probably failed."
+        error = None
         _respond_and_cache(rid, ret_hash, ret_image, ret_data, error)
         return ret_image, ret_data, ret_hash
     # ************************
