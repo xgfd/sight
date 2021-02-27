@@ -155,7 +155,12 @@ class OpItem implements Operation {
     return this.scriptHash;
   }
 
-  public toJson() {
+  public toJson(): {
+    fn: string;
+    rid?: string;
+    args: (string | number | boolean | [number, number])[];
+    extra_inputs: (string | number)[];
+  } {
     return {
       fn: `${this.package}.${this.name}`,
       rid: this.id,

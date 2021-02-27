@@ -96,8 +96,18 @@ class OperationPanel extends Component<IProps, IStates> {
     if (!canceled) {
       const filepath = filePaths[0];
       const response = await fetch(filepath);
-      const opListJson: [{ fn: string; args: [] }] = await response.json();
+      const opListJson: [
+        { fn: string; args: []; extra_inputs?: number[] }
+      ] = await response.json();
       const operations = opListJson.map(OpItem.fromJson);
+
+      // convert index references in op json list to actual op ids in the operation list
+      operations.forEach((op, index) => {
+        const inputIndxRefs = opListJson[index].extra_inputs;
+        if (inputIndxRefs) {
+          op.inputRefs = inputIndxRefs.map((indx) => operations[indx].id);
+        }
+      });
       const { setOperations } = this.props;
       setOperations(operations);
     }
@@ -106,8 +116,11 @@ class OperationPanel extends Component<IProps, IStates> {
   saveOpList = async () => {
     const { operations } = this.props;
     const instructions = operations.map((op) => {
-      const opJson = op.toJson() as any;
+      const opJson = op.toJson();
       delete opJson.rid;
+      opJson.extra_inputs = opJson.extra_inputs.map((opID) =>
+        operations.findIndex((o) => o.id === opID)
+      );
       return opJson;
     });
 
