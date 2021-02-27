@@ -11,7 +11,7 @@ import React, { Component } from 'react';
 import './App.global.css';
 import Gallery from './components/Gallery';
 import OperationPanel from './components/OperationPanel';
-import Operation from './Operation';
+import OpItem from './Operation';
 import { notify, run, upsert } from './utils';
 
 const { ErrorBoundary } = Alert;
@@ -23,12 +23,12 @@ loader.config({
 
 interface IAppState {
   collapsed: boolean;
-  selectedOp: Operation;
+  selectedOp: OpItem;
   selectionIndex: number;
-  operations: Operation[];
+  operations: OpItem[];
 }
 
-function firstDiff(arr: Operation[], newArr: Operation[]) {
+function firstDiff(arr: OpItem[], newArr: OpItem[]) {
   let i;
   for (i = 0; i < arr.length; i += 1) {
     if (arr[i].id !== (newArr[i] || {}).id) {
@@ -42,12 +42,12 @@ class App extends Component<unknown, IAppState> {
   constructor(props: unknown) {
     super(props);
 
-    const imread = new Operation('imread', 'builtin');
-    const gaussian = new Operation('GaussianBlur', 'builtin');
-    const threshold = new Operation('threshold', 'builtin');
-    const morphology = new Operation('morphologyEx', 'builtin');
-    const findcontours = new Operation('findContours', 'builtin');
-    const filtercontours = new Operation('filterContours', 'builtin');
+    const imread = new OpItem('imread', 'builtin');
+    const gaussian = new OpItem('GaussianBlur', 'builtin');
+    const threshold = new OpItem('threshold', 'builtin');
+    const morphology = new OpItem('morphologyEx', 'builtin');
+    const findcontours = new OpItem('findContours', 'builtin');
+    const filtercontours = new OpItem('filterContours', 'builtin');
     const operations = [
       imread,
       gaussian,
@@ -143,7 +143,7 @@ class App extends Component<unknown, IAppState> {
     // console.log(instructions);
 
     // set all pending operations' loading flag before run
-    execSequence.forEach((o: Operation) => {
+    execSequence.forEach((o: OpItem) => {
       o.loading = true;
     });
     this.setState({ operations });
@@ -152,14 +152,14 @@ class App extends Component<unknown, IAppState> {
       run(
         execSequence,
         instructions,
-        (err: Error | null, op: Operation | null, result: string) => {
+        (err: Error | null, op: OpItem | null, result: string) => {
           if (!op) {
             // no op, should only occurs when the server failed
             if (err) {
               // server error if there's an error but no op
               // notify and reset all loading operations
               notify('error', err.message);
-              execSequence.forEach((o: Operation) => {
+              execSequence.forEach((o: OpItem) => {
                 o.loading = false;
               });
               this.setState({ operations });
@@ -195,7 +195,7 @@ class App extends Component<unknown, IAppState> {
         }
       );
     } catch (e) {
-      execSequence.forEach((op: Operation) => {
+      execSequence.forEach((op: OpItem) => {
         op.loading = false;
       });
       this.setState({ operations });
@@ -210,7 +210,7 @@ class App extends Component<unknown, IAppState> {
    * @param operations New operation list.
    * @param selectionIndex Selected operation index.
    */
-  setOperations = (operations: Operation[]) => {
+  setOperations = (operations: OpItem[]) => {
     const { operations: preOperations } = this.state;
     const selectionIndex = firstDiff(preOperations, operations);
     const selection = operations[selectionIndex];
@@ -240,7 +240,7 @@ class App extends Component<unknown, IAppState> {
    * Change the currently selected operation and the corresponding index.
    * @param op The new selected operation.
    */
-  selectOp = (op: Operation, index: number) => {
+  selectOp = (op: OpItem, index: number) => {
     this.setState({
       selectedOp: op,
       selectionIndex: index,
@@ -254,7 +254,7 @@ class App extends Component<unknown, IAppState> {
    * @param op The operation to be inserted.
    * @param index The index to insert a new operation.
    */
-  insertOp = (op: Operation, index: number) => {
+  insertOp = (op: OpItem, index: number) => {
     const { operations } = this.state;
     const newOperations = [...operations];
     newOperations.splice(index + 1, 0, op);

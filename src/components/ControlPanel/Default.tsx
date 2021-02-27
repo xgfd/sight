@@ -15,7 +15,7 @@ export default class DefaultControls<
     this.state = { name, args: [...args], live: true } as K;
   }
 
-  updateArgs(index: number, value: any) {
+  updateArgs = (index: number, value: any) => {
     const { selectedOp, onChange } = this.props;
     selectedOp.updateArgs(index, value);
     this.setState({ name: selectedOp.name, args: selectedOp.args });
@@ -23,7 +23,7 @@ export default class DefaultControls<
     if (live) {
       onChange();
     }
-  }
+  };
 
   render() {
     const { name, args } = this.state;

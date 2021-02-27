@@ -1,3 +1,4 @@
+import Operation from '../../type';
 import AdaptiveThresholdControls from './AdaptiveThreshold';
 import BilateralControls from './BilateralFilter';
 import BitwiseAndControls from './BitwiseAnd';
@@ -6,7 +7,7 @@ import BlurControls from './Blur';
 import BoxFilterControls from './BoxFilter';
 import CannyControls from './Canny';
 import CircleROIControls from './CircleROI';
-import ControlsBase, { Operation } from './ControlsBase';
+import ControlsBase from './ControlsBase';
 import ConvertScaleAbsControls from './ConvertScaleAbs';
 import ConvexHullControls from './ConvexHull';
 import DefaultControls from './Default';

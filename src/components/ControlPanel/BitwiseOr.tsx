@@ -7,14 +7,14 @@ const { Option } = Select;
 export default class BitwiseOrControls extends BitwiseAndControls {
   render() {
     const { operations, index } = this.props;
-    const { name, extraRefs: extraInputs } = this.state;
+    const { name, inputRefs } = this.state;
 
     return (
       <>
         <h2>{name}</h2>
         <h4>Image 2</h4>
         <Select
-          value={extraInputs[0]}
+          value={inputRefs[0]}
           showSearch
           optionFilterProp="children"
           style={{ width: '100%' }}

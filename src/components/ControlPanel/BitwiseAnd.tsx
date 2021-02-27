@@ -4,7 +4,7 @@ import DefaultControls from './Default';
 import { OpControlsState, OpControlsProp } from './ControlsBase';
 
 interface ExtraInputsState extends OpControlsState {
-  extraRefs: string[];
+  inputRefs: string[];
 }
 
 const { Option } = Select;
@@ -13,36 +13,34 @@ export default class BitwiseAndControls extends DefaultControls<
   OpControlsProp,
   ExtraInputsState
 > {
-  static defaultValues = [];
-
-  static defaultExtraRefs = [''];
+  static defaultInputRefs = [''];
 
   constructor(props: OpControlsProp) {
     super(props);
     const { selectedOp } = props;
-    const { extraImageRefs: extraRefs } = selectedOp;
+    const { inputRefs } = selectedOp;
     this.state = {
       ...this.state,
-      extraRefs,
+      inputRefs,
     };
   }
 
-  updateExtraInputs(index: number, value: any) {
+  updateExtraInputs = (index: number, value: any) => {
     const { selectedOp, onChange } = this.props;
-    selectedOp.updateExtraRefs(index, value);
+    selectedOp.updateInputRefs(index, value);
     this.setState({
       name: selectedOp.name,
-      extraRefs: selectedOp.extraImageRefs,
+      inputRefs: selectedOp.inputRefs,
     });
     const { live } = this.state;
     if (live) {
       onChange();
     }
-  }
+  };
 
   render() {
     const { operations, index } = this.props;
-    const { name, extraRefs: extraInputs } = this.state;
+    const { name, inputRefs: extraInputs } = this.state;
 
     return (
       <>

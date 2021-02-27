@@ -25,7 +25,7 @@ import Icon, {
 } from '@ant-design/icons';
 import { Typography } from 'antd';
 import React from 'react';
-import Operation from '../Operation';
+import OpItem from '../Operation';
 
 const { Text } = Typography;
 
@@ -63,7 +63,7 @@ const IconMap: { [key: string]: React.ReactNode } = {
   warppolar: <GlobalOutlined />,
 };
 
-export default function getIcon(op: Operation): React.ReactNode {
+export default function getIcon(op: OpItem): React.ReactNode {
   let icon;
   if (op.package === 'custom') {
     icon = <ToolOutlined />;

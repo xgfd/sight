@@ -4,7 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import { PythonShell } from 'python-shell';
 import { BUILTIN, CUSTOM, VISION } from './constants';
-import Operation from './Operation';
+import OpItem from './Operation';
 
 let CVSHELL: PythonShell;
 
@@ -83,7 +83,7 @@ function upsert(pack: string, module: string, cb: (err: boolean) => void) {
   CVSHELL.on('message', onMessage);
 }
 
-function exportScript(operations: Operation[], cb: (filepath: string) => void) {
+function exportScript(operations: OpItem[], cb: (filepath: string) => void) {
   const instructions = operations.map((op) => op.toJson());
   CVSHELL.send(`export '${JSON.stringify(instructions)}'`);
 
@@ -107,14 +107,14 @@ function exportScript(operations: Operation[], cb: (filepath: string) => void) {
  * @param cb Callback function that is called for **each** operation after its execution.
  */
 function run(
-  operations: Operation[],
+  operations: OpItem[],
   instructions: {
     fn: string;
     rid: string;
     args: (string | number | boolean | [number, number])[];
     extra_inputs?: string[];
   }[],
-  cb: (err: Error | null, op: Operation | null, result: string) => void
+  cb: (err: Error | null, op: OpItem | null, result: string) => void
 ) {
   CVSHELL.send(`run '${JSON.stringify(instructions)}'`);
 

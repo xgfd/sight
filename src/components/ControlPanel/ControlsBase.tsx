@@ -1,13 +1,5 @@
 import { Component } from 'react';
-
-declare interface Operation {
-  id: string;
-  name: string;
-  args: any[];
-  extraImageRefs: string[];
-  updateArgs: (index: number, value: any) => void;
-  updateExtraRefs: (index: number, value: any) => void;
-}
+import Operation from '../../type';
 
 interface OpControlsProp {
   selectedOp: Operation;
@@ -21,7 +13,7 @@ interface OpControlsState {
   args: any[];
   live: boolean;
 }
-export default class ControlsBase<
+export default abstract class ControlsBase<
   T extends OpControlsProp = OpControlsProp, // generic parameter defaults introduced in TS v2.3
   K extends OpControlsState = OpControlsState
 > extends Component<T, K> {
@@ -29,7 +21,9 @@ export default class ControlsBase<
 
   static defaultExtraRefs: string[] = [];
 
-  updatedArgs = (index: number, value: any) => {};
+  abstract updateArgs: (index: number, value: any) => void;
+
+  abstract updateExtraInputs?: (index: number, value: any) => void;
 }
 
-export { OpControlsProp, OpControlsState, Operation };
+export { OpControlsProp, OpControlsState };

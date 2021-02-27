@@ -4,6 +4,7 @@ import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import getControlComponent from './components/ControlPanel';
 import { BUILTIN, TEMPLATES, CUSTOM } from './constants';
+import Operation from './type';
 
 function sha256hash(data: string) {
   return crypto.createHash('sha256').update(data).digest('hex');
@@ -60,10 +61,10 @@ function writeScript(
   fs.writeFileSync(pyPath, script);
 }
 
-class Operation {
+class OpItem implements Operation {
   static fromJson(opJson: { fn: string; args: [] }) {
     const [pack, name] = opJson.fn.split('.');
-    const op = new Operation(name, pack as 'builtin' | 'custom');
+    const op = new OpItem(name, pack as 'builtin' | 'custom');
     op.args = opJson.args;
     return op;
   }
@@ -92,7 +93,7 @@ class Operation {
   // arguments from the control panel
   args: ([number, number] | string | number | boolean)[] = [];
 
-  extraImageRefs: string[] = [];
+  inputRefs: string[] = [];
 
   constructor(
     name: string,
@@ -108,7 +109,7 @@ class Operation {
     this.ControlPanel = component;
     // important: create a shallow copy to avoid unwanted modification to component.defaultValues
     this.args = [...component.defaultValues];
-    this.extraImageRefs = [...component.defaultExtraRefs];
+    this.inputRefs = [...component.defaultExtraRefs];
 
     if (newCustomOp) {
       const script = loadScript('__template__', 'templates');
@@ -141,9 +142,9 @@ class Operation {
     this.args = [...this.args];
   }
 
-  public updateExtraRefs(index: number, value: string) {
-    this.extraImageRefs[index] = value;
-    this.extraImageRefs = [...this.extraImageRefs];
+  public updateInputRefs(index: number, value: string) {
+    this.inputRefs[index] = value;
+    this.inputRefs = [...this.inputRefs];
   }
 
   public getScript() {
@@ -159,9 +160,9 @@ class Operation {
       fn: `${this.package}.${this.name}`,
       rid: this.id,
       args: [...this.args],
-      extra_inputs: [...this.extraImageRefs],
+      extra_inputs: [...this.inputRefs],
     };
   }
 }
 
-export default Operation;
+export default OpItem;

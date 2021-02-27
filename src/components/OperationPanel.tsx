@@ -18,7 +18,7 @@ import {
 import { ipcRenderer, remote } from 'electron';
 import fs from 'fs';
 import React, { Component } from 'react';
-import Operation from '../Operation';
+import OpItem from '../Operation';
 import { exportScript, listScripts, rmScript, upsert } from '../utils';
 import getIcon from './Icons';
 
@@ -26,12 +26,12 @@ const { Text } = Typography;
 const { dialog } = remote;
 
 interface IProps {
-  operations: Operation[];
+  operations: OpItem[];
   selectedKey: string;
   resultUpToDate: boolean;
-  setOperations: (operations: Operation[], selectionIndex?: number) => void;
-  selectOp: (op: Operation, index: number) => void;
-  insertOp: (op: Operation, index: number) => void;
+  setOperations: (operations: OpItem[], selectionIndex?: number) => void;
+  selectOp: (op: OpItem, index: number) => void;
+  insertOp: (op: OpItem, index: number) => void;
   removeOp: (index: number) => void;
 }
 
@@ -97,7 +97,7 @@ class OperationPanel extends Component<IProps, IStates> {
       const filepath = filePaths[0];
       const response = await fetch(filepath);
       const opListJson: [{ fn: string; args: [] }] = await response.json();
-      const operations = opListJson.map(Operation.fromJson);
+      const operations = opListJson.map(OpItem.fromJson);
       const { setOperations } = this.props;
       setOperations(operations);
     }
@@ -140,10 +140,10 @@ class OperationPanel extends Component<IProps, IStates> {
   insertOp = (fullOpName: string, index: number) => {
     const { insertOp } = this.props;
     const [pack, name] = fullOpName.split('.');
-    let newOp: Operation;
+    let newOp: OpItem;
     if (name.startsWith('__')) {
       const trimmedName = name.substring(2);
-      newOp = new Operation(trimmedName, 'custom', true);
+      newOp = new OpItem(trimmedName, 'custom', true);
       upsert('custom', trimmedName, (err) => {
         if (!err) {
           insertOp(newOp, index);
@@ -151,12 +151,12 @@ class OperationPanel extends Component<IProps, IStates> {
         }
       });
     } else {
-      newOp = new Operation(name, pack as 'custom' | 'builtin');
+      newOp = new OpItem(name, pack as 'custom' | 'builtin');
       insertOp(newOp, index);
     }
   };
 
-  removeScript = (rmop: Operation) => {
+  removeScript = (rmop: OpItem) => {
     const { operations, setOperations } = this.props;
 
     rmScript(rmop.package, rmop.name);

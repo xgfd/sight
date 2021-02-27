@@ -4,11 +4,11 @@ import path from 'path';
 import React from 'react';
 import fallback from '../../assets/fallback.png';
 import { IMAGE_CACHE } from '../constants';
-import Operation from '../Operation';
+import OpItem from '../Operation';
 
 interface IProps {
-  operations: Operation[];
-  selectedOp: Operation;
+  operations: OpItem[];
+  selectedOp: OpItem;
 }
 
 export default function Gallery(props: IProps) {
