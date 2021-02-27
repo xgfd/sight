@@ -1,7 +1,7 @@
 import { Select } from 'antd';
 import React from 'react';
 import DefaultControls from './Default';
-import { OpControlsState, OpControlsProp } from './ControlsBase';
+import ControlsBase, { OpControlsState, OpControlsProp } from './ControlsBase';
 
 interface ExtraInputsState extends OpControlsState {
   inputRefs: string[];
@@ -9,7 +9,7 @@ interface ExtraInputsState extends OpControlsState {
 
 const { Option } = Select;
 
-export default class BitwiseAndControls extends DefaultControls<
+export default class BitwiseAndControls extends ControlsBase<
   OpControlsProp,
   ExtraInputsState
 > {

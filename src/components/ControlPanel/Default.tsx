@@ -8,23 +8,6 @@ export default class DefaultControls<
 > extends ControlsBase<T, K> {
   static defaultValues = [[50, 150] as [number, number], 3, 3, 0, 0, '', false];
 
-  constructor(props: T) {
-    super(props);
-    const { selectedOp } = props;
-    const { name, args } = selectedOp;
-    this.state = { name, args: [...args], live: true } as K;
-  }
-
-  updateArgs = (index: number, value: any) => {
-    const { selectedOp, onChange } = this.props;
-    selectedOp.updateArgs(index, value);
-    this.setState({ name: selectedOp.name, args: selectedOp.args });
-    const { live } = this.state;
-    if (live) {
-      onChange();
-    }
-  };
-
   render() {
     const { name, args } = this.state;
 

@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import Operation from '../../type';
+import { Operation } from '../../type';
 
 interface OpControlsProp {
   selectedOp: Operation;
@@ -19,11 +19,28 @@ export default abstract class ControlsBase<
 > extends Component<T, K> {
   static defaultValues: (string | number | boolean | [number, number])[] = [];
 
-  static defaultExtraRefs: string[] = [];
+  static defaultInputRefs: string[] = [];
 
-  abstract updateArgs: (index: number, value: any) => void;
+  constructor(props: T) {
+    super(props);
+    const { selectedOp } = props;
+    const { name, args } = selectedOp;
+    // eslint-disable-next-line react/no-unused-state
+    this.state = { name, args: [...args], live: true } as K;
+  }
 
-  abstract updateExtraInputs?: (index: number, value: any) => void;
+  updateArgs = (index: number, value: any) => {
+    const { selectedOp, onChange } = this.props;
+    selectedOp.updateArgs(index, value);
+    // eslint-disable-next-line react/no-unused-state
+    this.setState({ name: selectedOp.name, args: selectedOp.args });
+    const { live } = this.state;
+    if (live) {
+      onChange();
+    }
+  };
+
+  updateExtraInputs = (index: number, value: any) => undefined;
 }
 
 export { OpControlsProp, OpControlsState };

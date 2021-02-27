@@ -5,6 +5,7 @@ import path from 'path';
 import { PythonShell } from 'python-shell';
 import { BUILTIN, CUSTOM, VISION } from './constants';
 import OpItem from './Operation';
+import { Instruction } from './type';
 
 let CVSHELL: PythonShell;
 
@@ -108,12 +109,7 @@ function exportScript(operations: OpItem[], cb: (filepath: string) => void) {
  */
 function run(
   operations: OpItem[],
-  instructions: {
-    fn: string;
-    rid: string;
-    args: (string | number | boolean | [number, number])[];
-    extra_inputs?: string[];
-  }[],
+  instructions: Instruction[],
   cb: (err: Error | null, op: OpItem | null, result: string) => void
 ) {
   CVSHELL.send(`run '${JSON.stringify(instructions)}'`);

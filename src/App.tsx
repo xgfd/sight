@@ -12,6 +12,7 @@ import './App.global.css';
 import Gallery from './components/Gallery';
 import OperationPanel from './components/OperationPanel';
 import OpItem from './Operation';
+import { OpJSON, Instruction } from './type';
 import { notify, run, upsert } from './utils';
 
 const { ErrorBoundary } = Alert;
@@ -83,16 +84,15 @@ class App extends Component<unknown, IAppState> {
 
   execOperations = (index?: number) => {
     const { operations, selectionIndex } = this.state;
-    if (index === undefined) {
-      index = selectionIndex; // eslint-disable-line no-param-reassign
-    }
 
-    let execSequence = operations.slice(index);
+    const seqStartIndx = index || selectionIndex;
+
+    let execSequence = operations.slice(seqStartIndx);
 
     // use the last result hash as the input hash of this operation sequence
     // unless this operation sequence starts from the beginning
     const lastResultHash =
-      index > 0 ? operations[index - 1].resultImageHash : '';
+      seqStartIndx > 0 ? operations[seqStartIndx - 1].resultImageHash : '';
 
     // cancel execution and ask to evaluate an immediately previous `imread` if the first operation doesn't have an input result hash
     if (
@@ -104,43 +104,36 @@ class App extends Component<unknown, IAppState> {
       return;
     }
 
-    let instructions = execSequence.map((op, i) => {
+    const instructions: Instruction[] = [];
+
+    for (let i = 0; i < execSequence.length; i += 1) {
+      const op = execSequence[i];
+
       const opJson = op.toJson();
-      // add the input hash for the first operation
-      if (i === 0) {
-        return { ...opJson, last_hash: lastResultHash };
-      }
-      return opJson;
-    });
-
-    let execSeqEnd = instructions.length;
-    for (let i = 0; i < instructions.length; i += 1) {
-      const inst = instructions[i];
-
-      (inst as {
-        fn: string;
-        rid: string;
-        args: (string | number | boolean | [number, number])[];
-        extra_inputs: (number | string)[];
-      }).extra_inputs = inst.extra_inputs.map(this.idToRef);
-
-      if (inst.extra_inputs.some((ref) => (ref as any) === -1)) {
+      const inputRefs = opJson.extra_inputs.map(this.idToRef);
+      // break if some ops are missing inputs
+      if (inputRefs.some((ref) => ref === -1)) {
         if (i > 0) {
-          notify(
-            'warning',
-            `Missing second image for ${inst.fn.split('.')[1]}.`
-          );
-          this.selectOp(operations[i + index], i + index);
+          notify('warning', `Missing second image for ${op.name}.`);
+          this.selectOp(operations[i + seqStartIndx], i + seqStartIndx);
         }
-        execSeqEnd = i;
         break;
       }
-    }
-    // truncate to the sub sequence that can be executed
-    instructions = instructions.slice(0, execSeqEnd);
-    execSequence = execSequence.slice(0, execSeqEnd);
 
-    // console.log(instructions);
+      const inst = { ...opJson, extra_inputs: inputRefs } as Instruction;
+      // add the input hash for the first operation
+      if (i === 0) {
+        inst.last_hash = lastResultHash;
+      }
+      instructions.push(inst);
+    }
+
+    if (instructions.length === 0) {
+      return;
+    }
+
+    // truncate to the same length as instructions
+    execSequence = execSequence.slice(0, instructions.length);
 
     // set all pending operations' loading flag before run
     execSequence.forEach((o: OpItem) => {

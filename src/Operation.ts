@@ -4,7 +4,7 @@ import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import getControlComponent from './components/ControlPanel';
 import { BUILTIN, TEMPLATES, CUSTOM } from './constants';
-import Operation from './type';
+import { Operation, OpJSON } from './type';
 
 function sha256hash(data: string) {
   return crypto.createHash('sha256').update(data).digest('hex');
@@ -62,10 +62,12 @@ function writeScript(
 }
 
 class OpItem implements Operation {
-  static fromJson(opJson: { fn: string; args: [] }) {
-    const [pack, name] = opJson.fn.split('.');
-    const op = new OpItem(name, pack as 'builtin' | 'custom');
-    op.args = opJson.args;
+  static fromJson(opJson: OpJSON) {
+    const { fn, args, rid, extra_inputs: inputRefs } = opJson;
+    const [pack, name] = fn.split('.');
+    const op = new OpItem(name, pack as 'builtin' | 'custom', false, rid);
+    op.args = args;
+    op.inputRefs = inputRefs || [];
     return op;
   }
 
@@ -98,9 +100,10 @@ class OpItem implements Operation {
   constructor(
     name: string,
     pack: 'custom' | 'builtin' = 'custom',
-    newCustomOp = false
+    newCustomOp = false,
+    id = uuidv4()
   ) {
-    this.id = uuidv4();
+    this.id = id;
     this.loading = false;
     // remove invalid char for a python module's name
     this.name = name.replaceAll(/\.|-|\s|,/gi, '_');
@@ -109,7 +112,7 @@ class OpItem implements Operation {
     this.ControlPanel = component;
     // important: create a shallow copy to avoid unwanted modification to component.defaultValues
     this.args = [...component.defaultValues];
-    this.inputRefs = [...component.defaultExtraRefs];
+    this.inputRefs = [...component.defaultInputRefs];
 
     if (newCustomOp) {
       const script = loadScript('__template__', 'templates');
@@ -155,12 +158,7 @@ class OpItem implements Operation {
     return this.scriptHash;
   }
 
-  public toJson(): {
-    fn: string;
-    rid?: string;
-    args: (string | number | boolean | [number, number])[];
-    extra_inputs: (string | number)[];
-  } {
+  public toJson(): OpJSON {
     return {
       fn: `${this.package}.${this.name}`,
       rid: this.id,

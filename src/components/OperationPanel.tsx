@@ -19,6 +19,7 @@ import { ipcRenderer, remote } from 'electron';
 import fs from 'fs';
 import React, { Component } from 'react';
 import OpItem from '../Operation';
+import { OpJSON } from '../type';
 import { exportScript, listScripts, rmScript, upsert } from '../utils';
 import getIcon from './Icons';
 
@@ -35,7 +36,7 @@ interface IProps {
   removeOp: (index: number) => void;
 }
 
-interface IStates {
+interface States {
   installedScripts: { builtin: string[]; custom: string[] };
   drawerOn: boolean;
   insertionIndex: number;
@@ -56,7 +57,7 @@ function groupByFirstChar(names: string[]) {
   }, {} as { [key: string]: string[] });
 }
 
-class OperationPanel extends Component<IProps, IStates> {
+class OperationPanel extends Component<IProps, States> {
   constructor(props: IProps) {
     super(props);
     this.state = {
@@ -96,18 +97,11 @@ class OperationPanel extends Component<IProps, IStates> {
     if (!canceled) {
       const filepath = filePaths[0];
       const response = await fetch(filepath);
-      const opListJson: [
-        { fn: string; args: []; extra_inputs?: number[] }
-      ] = await response.json();
+
+      const opListJson: OpJSON[] = await response.json();
+
       const operations = opListJson.map(OpItem.fromJson);
 
-      // convert index references in op json list to actual op ids in the operation list
-      operations.forEach((op, index) => {
-        const inputIndxRefs = opListJson[index].extra_inputs;
-        if (inputIndxRefs) {
-          op.inputRefs = inputIndxRefs.map((indx) => operations[indx].id);
-        }
-      });
       const { setOperations } = this.props;
       setOperations(operations);
     }
@@ -115,15 +109,7 @@ class OperationPanel extends Component<IProps, IStates> {
 
   saveOpList = async () => {
     const { operations } = this.props;
-    const instructions = operations.map((op) => {
-      const opJson = op.toJson();
-      delete opJson.rid;
-      opJson.extra_inputs = opJson.extra_inputs.map((opID) =>
-        operations.findIndex((o) => o.id === opID)
-      );
-      return opJson;
-    });
-
+    const instructions = operations.map((op) => op.toJson());
     const { canceled, filePath } = await dialog.showSaveDialog({
       defaultPath: 'operations.json',
       properties: ['createDirectory'],
@@ -136,6 +122,9 @@ class OperationPanel extends Component<IProps, IStates> {
       );
     }
   };
+
+  idsToIndices = (ids: string[], operations: OpItem[]) =>
+    ids.map((opID) => operations.findIndex((o) => o.id === opID));
 
   exportAsPython = () => {
     const { operations } = this.props;
