@@ -12,7 +12,7 @@ def test_run():
     cmd_input = json.dumps(
         [
             {"fn": "builtin.imread", "rid": "0", "args": ["test.png", 0]},
-            {"fn": "builtin.canny", "rid": "1", "args": [[80, 120], 3, False]},
+            {"fn": "builtin.Canny", "rid": "1", "args": [[80, 120], 3, False]},
             {"fn": "builtin.imread", "rid": "2", "args": ["test.png", 0]},
         ]
     )
@@ -20,12 +20,26 @@ def test_run():
     cmd_input = json.dumps(
         [
             {
-                "fn": "builtin.canny",
-                "last_hash": "9c41a9c17c4882da1f5bfe1a8c045ab498dae04ade52e99258209fec596c3822",
-                "rid": "1",
+                "fn": "builtin.Canny",
+                "last_hash": "2c3c4270da43daa9dcf21057839d0a7e05e4d19527598fcd914cd39741b5bd4a",
+                "rid": "canny-1",
                 "args": [[80, 120], 3, False],
             },
-            {"fn": "builtin.imread", "rid": "2", "args": ["test.png", -1]},
+            {
+                "fn": "builtin.bitwise_and",
+                "rid": "bitwiseand-2",
+                "extra_inputs": [
+                    "2c3c4270da43daa9dcf21057839d0a7e05e4d19527598fcd914cd39741b5bd4a"
+                ],
+                "args": [],
+            },
+            {"fn": "builtin.imread", "rid": "0", "args": ["test.png", 0]},
+            {
+                "fn": "builtin.bitwise_or",
+                "rid": "bitwiseor-3",
+                "extra_inputs": [0],
+                "args": [],
+            },
         ]
     )
     run(cmd_input)
@@ -52,7 +66,7 @@ def test_export():
 def test_parse_and_exec():
     instructions = [
         {"fn": "builtin.imread", "rid": "0", "args": ["test.png", 0]},
-        {"fn": "builtin.canny", "rid": "1", "args": [[80, 120], 3, False]},
+        {"fn": "builtin.Canny", "rid": "1", "args": [[80, 120], 3, False]},
         {"fn": "builtin.imread", "rid": "2", "args": ["test.png", 0]},
     ]
     cmd = shlex.join(["run", json.dumps(instructions)])
@@ -66,6 +80,6 @@ def test_parse_and_exec():
 
 if __name__ == "__main__":
     # test_ls()
-    # test_run()
+    test_run()
     # test_parse_and_exec()
-    test_export()
+    # test_export()

@@ -2,7 +2,7 @@ import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
-import createControlComponent from './components/ControlPanel';
+import getControlComponent from './components/ControlPanel';
 import { BUILTIN, TEMPLATES, CUSTOM } from './constants';
 
 function sha256hash(data: string) {
@@ -89,7 +89,10 @@ class Operation {
 
   ControlPanel;
 
+  // arguments from the control panel
   args: ([number, number] | string | number | boolean)[] = [];
+
+  extraImageRefs: string[] = [];
 
   constructor(
     name: string,
@@ -101,10 +104,11 @@ class Operation {
     // remove invalid char for a python module's name
     this.name = name.replaceAll(/\.|-|\s|,/gi, '_');
     this.package = pack;
-    const component = createControlComponent(this);
+    const component = getControlComponent(this);
     this.ControlPanel = component;
     // important: create a shallow copy to avoid unwanted modification to component.defaultValues
     this.args = [...component.defaultValues];
+    this.extraImageRefs = [...component.defaultExtraRefs];
 
     if (newCustomOp) {
       const script = loadScript('__template__', 'templates');
@@ -134,8 +138,12 @@ class Operation {
 
   public updateArgs(index: number, value: any) {
     this.args[index] = value;
-    // create a new copy to trigger update
     this.args = [...this.args];
+  }
+
+  public updateExtraRefs(index: number, value: string) {
+    this.extraImageRefs[index] = value;
+    this.extraImageRefs = [...this.extraImageRefs];
   }
 
   public getScript() {
@@ -150,7 +158,8 @@ class Operation {
     return {
       fn: `${this.package}.${this.name}`,
       rid: this.id,
-      args: this.args,
+      args: [...this.args],
+      extra_inputs: [...this.extraImageRefs],
     };
   }
 }

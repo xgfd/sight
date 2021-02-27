@@ -1,30 +1,9 @@
 import { Input, InputNumber, Slider, Switch } from 'antd';
-import React, { Component } from 'react';
-import ControlsBase from './ControlsBase';
-
-// cannot import from Operation due to circular dependency
-declare interface Operation {
-  id: string;
-  name: string;
-  args: any[];
-  updateArgs: (index: number, value: any) => void;
-}
-
-interface OpControlsProp {
-  selectedOp: Operation;
-  onChange: (index?: number) => void;
-}
-
-interface OpControlsState {
-  name: string;
-  args: any[];
-  live: boolean;
-}
-
-export { OpControlsProp, OpControlsState, Operation };
+import React from 'react';
+import ControlsBase, { OpControlsProp, OpControlsState } from './ControlsBase';
 
 export default class DefaultControls<
-  T extends OpControlsProp = OpControlsProp, // generic parameter defaults introduced in TS v2.3
+  T extends OpControlsProp = OpControlsProp,
   K extends OpControlsState = OpControlsState
 > extends ControlsBase<T, K> {
   static defaultValues = [[50, 150] as [number, number], 3, 3, 0, 0, '', false];

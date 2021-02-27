@@ -66,13 +66,28 @@ class App extends Component<unknown, IAppState> {
     };
   }
 
+  private idToRef = (id: string) => {
+    const { operations, selectionIndex } = this.state;
+    const index = operations.findIndex((op) => op.id === id);
+
+    if (index === -1) {
+      return -1;
+    }
+
+    if (index < selectionIndex) {
+      return operations[index].resultImageHash;
+    }
+
+    return index - selectionIndex;
+  };
+
   execOperations = (index?: number) => {
     const { operations, selectionIndex } = this.state;
     if (index === undefined) {
       index = selectionIndex; // eslint-disable-line no-param-reassign
     }
 
-    const refreshSeq = operations.slice(index);
+    let execSequence = operations.slice(index);
 
     // use the last result hash as the input hash of this operation sequence
     // unless this operation sequence starts from the beginning
@@ -81,24 +96,62 @@ class App extends Component<unknown, IAppState> {
 
     // cancel execution and ask to evaluate an immediately previous `imread` if the first operation doesn't have an input result hash
     if (
-      refreshSeq.length > 0 &&
-      refreshSeq[0].name !== 'imread' &&
+      execSequence.length > 0 &&
+      execSequence[0].name !== 'imread' &&
       !lastResultHash
     ) {
       // notify('warning', 'Please execute Imread first.');
       return;
     }
 
+    let instructions = execSequence.map((op, i) => {
+      const opJson = op.toJson();
+      // add the input hash for the first operation
+      if (i === 0) {
+        return { ...opJson, last_hash: lastResultHash };
+      }
+      return opJson;
+    });
+
+    let execSeqEnd = instructions.length;
+    for (let i = 0; i < instructions.length; i += 1) {
+      const inst = instructions[i];
+
+      (inst as {
+        fn: string;
+        rid: string;
+        args: (string | number | boolean | [number, number])[];
+        extra_inputs: (number | string)[];
+      }).extra_inputs = inst.extra_inputs.map(this.idToRef);
+
+      if (inst.extra_inputs.some((ref) => (ref as any) === -1)) {
+        if (i > 0) {
+          notify(
+            'warning',
+            `Missing second image for ${inst.fn.split('.')[1]}.`
+          );
+          this.selectOp(operations[i + index], i + index);
+        }
+        execSeqEnd = i;
+        break;
+      }
+    }
+    // truncate to the sub sequence that can be executed
+    instructions = instructions.slice(0, execSeqEnd);
+    execSequence = execSequence.slice(0, execSeqEnd);
+
+    // console.log(instructions);
+
     // set all pending operations' loading flag before run
-    refreshSeq.forEach((o: Operation) => {
+    execSequence.forEach((o: Operation) => {
       o.loading = true;
     });
     this.setState({ operations });
 
     try {
       run(
-        refreshSeq,
-        lastResultHash,
+        execSequence,
+        instructions,
         (err: Error | null, op: Operation | null, result: string) => {
           if (!op) {
             // no op, should only occurs when the server failed
@@ -106,7 +159,7 @@ class App extends Component<unknown, IAppState> {
               // server error if there's an error but no op
               // notify and reset all loading operations
               notify('error', err.message);
-              refreshSeq.forEach((o: Operation) => {
+              execSequence.forEach((o: Operation) => {
                 o.loading = false;
               });
               this.setState({ operations });
@@ -142,7 +195,7 @@ class App extends Component<unknown, IAppState> {
         }
       );
     } catch (e) {
-      refreshSeq.forEach((op: Operation) => {
+      execSequence.forEach((op: Operation) => {
         op.loading = false;
       });
       this.setState({ operations });
@@ -264,7 +317,7 @@ class App extends Component<unknown, IAppState> {
   };
 
   render() {
-    const { collapsed, operations, selectedOp } = this.state;
+    const { collapsed, operations, selectedOp, selectionIndex } = this.state;
     const { ControlPanel } = selectedOp;
     return (
       <ErrorBoundary>
@@ -358,6 +411,8 @@ class App extends Component<unknown, IAppState> {
                 <ControlPanel
                   key={selectedOp.id}
                   selectedOp={selectedOp}
+                  operations={operations}
+                  index={selectionIndex}
                   onChange={() => {
                     this.evalDebounced();
                     this.setState({ selectedOp });

@@ -66,7 +66,8 @@ def _ret_hash(fn: Callable, inputhash: str, args: List) -> str:
 
 def _run_step(
     fn_name: str,
-    image: Union[None, object],
+    images: List[Union[None, object]],
+    extra_input_refs: List[Union[str, int]],
     data: Tuple,
     control_args: List,
     rid: str,
@@ -82,7 +83,7 @@ def _run_step(
 
     Args:
         fn_name (str): The full function name (package.module).
-        image (Union[None, object]): Input image.
+        images (List[Union[None, object]]): Input images.
         data (Tuple): Other data returned from the last execution.
         control_args (List): Input arguments from the frontend.
         rid (str): Request id of this run.
@@ -94,14 +95,14 @@ def _run_step(
 
     package, module_name = fn_name.split(".")
 
-    # non-imread functions need a valid input image
+    # non-imread functions need valid input images
     # otherwise response and return
-    if module_name != "imread" and image is None:
+    if module_name != "imread" and np.any(images is None):
         # reset input image and hash
         ret_image = None
         ret_data = ()
         ret_hash = ""
-        error = "No input image. The previous step probably failed."
+        # error = "Missing input image. The previous step probably failed."
         error = None
         _respond_and_cache(rid, ret_hash, ret_image, ret_data, error)
         return ret_image, ret_data, ret_hash
@@ -126,7 +127,7 @@ def _run_step(
     # before run we can predicate the result hash
     # there's no need to run the function if the result hash matches a cached image
     input_hash = "" if module_name == "imread" else input_hash
-    ret_hash = _ret_hash(fn, input_hash, control_args)
+    ret_hash = _ret_hash(fn, input_hash, [*extra_input_refs, *control_args])
     ret_image, ret_data = _get_result(ret_hash)
     error: Union[str, None] = None
 
@@ -140,13 +141,13 @@ def _run_step(
             if fn_arg_count == ctrl_arg_count:
                 # all args come from controls, i.e. imread
                 result = fn(*control_args)
-            elif fn_arg_count == ctrl_arg_count + 1:
-                # take an image plus control args, i.e. Canny, blur
-                result = fn(image, *control_args)
+            elif fn_arg_count == ctrl_arg_count + len(images):
+                # take some images plus control args, i.e. Canny, blur
+                result = fn(*images, *control_args)
             else:
                 # take an image, other data from the last step and control args
                 # i.e. warpPolar
-                result = fn(image, *data, *control_args)
+                result = fn(*images, *data, *control_args)
 
             # function returned multiple values
             if isinstance(result, tuple):
@@ -190,6 +191,28 @@ def _save_result(hash: str, image: object, data: Tuple = ()) -> bool:
         return True
     except Exception:
         return False
+
+
+def _ref2reshash(ref: Union[int, str], history: List[str]) -> str:
+    return ref if isinstance(ref, str) else history[ref]
+
+
+def _ref2image(ref: Union[int, str], history: List[object]) -> Union[None, object]:
+    """Get the result image of a reference.
+
+    Args:
+        ref (Union[int, str]): Result reference. Either a result hash referring to a result image outside the current op sequence, or an index referring to a result image returned by a previous op in the current op sequence.
+        history (List[object]): Images produced by previous ops of the current op sequence.
+
+    Returns:
+        Union[None, object]: The referred image or None.
+    """
+    image = None
+    try:
+        image = history[ref]
+    except Exception:
+        image, _ = _get_result(ref)
+    return image
 
 
 def _get_result(hash: str) -> Union[Tuple[None, None], Tuple[object, Tuple]]:
@@ -433,7 +456,14 @@ def run(req: str):
     Args:
         req (str): Json string of the sequence of operations to be executed.
     """
-    # the input image and hash for each step, updated during each iteration
+    # store images of executed ops in the op sequence
+    # to enable ops to use non-immediate predecessor's result as
+    # secondary images
+    image_history = []
+    reshash_history = []
+
+    # the input image, data and hash for each step, updated during each iteration
+    # these are the results of the immediate predecessor of the to-be-executed op
     image = None
     data = []
     input_hash = ""
@@ -456,7 +486,7 @@ def run(req: str):
                 "",
                 None,
                 None,
-                "Cached input image is missing. Run imread again.",
+                "Cached image lost. Run imread again.",
             )
             return
 
@@ -468,11 +498,23 @@ def run(req: str):
         fn_name = op["fn"]
         rid = op["rid"]
         control_args = op["args"]
-
+        extra_input_refs = op.get("extra_inputs", [])
+        extra_images = [_ref2image(ref, image_history) for ref in extra_input_refs]
+        extra_input_hashes = [
+            _ref2reshash(ref, reshash_history) for ref in extra_input_refs
+        ]
         # execute and set input image and hash for the next iteration
         image, data, input_hash = _run_step(
-            fn_name, image, data, control_args, rid, input_hash
+            fn_name,
+            [image, *extra_images],
+            extra_input_hashes,
+            data,
+            control_args,
+            rid,
+            input_hash,
         )
+        image_history.append(image)
+        reshash_history.append(input_hash)
 
 
 _init()

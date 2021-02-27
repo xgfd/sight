@@ -1,13 +1,15 @@
 import AdaptiveThresholdControls from './AdaptiveThreshold';
 import BilateralControls from './BilateralFilter';
+import BitwiseAndControls from './BitwiseAnd';
+import BitwiseOrControls from './BitwiseOr';
 import BlurControls from './Blur';
 import BoxFilterControls from './BoxFilter';
 import CannyControls from './Canny';
 import CircleROIControls from './CircleROI';
-import ControlsBase from './ControlsBase';
+import ControlsBase, { Operation } from './ControlsBase';
 import ConvertScaleAbsControls from './ConvertScaleAbs';
 import ConvexHullControls from './ConvexHull';
-import DefaultControls, { Operation } from './Default';
+import DefaultControls from './Default';
 import EqualizeHistControls from './EqualizeHist';
 import ExpandDimensionControls from './ExpandDimension';
 import FilterContoursControls from './FilterContours';
@@ -33,6 +35,8 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   adaptivethreshold: AdaptiveThresholdControls,
   blur: BlurControls,
   boxfilter: BoxFilterControls,
+  bitwise_and: BitwiseAndControls,
+  bitwise_or: BitwiseOrControls,
   bilateralfilter: BilateralControls,
   canny: CannyControls,
   convertscaleabs: ConvertScaleAbsControls,
@@ -60,7 +64,7 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   warppolar: WarpPolarControls,
 };
 
-export default function createControlComponent(op: Operation) {
+export default function getControlComponent(op: Operation) {
   const { name } = op;
   let component;
   try {

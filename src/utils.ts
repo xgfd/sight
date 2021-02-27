@@ -108,18 +108,14 @@ function exportScript(operations: Operation[], cb: (filepath: string) => void) {
  */
 function run(
   operations: Operation[],
-  lastHash: string,
+  instructions: {
+    fn: string;
+    rid: string;
+    args: (string | number | boolean | [number, number])[];
+    extra_inputs?: string[];
+  }[],
   cb: (err: Error | null, op: Operation | null, result: string) => void
 ) {
-  const instructions = operations.map((op, index) => {
-    const opJson = op.toJson();
-    // add the input hash for the first operation
-    if (index === 0) {
-      return { ...opJson, last_hash: lastHash };
-    }
-    return opJson;
-  });
-
   CVSHELL.send(`run '${JSON.stringify(instructions)}'`);
 
   // make sure there's only one listener at all time
