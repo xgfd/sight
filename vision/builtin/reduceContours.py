@@ -51,32 +51,36 @@ def main(
     """
 
     if len(_contours) == 0:
-        return image, None
+        ret_contour = None
+    else:
+        if method == "first":
+            ret_contour = _contours[0]
 
-    if method == "first":
-        ret_contour = _contours[0]
+        if method == "last":
+            ret_contour = _contours[-1]
 
-    if method == "last":
-        ret_contour = _contours[-1]
+        # ret_contour = eval(method)(_contours, key=FEATURES[sort_by])
+        if method == "max":
+            ret_contour = max(_contours, key=FEATURES[order_by])
 
-    # ret_contour = eval(method)(_contours, key=FEATURES[sort_by])
-    if method == "max":
-        ret_contour = max(_contours, key=FEATURES[order_by])
+        if method == "min":
+            ret_contour = min(_contours, key=FEATURES[order_by])
 
-    if method == "min":
-        ret_contour = min(_contours, key=FEATURES[order_by])
-
-    if method == "concatenate":
-        ret_contour = np.concatenate(tuple(_contours), axis=0)
+        if method == "concatenate":
+            ret_contour = np.concatenate(tuple(_contours), axis=0)
 
     if return_image_mode == 0:
         # colour image with shape overlay
         ret_image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
-        cv2.drawContours(ret_image, [ret_contour], -1, (255, 255, 0), line_thickness)
+        if ret_contour is not None:
+            cv2.drawContours(
+                ret_image, [ret_contour], -1, (255, 255, 0), line_thickness
+            )
     elif return_image_mode == 1:
         # shape on black background
         ret_image = np.zeros_like(image)
-        cv2.drawContours(ret_image, [ret_contour], -1, 255, line_thickness)
+        if ret_contour is not None:
+            cv2.drawContours(ret_image, [ret_contour], -1, 255, line_thickness)
     else:
         # pass on the input image
         ret_image = image

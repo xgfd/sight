@@ -14,8 +14,8 @@ def main(
     arclength_range: Tuple[float, float],
     aspect_range: Tuple[float, float],
     intensity_range: Tuple[float, float],
-    line_thickness=2,
-    return_image_mode=3,  # controls what image to return 0=colour image with shape overlay; 1=shape on black background; 2=pass on the input image
+    line_thickness,
+    return_image_mode,  # controls what image to return 0=colour image with shape overlay; 1=shape on black background; 2=pass on the input image
 ) -> Tuple[object, List[Contour]]:
 
     area_l, area_h = area_range

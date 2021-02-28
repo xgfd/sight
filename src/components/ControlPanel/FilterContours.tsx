@@ -78,23 +78,23 @@ export default class FilterContoursControls extends DefaultControls {
           marks={{ 0: '0', 127: '127', 255: '255' }}
           range
           max={255}
-          value={args[4]}
-          onChange={(value: [number, number]) => this.updateArgs(4, value)}
+          value={args[5]}
+          onChange={(value: [number, number]) => this.updateArgs(5, value)}
         />
         <h4>Line thickness</h4>
         <InputNumber
           min={-1}
           max={10}
-          value={args[5]}
-          onChange={(value) => this.updateArgs(5, value)}
+          value={args[6]}
+          onChange={(value) => this.updateArgs(6, value)}
         />
         <h4>Return image</h4>
         <Select
-          value={args[6]}
+          value={args[7]}
           showSearch
           optionFilterProp="children"
           style={{ width: '100%' }}
-          onChange={(value) => this.updateArgs(6, value)}
+          onChange={(value) => this.updateArgs(7, value)}
         >
           <Option value={0}>Overlay (Colour)</Option>
           <Option value={1}>Contours only</Option>
