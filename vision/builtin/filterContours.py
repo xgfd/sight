@@ -11,6 +11,7 @@ def main(
     area_range: Tuple[float, float],
     bound_area_range: Tuple[float, float],
     length_range: Tuple[float, float],
+    arclength_range: Tuple[float, float],
     aspect_range: Tuple[float, float],
     intensity_range: Tuple[float, float],
     line_thickness=2,
@@ -20,6 +21,7 @@ def main(
     area_l, area_h = area_range
     bound_area_l, bound_area_h = bound_area_range
     length_l, length_h = length_range
+    arclength_l, arclength_h = arclength_range
     aspect_l, aspect_h = aspect_range
 
     selected_contours = []
@@ -38,6 +40,7 @@ def main(
             (area_l <= area <= area_h)
             and (bound_area_l <= bound_area <= bound_area_h)
             and (length_l <= length <= length_h)
+            and (arclength_l <= cv2.arcLength(cont, closed=True) <= arclength_h)
             and (aspect_l <= aspect <= aspect_h)
         ):
             selected_contours.append(cont)

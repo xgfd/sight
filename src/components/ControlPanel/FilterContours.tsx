@@ -9,19 +9,25 @@ export default class FilterContoursControls extends DefaultControls {
     [25, 5_000_000] as [number, number],
     [25, 5_000_000] as [number, number],
     [5, 3_000] as [number, number],
+    [10, 10_000] as [number, number],
     [0.01, 1] as [number, number],
     [0, 128] as [number, number],
     2,
     1,
   ];
 
-  RangeComponent = (index: number, [lower, upper]: [number, number]) => (
+  RangeComponent = (
+    index: number,
+    [lower, upper]: [number, number],
+    step = 10
+  ) => (
     <Row>
       <Col span={12}>
         <InputNumber
           size="small"
           style={{ width: 85 }}
-          step={10}
+          min={0}
+          step={step}
           value={lower}
           onChange={(newLow) => {
             this.updateArgs(index, [newLow, Math.max(newLow as number, upper)]);
@@ -32,6 +38,7 @@ export default class FilterContoursControls extends DefaultControls {
         <InputNumber
           size="small"
           style={{ width: 85 }}
+          min={0}
           step={10}
           value={upper}
           onChange={(newUp) => {
@@ -52,16 +59,18 @@ export default class FilterContoursControls extends DefaultControls {
         {this.RangeComponent(0, args[0])}
         <h4>Bound area range</h4>
         {this.RangeComponent(1, args[1])}
-        <h4>Length range</h4>
-        {this.RangeComponent(2, args[2])}
+        <h4>Bound length range</h4>
+        {this.RangeComponent(2, args[2], 5)}
+        <h4>Arc length range</h4>
+        {this.RangeComponent(3, args[3], 5)}
         <h4>Aspect range</h4>
         <Slider
           marks={{ 0: '0', 0.5: '.5', 1: '1' }}
           range
           max={1}
           step={0.01}
-          value={args[3]}
-          onChange={(value: [number, number]) => this.updateArgs(3, value)}
+          value={args[4]}
+          onChange={(value: [number, number]) => this.updateArgs(4, value)}
         />
         <h4>Intensity range</h4>
         <Slider
