@@ -111,7 +111,7 @@ class OperationPanel extends Component<IProps, States> {
     const { operations } = this.props;
     const instructions = operations.map((op) => op.toJson());
     const { canceled, filePath } = await dialog.showSaveDialog({
-      defaultPath: 'operations.json',
+      defaultPath: 'sightfile.json',
       properties: ['createDirectory'],
     });
 
@@ -134,7 +134,7 @@ class OperationPanel extends Component<IProps, States> {
       const file = new Blob([content], { type: 'application/zip' });
       const element = document.createElement('a');
       element.href = URL.createObjectURL(file);
-      element.download = 'archive.zip';
+      element.download = 'sight.zip';
       element.click();
     });
   };

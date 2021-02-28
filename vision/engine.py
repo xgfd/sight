@@ -425,6 +425,7 @@ def main(image):
         main_str = "\n\n    ".join(index_main)
         zip.writestr("index.py", f"{import_str}\n\n{main_str}\n")
         zip.writestr("config.json", json.dumps(config, indent=4))
+        zip.writestr("sightfile.json", req)
 
     return str(Path("archive.zip").resolve())
 
