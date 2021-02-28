@@ -1,6 +1,9 @@
 import { Col, InputNumber, Row, Select, Slider } from 'antd';
 import React from 'react';
-import DefaultControls, { OpControlsProp, OpControlsState } from './Default';
+import DefaultControls, {
+  OpControlsProp,
+  OpControlsState,
+} from './ControlsBase';
 
 const { Option } = Select;
 
@@ -67,30 +70,15 @@ export default class CircleROIControls extends DefaultControls<
           <Option value={3}>TC89_L1</Option>
           <Option value={4}>TC89_KCOS</Option>
         </Select>
-        <h4>Bound area range</h4>
-        <Row>
-          <Col span={15}>
-            <Slider
-              range
-              max={boundAreaMax}
-              value={args[2]}
-              onChange={(value: [number, number]) => this.updateArgs(2, value)}
-            />
-          </Col>
-          <Col span={9}>
-            <InputNumber
-              size="small"
-              style={{ width: 85 }}
-              min={1000}
-              step={10000}
-              bordered={false}
-              defaultValue={boundAreaMax}
-              onChange={(value) =>
-                this.setState({ boundAreaMax: value as number })
-              }
-            />
-          </Col>
-        </Row>
+        <h4>ROI percentage range</h4>
+        <Slider
+          range
+          tipFormatter={(v) => `${(v as number) * 100}%`}
+          max={1}
+          step={0.01}
+          value={args[2]}
+          onChange={(value: [number, number]) => this.updateArgs(2, value)}
+        />
         <h4>Aspect range</h4>
         <Slider
           marks={{ 0: '0', 1: '1' }}

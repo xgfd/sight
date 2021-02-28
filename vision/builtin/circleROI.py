@@ -10,14 +10,17 @@ def main(
     image: object,
     contour_mode: int,
     method: int,
-    bound_area_range: Tuple[float, float],
+    area_pert_range: Tuple[float, float],
     aspect: float,
     line_thickness=2,
     return_image_mode=1,  # controls what image to return 0=colour image with shape overlay; 1=shape on black background; 2=pass on the input image
 ) -> Tuple[object, Union[Circle, None]]:
     contours, _ = cv2.findContours(image, mode=contour_mode, method=method)
 
-    bound_area_l, bound_area_h = bound_area_range
+    image_w, image_h = image.shape[:2]
+    image_area = image_w * image_h
+    area_pert_l, area_pert_h = area_pert_range
+    area_l, area_h = area_pert_l * image_area, area_pert_h * image_area
 
     selected = []
 
@@ -28,9 +31,7 @@ def main(
         width = min(w, h)
         if length == 0:
             continue
-        if (bound_area_l <= bound_area <= bound_area_h) and (
-            aspect <= (width / length)
-        ):
+        if (area_l <= bound_area <= area_h) and (aspect <= (width / length)):
             selected.append(cont)
 
     if len(selected) > 0:
