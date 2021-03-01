@@ -9,18 +9,19 @@ import Icon, {
   FileImageOutlined,
   FilterOutlined,
   FunctionOutlined,
-  ToolOutlined,
   GlobalOutlined,
   HeatMapOutlined,
   HighlightOutlined,
   LoginOutlined,
   LogoutOutlined,
   MergeCellsOutlined,
+  PartitionOutlined,
   PauseOutlined,
+  PlusSquareOutlined,
   RadarChartOutlined,
   RiseOutlined,
   SplitCellsOutlined,
-  PartitionOutlined,
+  ToolOutlined,
   UngroupOutlined,
 } from '@ant-design/icons';
 import { Typography } from 'antd';
@@ -30,7 +31,8 @@ import OpItem from '../Operation';
 const { Text } = Typography;
 
 const IconMap: { [key: string]: React.ReactNode } = {
-  add: <CalculatorOutlined />,
+  add: <PlusSquareOutlined />,
+  addweighted: <CalculatorOutlined />,
   annotation: <HighlightOutlined />,
   bitwise_and: <BlockOutlined />,
   bitwise_or: <BlockOutlined />,

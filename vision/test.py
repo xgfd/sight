@@ -40,6 +40,15 @@ def test_run():
                 "extra_inputs": [0],
                 "args": [],
             },
+            {
+                "fn": "builtin.addWeighted",
+                "rid": "addweighted-4",
+                "extra_inputs": [
+                    0,
+                    "2c3c4270da43daa9dcf21057839d0a7e05e4d19527598fcd914cd39741b5bd4a",
+                ],
+                "args": [0.5, 0.5, 0],
+            },
         ]
     )
     run(cmd_input)
@@ -125,6 +134,6 @@ def test_parse_and_exec():
 
 if __name__ == "__main__":
     # test_ls()
-    # test_run()
+    test_run()
     # test_parse_and_exec()
-    test_export()
+    # test_export()

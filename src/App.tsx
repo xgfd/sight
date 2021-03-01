@@ -114,7 +114,7 @@ class App extends Component<unknown, IAppState> {
       // break if some ops are missing inputs
       if (inputRefs.some((ref) => ref === -1)) {
         if (i > 0) {
-          notify('warning', `Missing second image for ${op.name}.`);
+          notify('warning', `${op.name}: Missing required image`);
           this.selectOp(operations[i + seqStartIndx], i + seqStartIndx);
         }
         break;

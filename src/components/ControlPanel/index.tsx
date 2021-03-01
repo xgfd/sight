@@ -1,5 +1,6 @@
 import Operation from '../../type';
 import AdaptiveThresholdControls from './AdaptiveThreshold';
+import AddWeightedControls from './AddWeighted';
 import BilateralControls from './BilateralFilter';
 import BitwiseAndControls from './BitwiseAnd';
 import BitwiseOrControls from './BitwiseOr';
@@ -34,6 +35,7 @@ import WarpPolarControls from './WarpPolar';
 
 const controlComponents: { [key: string]: typeof ControlsBase } = {
   adaptivethreshold: AdaptiveThresholdControls,
+  addweighted: AddWeightedControls,
   blur: BlurControls,
   boxfilter: BoxFilterControls,
   bitwise_and: BitwiseAndControls,

@@ -139,15 +139,21 @@ def _run_step(
             fn_arg_count = len(sig.parameters)
             ctrl_arg_count = len(control_args)
 
+            # fill the right number of inputs to the function
+            # with the following precedence:
+            # control panel args > control panel images
+            # > previous result image > previous result data
             if fn_arg_count == ctrl_arg_count:
-                # all args come from controls, i.e. imread
+                # only control panel args, i.e. imread
                 result = fn(*control_args)
+            elif fn_arg_count == ctrl_arg_count + len(images) - 1:
+                # control panel images and args, i.e. addWeighted
+                result = fn(*images[1:], *control_args)
             elif fn_arg_count == ctrl_arg_count + len(images):
-                # take some images plus control args, i.e. Canny, blur
+                # previous result image, control panel images and args, i.e. Canny, blur, bitwise_and
                 result = fn(*images, *control_args)
             else:
-                # take an image, other data from the last step and control args
-                # i.e. warpPolar
+                # previous result image, control panel images (if any), previous result data and control panel args, i.e. filterContours, warpPolar
                 result = fn(*images, *data, *control_args)
 
             # function returned multiple values
