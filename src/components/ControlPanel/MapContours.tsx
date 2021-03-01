@@ -1,10 +1,10 @@
 import { InputNumber, Select } from 'antd';
 import React from 'react';
-import DefaultControls from './Default';
+import ControlsBase from './ControlsBase';
 
 const { Option } = Select;
 
-export default class MapContoursControls extends DefaultControls {
+export default class MapContoursControls extends ControlsBase {
   static defaultValues = ['boundingRect', 2, 1];
 
   render() {

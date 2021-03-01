@@ -1,10 +1,10 @@
 import { InputNumber, Select } from 'antd';
 import React from 'react';
-import DefaultControls from './Default';
+import ControlsBase from './ControlsBase';
 
 const { Option } = Select;
 
-export default class BilateralControls extends DefaultControls {
+export default class BilateralControls extends ControlsBase {
   static defaultValues = [5, 50, 50, 4];
 
   render() {

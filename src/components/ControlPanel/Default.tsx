@@ -1,11 +1,8 @@
 import { Input, InputNumber, Slider, Switch } from 'antd';
 import React from 'react';
-import ControlsBase, { OpControlsProp, OpControlsState } from './ControlsBase';
+import ControlsBase from './ControlsBase';
 
-export default class DefaultControls<
-  T extends OpControlsProp = OpControlsProp,
-  K extends OpControlsState = OpControlsState
-> extends ControlsBase<T, K> {
+export default class DefaultControls extends ControlsBase {
   static defaultValues = [[50, 150] as [number, number], 3, 3, 0, 0, '', false];
 
   render() {

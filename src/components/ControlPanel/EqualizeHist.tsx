@@ -1,7 +1,7 @@
 import React from 'react';
-import DefaultControls from './Default';
+import ControlsBase from './ControlsBase';
 
-export default class EqualizeHistControls extends DefaultControls {
+export default class EqualizeHistControls extends ControlsBase {
   static defaultValues = [];
 
   render() {

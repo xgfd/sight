@@ -5,9 +5,14 @@ import BitwiseAndControls from './BitwiseAnd';
 const { Option } = Select;
 
 export default class BitwiseOrControls extends BitwiseAndControls {
+  static defaultInputRefs = [''];
+
   render() {
     const { operations, index } = this.props;
-    const { name, inputRefs } = this.state;
+    const { name } = this.state;
+    let { inputRefs } = this.state;
+    const allIDs = operations.map((op) => op.id);
+    inputRefs = inputRefs.map((id) => (allIDs.includes(id) ? id : ''));
 
     return (
       <>

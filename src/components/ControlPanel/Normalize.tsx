@@ -1,10 +1,10 @@
 import { InputNumber, Select } from 'antd';
 import React from 'react';
-import DefaultControls from './Default';
+import ControlsBase from './ControlsBase';
 
 const { Option } = Select;
 
-export default class NormalizeControls extends DefaultControls {
+export default class NormalizeControls extends ControlsBase {
   static defaultValues = [0, 255, 32, -1];
 
   render() {

@@ -1,10 +1,10 @@
 import { InputNumber, Select } from 'antd';
 import React from 'react';
-import DefaultControls from './Default';
+import ControlsBase from './ControlsBase';
 
 const { Option } = Select;
 
-export default class ReduceContoursControls extends DefaultControls {
+export default class ReduceContoursControls extends ControlsBase {
   static defaultValues = ['max', 'contourArea', 2, 1];
 
   render() {

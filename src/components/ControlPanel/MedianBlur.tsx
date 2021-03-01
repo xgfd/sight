@@ -1,8 +1,8 @@
 import { InputNumber } from 'antd';
 import React from 'react';
-import DefaultControls from './Default';
+import ControlsBase from './ControlsBase';
 
-export default class MedianControls extends DefaultControls {
+export default class MedianControls extends ControlsBase {
   static defaultValues = [3];
 
   render() {

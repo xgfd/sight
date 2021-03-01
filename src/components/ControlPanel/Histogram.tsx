@@ -1,8 +1,8 @@
 import { Switch } from 'antd';
 import React from 'react';
-import DefaultControls from './Default';
+import ControlsBase from './ControlsBase';
 
-export default class HistogramControls extends DefaultControls {
+export default class HistogramControls extends ControlsBase {
   static defaultValues = [true];
 
   render() {

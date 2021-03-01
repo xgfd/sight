@@ -1,22 +1,10 @@
-import { Col, InputNumber, Row, Select, Slider } from 'antd';
+import { InputNumber, Select, Slider } from 'antd';
 import React from 'react';
-import DefaultControls, {
-  OpControlsProp,
-  OpControlsState,
-} from './ControlsBase';
+import ControlsBase from './ControlsBase';
 
 const { Option } = Select;
 
-interface FCState extends OpControlsState {
-  areaMax: number;
-  boundAreaMax: number;
-  lengthMax: number;
-}
-
-export default class CircleROIControls extends DefaultControls<
-  OpControlsProp,
-  FCState
-> {
+export default class CircleROIControls extends ControlsBase {
   static defaultValues = [
     3,
     2,
@@ -26,19 +14,8 @@ export default class CircleROIControls extends DefaultControls<
     1,
   ];
 
-  constructor(props: OpControlsProp) {
-    super(props);
-    const { selectedOp } = props;
-    const { args } = selectedOp;
-    const boundHigh = args[2][1];
-    this.state = {
-      ...this.state,
-      boundAreaMax: Math.ceil(boundHigh / 100) * 2 * 100,
-    };
-  }
-
   render() {
-    const { name, args, boundAreaMax } = this.state;
+    const { name, args } = this.state;
 
     return (
       <>

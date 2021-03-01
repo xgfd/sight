@@ -1,8 +1,8 @@
 import { Slider, Switch } from 'antd';
 import React from 'react';
-import DefaultControls from './Default';
+import ControlsBase from './ControlsBase';
 
-export default class CannyControls extends DefaultControls {
+export default class CannyControls extends ControlsBase {
   static defaultValues = [[50, 150] as [number, number], 3, false];
 
   render() {

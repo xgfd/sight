@@ -12,16 +12,17 @@ interface OpControlsState {
   name: string;
   args: any[];
   live: boolean;
+  inputRefs: string[];
 }
-export default abstract class ControlsBase<
-  T extends OpControlsProp = OpControlsProp, // generic parameter defaults introduced in TS v2.3
-  K extends OpControlsState = OpControlsState
-> extends Component<T, K> {
+export default abstract class ControlsBase extends Component<
+  OpControlsProp,
+  OpControlsState
+> {
   static defaultValues: (string | number | boolean | [number, number])[] = [];
 
   static defaultInputRefs: string[] = [];
 
-  constructor(props: T) {
+  constructor(props: OpControlsProp) {
     super(props);
     const { selectedOp } = props;
     const { name, args } = selectedOp;
@@ -40,7 +41,7 @@ export default abstract class ControlsBase<
     }
   };
 
-  updateExtraInputs = (index: number, value: any) => undefined;
+  updateExtraInputs = (index: number, value: any) => {};
 }
 
 export { OpControlsProp, OpControlsState };

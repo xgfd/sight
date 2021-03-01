@@ -12,7 +12,7 @@ import './App.global.css';
 import Gallery from './components/Gallery';
 import OperationPanel from './components/OperationPanel';
 import OpItem from './Operation';
-import { OpJSON, Instruction } from './type';
+import { Instruction } from './type';
 import { notify, run, upsert } from './utils';
 
 const { ErrorBoundary } = Alert;
@@ -140,6 +140,8 @@ class App extends Component<unknown, IAppState> {
       o.loading = true;
     });
     this.setState({ operations });
+
+    console.log(instructions);
 
     try {
       run(

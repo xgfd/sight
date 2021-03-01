@@ -1,19 +1,10 @@
 import { InputNumber, Select } from 'antd';
 import React from 'react';
-import DefaultControls, { OpControlsProp, OpControlsState } from './Default';
+import ControlsBase from './ControlsBase';
 
 const { Option } = Select;
 
-interface FCState extends OpControlsState {
-  areaMax: number;
-  boundAreaMax: number;
-  lengthMax: number;
-}
-
-export default class FindContoursControls extends DefaultControls<
-  OpControlsProp,
-  FCState
-> {
+export default class FindContoursControls extends ControlsBase {
   static defaultValues = [3, 2, 2, 1];
 
   render() {

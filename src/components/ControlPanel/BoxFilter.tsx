@@ -1,10 +1,10 @@
 import { InputNumber, Select, Switch } from 'antd';
 import React from 'react';
-import DefaultControls from './Default';
+import ControlsBase from './ControlsBase';
 
 const { Option } = Select;
 
-export default class BoxFilterControls extends DefaultControls {
+export default class BoxFilterControls extends ControlsBase {
   static defaultValues = [3, 3, true, 4];
 
   render() {

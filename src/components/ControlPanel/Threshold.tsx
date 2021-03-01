@@ -1,10 +1,10 @@
 import { InputNumber, Select, Slider } from 'antd';
 import React from 'react';
-import DefaultControls from './Default';
+import ControlsBase from './ControlsBase';
 
 const { Option } = Select;
 
-export default class ThresholdControls extends DefaultControls {
+export default class ThresholdControls extends ControlsBase {
   static defaultValues = [127, 255, 0];
 
   render() {

@@ -1,10 +1,10 @@
 import { InputNumber, Select } from 'antd';
 import React from 'react';
-import DefaultControls from './Default';
+import ControlsBase from './ControlsBase';
 
 const { Option } = Select;
 
-export default class InscribedCircleControls extends DefaultControls {
+export default class InscribedCircleControls extends ControlsBase {
   static defaultValues = [2, 3, 0, 1];
 
   render() {

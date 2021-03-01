@@ -1,18 +1,10 @@
 import { Select } from 'antd';
 import React from 'react';
-import DefaultControls from './Default';
-import ControlsBase, { OpControlsState, OpControlsProp } from './ControlsBase';
-
-interface ExtraInputsState extends OpControlsState {
-  inputRefs: string[];
-}
+import ControlsBase, { OpControlsProp } from './ControlsBase';
 
 const { Option } = Select;
 
-export default class BitwiseAndControls extends ControlsBase<
-  OpControlsProp,
-  ExtraInputsState
-> {
+export default class BitwiseAndControls extends ControlsBase {
   static defaultInputRefs = [''];
 
   constructor(props: OpControlsProp) {
@@ -40,14 +32,17 @@ export default class BitwiseAndControls extends ControlsBase<
 
   render() {
     const { operations, index } = this.props;
-    const { name, inputRefs: extraInputs } = this.state;
+    const { name } = this.state;
+    let { inputRefs } = this.state;
+    const allIDs = operations.map((op) => op.id);
+    inputRefs = inputRefs.map((id) => (allIDs.includes(id) ? id : ''));
 
     return (
       <>
         <h2>{name}</h2>
         <h4>Image 2</h4>
         <Select
-          value={extraInputs[0]}
+          value={inputRefs[0]}
           showSearch
           optionFilterProp="children"
           style={{ width: '100%' }}

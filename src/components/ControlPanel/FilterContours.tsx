@@ -1,10 +1,10 @@
 import { Col, InputNumber, Row, Select, Slider } from 'antd';
 import React from 'react';
-import DefaultControls from './Default';
+import ControlsBase from './ControlsBase';
 
 const { Option } = Select;
 
-export default class FilterContoursControls extends DefaultControls {
+export default class FilterContoursControls extends ControlsBase {
   static defaultValues = [
     [25, 5_000_000] as [number, number],
     [25, 5_000_000] as [number, number],

@@ -1,8 +1,8 @@
 import { InputNumber } from 'antd';
 import React from 'react';
-import DefaultControls from './Default';
+import ControlsBase from './ControlsBase';
 
-export default class ExpandDimensionControls extends DefaultControls {
+export default class ExpandDimensionControls extends ControlsBase {
   static defaultValues = [0];
 
   render() {

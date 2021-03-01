@@ -1,10 +1,10 @@
 import { InputNumber, Select } from 'antd';
 import React from 'react';
-import DefaultControls from './Default';
+import ControlsBase from './ControlsBase';
 
 const { Option } = Select;
 
-export default class AdaptiveThresholdControls extends DefaultControls {
+export default class AdaptiveThresholdControls extends ControlsBase {
   static defaultValues = [255, 0, 0, 21, 0];
 
   render() {

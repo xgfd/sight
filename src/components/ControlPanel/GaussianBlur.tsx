@@ -1,10 +1,10 @@
 import { InputNumber, Select } from 'antd';
 import React from 'react';
-import DefaultControls from './Default';
+import ControlsBase from './ControlsBase';
 
 const { Option } = Select;
 
-export default class GaussianControls extends DefaultControls {
+export default class GaussianControls extends ControlsBase {
   static defaultValues = [3, 3, 0, 0, 4];
 
   render() {

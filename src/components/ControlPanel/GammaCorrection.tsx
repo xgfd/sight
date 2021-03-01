@@ -1,8 +1,8 @@
 import { Slider } from 'antd';
 import React from 'react';
-import DefaultControls from './Default';
+import ControlsBase from './ControlsBase';
 
-export default class GammaCorrectionControls extends DefaultControls {
+export default class GammaCorrectionControls extends ControlsBase {
   static defaultValues = [1];
 
   render() {

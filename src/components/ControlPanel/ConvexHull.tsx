@@ -1,10 +1,10 @@
 import { InputNumber, Select } from 'antd';
 import React from 'react';
-import DefaultControls from './Default';
+import ControlsBase from './ControlsBase';
 
 const { Option } = Select;
 
-export default class ConvexHullControls extends DefaultControls {
+export default class ConvexHullControls extends ControlsBase {
   static defaultValues = [2, 1];
 
   render() {

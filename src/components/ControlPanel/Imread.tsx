@@ -3,10 +3,10 @@ import { Button, Select, Upload } from 'antd';
 import { RcFile } from 'antd/lib/upload';
 import path from 'path';
 import React from 'react';
-import DefaultControls, { OpControlsProp } from './Default';
+import ControlsBase, { OpControlsProp } from './ControlsBase';
 
 const { Option } = Select;
-export default class ImreadControls extends DefaultControls {
+export default class ImreadControls extends ControlsBase {
   static defaultValues = ['', 0];
 
   constructor(props: OpControlsProp) {
