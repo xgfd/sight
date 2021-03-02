@@ -1,4 +1,3 @@
-import Operation from '../../type';
 import AdaptiveThresholdControls from './AdaptiveThreshold';
 import AddWeightedControls from './AddWeighted';
 import BilateralControls from './BilateralFilter';
@@ -29,6 +28,7 @@ import MinEnclosingCircleControls from './MinEnclosingCircle';
 import MorphologyExControls from './MorphologyEx';
 import NormalizeControls from './Normalize';
 import ReduceContoursControls from './ReduceContours';
+import RefImageControls from './RefImage';
 import SobelControls from './Sobel';
 import ThresholdControls from './Threshold';
 import WarpPolarControls from './WarpPolar';
@@ -42,6 +42,7 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   bitwise_or: BitwiseOrControls,
   bilateralfilter: BilateralControls,
   canny: CannyControls,
+  refimage: RefImageControls,
   convertscaleabs: ConvertScaleAbsControls,
   convexhull: ConvexHullControls,
   circleroi: CircleROIControls,

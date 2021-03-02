@@ -1,4 +1,5 @@
 import Icon, {
+  ApiOutlined,
   BarChartOutlined,
   BlockOutlined,
   BuildOutlined,
@@ -40,6 +41,7 @@ const IconMap: { [key: string]: React.ReactNode } = {
   boxblur: <ExpandOutlined />,
   bilateralfilter: <PauseOutlined />,
   canny: <HeatMapOutlined />,
+  refimage: <ApiOutlined />,
   convertscaleabs: <RiseOutlined />,
   crop: <ExpandOutlined />,
   contours: <HeatMapOutlined />,

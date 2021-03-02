@@ -316,7 +316,7 @@ class OperationPanel extends Component<IProps, States> {
             disabled={popconfirmDisabled}
           >
             <Space size="small">
-              <Text ellipsis={{ tooltip: op.name }} style={{ width: 70 }}>
+              <Text ellipsis={{ tooltip: op.name }} style={{ width: 75 }}>
                 {op.name}
               </Text>
               <div>

@@ -141,8 +141,6 @@ class App extends Component<unknown, IAppState> {
     });
     this.setState({ operations });
 
-    console.log(instructions);
-
     try {
       run(
         execSequence,

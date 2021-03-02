@@ -5,14 +5,7 @@ import ControlsBase from './ControlsBase';
 const { Option } = Select;
 
 export default class CircleROIControls extends ControlsBase {
-  static defaultValues = [
-    3,
-    2,
-    [1000000, 1500000] as [number, number],
-    0.6,
-    2,
-    1,
-  ];
+  static defaultValues = [3, 2, [0.4, 0.7] as [number, number], 0.6, 2, 1];
 
   render() {
     const { name, args } = this.state;
