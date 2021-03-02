@@ -107,6 +107,12 @@ def test_export():
             "extra_inputs": [],
         },
         {
+            "fn": "builtin.refImage",
+            "rid": "ede1d91f-f30e-4f41-ab73-ecf085ea363b",
+            "args": [],
+            "extra_inputs": ["af4385ad-cba5-4746-8400-eae3ee5b2988"],
+        },
+        {
             "fn": "builtin.bitwise_or",
             "rid": "ac148d38-9aa5-4c26-8432-d789720f27c2",
             "args": [],
@@ -134,6 +140,6 @@ def test_parse_and_exec():
 
 if __name__ == "__main__":
     # test_ls()
-    test_run()
+    # test_run()
     # test_parse_and_exec()
-    # test_export()
+    test_export()

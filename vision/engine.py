@@ -308,6 +308,7 @@ def echo(line):
 
 
 def _img_var(index, operations: List[Op]):
+    # the first imread is removed from operations and its id maps to -1, which means that the current variable referrs to the input image
     if index < 0:
         return "image"
 
@@ -317,10 +318,6 @@ def _img_var(index, operations: List[Op]):
     return f"{name}_{index+1}"
 
 
-def _id2index(id: str, id_map) -> int:
-    return id_map[id]
-
-
 def export(req: str):
     """Export a sequence of operations as a Python package archive.
 
@@ -328,110 +325,118 @@ def export(req: str):
         str: Path to the exported archive.
     """
     operations: List[Op] = json.loads(req)
-    # remove imread on top
-    if operations[0]["fn"] == "builtin.imread":
-        operations = operations[1:]
 
-    id_index_map = {op["rid"]: index for index, op in enumerate(operations)}
+    id2var = {}
 
     config = {}
-    index_imports = {"import json", "from os import path"}
+
+    imports = {"import json", "from os import path"}
 
     main_header = """
-def main(image):
-    data = ()
+def main($images$):
     with open(path.join(path.dirname(__file__), "config.json")) as c:
         config = json.load(c)"""
 
-    index_main = [main_header]
     main_body = []
     ret_img_var = None
+
+    imread_count = 0
+
+    indentation = " " * 4
+
     with ZipFile("archive.zip", "w") as zip:
-        hasbuiltin = False
-        hascustom = False
 
         for index, op in enumerate(operations):
             fn_name = op["fn"]
-            package, module = fn_name.split(".")
-            if package == "builtin":
-                hasbuiltin = True
-            if package == "custom":
-                hascustom = True
-            scriptfile = Path(__file__).parent / package / f"{module}.py"
-            arcname = Path(package) / f"{module}.py"
-            zip.write(scriptfile, arcname)
 
-            # import statement
-            index_imports.add(f'from .{op["fn"]} import main as {module}')
-
-            # function invocation statement
-            # line to read args
-            config_key = f"{module}_{index}"
-            main_body.append(f'args = config["{config_key}"]')
-
-            # construct the actual call depending on the return annotation
-            # and the number of accepted parameters of the function
-            args = op["args"]
-            config[config_key] = args
-            sig = SIGNATURES[fn_name]
-            fn_arg_count = len(sig.parameters)
-            ctrl_arg_count = len(args)
-
-            extra_img_refs = [
-                _img_var(_id2index(id, id_index_map), operations)
-                for id in op["extra_inputs"]
-            ]
-
-            fn_call_left = ""
-            fn_call_right = ""
-
-            ret_img_var: str = _img_var(index, operations)
-            if getattr(sig.return_annotation, "_name", "") == "Tuple":
-                fn_call_left = f"{ret_img_var}, *data"
+            if fn_name == "builtin.imread":
+                imread_count += 1
+                id2var[op["rid"]] = f"image{imread_count}"
+            elif fn_name == "builtin.refImage":
+                extra_img_refs = [id2var.get(id, "None") for id in op["extra_inputs"]]
+                ret_img_var = extra_img_refs[0]
+                id2var[op["rid"]] = ret_img_var
             else:
-                fn_call_left = ret_img_var
+                package, module = fn_name.split(".")
+                scriptfile = Path(__file__).parent / package / f"{module}.py"
+                arcname = Path(package) / f"{module}.py"
+                zip.write(scriptfile, arcname)
 
-            last_img_var = _img_var(index - 1, operations)
-            if fn_arg_count == ctrl_arg_count:
-                # all args come from controls, i.e. imread
-                fn_call_right = f"{module}(*args)"
-            elif fn_arg_count == ctrl_arg_count + len(extra_img_refs):
-                # take all images from non-immediate predecessors
-                # plus control args, i.e. Canny, blur
-                input_images = extra_img_refs
-                fn_call_right = f"{module}({', '.join(input_images)}, *args)"
-            elif fn_arg_count == ctrl_arg_count + len(extra_img_refs) + 1:
-                # take the image from immediate predecessor
-                # plus extra images
-                # plus control args, i.e. Canny, blur
-                input_images = [last_img_var, *extra_img_refs]
-                fn_call_right = f"{module}({', '.join(input_images)}, *args)"
-            else:
-                # take an image, other data from the last step and control args
-                # i.e. warpPolar
-                fn_call_right = f"{module}({last_img_var}, *data, *args)"
+                # import statement
+                imports.add(f"from .{fn_name} import main as {module}")
 
-            main_body.append(f"{fn_call_left} = {fn_call_right}")
+                # function invocation statement
+                # line to read args
+                config_key = f"{module}_{index}"
+                config_line = f'args = config["{config_key}"]'
 
-        if hasbuiltin:
-            initfile = Path(__file__).parent / "builtin" / "__init__.py"
-            arcname = Path("builtin") / "__init__.py"
-            zip.write(initfile, arcname)
+                # construct the actual call depending on the return annotation
+                # and the number of accepted parameters of the function
+                args = op["args"]
+                config[config_key] = args
+                sig = SIGNATURES[fn_name]
 
-        if hascustom:
-            initfile = Path(__file__).parent / "custom" / "__init__.py"
-            arcname = Path("custom") / "__init__.py"
-            zip.write(initfile, arcname)
+                fn_arg_count = len(sig.parameters)
+                ctrl_arg_count = len(args)
+
+                extra_img_refs = [id2var.get(id, "None") for id in op["extra_inputs"]]
+
+                fn_call_left = ""
+                fn_call_right = ""
+
+                ret_img_var: str = _img_var(index, operations)
+                id2var[op["rid"]] = ret_img_var
+
+                if getattr(sig.return_annotation, "_name", "") == "Tuple":
+                    fn_call_left = f"{ret_img_var}, *data"
+                else:
+                    fn_call_left = ret_img_var
+
+                last_img_var = id2var[operations[index - 1]["rid"]]
+                if fn_arg_count == ctrl_arg_count:
+                    # require only UI args, i.e. imread
+                    fn_call_right = f"{module}(*args)"
+                elif fn_arg_count == ctrl_arg_count + len(extra_img_refs):
+                    # UI images + UI args
+                    input_images = extra_img_refs
+                    fn_call_right = f"{module}({', '.join(input_images)}, *args)"
+                elif fn_arg_count == ctrl_arg_count + len(extra_img_refs) + 1:
+                    # last image + UI images + UI args
+                    input_images = [last_img_var, *extra_img_refs]
+                    fn_call_right = f"{module}({', '.join(input_images)}, *args)"
+                else:
+                    # previous image + UI images + previous data + UI args
+                    input_images = [last_img_var, *extra_img_refs]
+                    fn_call_right = f"{module}({', '.join(input_images)}, *data, *args)"
+
+                fn_call_line = f"{fn_call_left} = {fn_call_right}"
+                main_body.append(f"{config_line}\n{indentation}{fn_call_line}")
 
         if ret_img_var is not None:
             main_body.append(f"return {ret_img_var}, *data")
 
-        import_str = "\n".join(sorted(list(index_imports), reverse=True))
-        index_main.extend(main_body)
-        main_str = "\n\n    ".join(index_main)
-        zip.writestr("index.py", f"{import_str}\n\n{main_str}\n")
+        import_str = "\n".join(sorted(list(imports), reverse=True))
+
+        input_vars = ", ".join([f"image{i+1}" for i in range(imread_count)])
+        main_header = main_header.replace("$images$", input_vars)
+        index_main = [main_header, *main_body]
+        main_str = f"\n\n{indentation}".join(index_main)
+
+        index_py = f"{import_str}\n\n{main_str}\n"
+
+        if "builtin." in import_str:
+            initfile = Path(__file__).parent / "builtin" / "__init__.py"
+            arcname = Path("builtin") / "__init__.py"
+            zip.write(initfile, arcname)
+
+        if "custom." in import_str:
+            initfile = Path(__file__).parent / "custom" / "__init__.py"
+            arcname = Path("custom") / "__init__.py"
+            zip.write(initfile, arcname)
+
+        zip.writestr("index.py", index_py)
         zip.writestr("config.json", json.dumps(config, indent=4))
-        zip.writestr("sightfile.json", req)
+        zip.writestr("Sightfile.json", req)
 
     return str(Path("archive.zip").resolve())
 
