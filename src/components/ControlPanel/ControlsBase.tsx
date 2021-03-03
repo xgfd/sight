@@ -27,7 +27,7 @@ export default abstract class ControlsBase extends Component<
     const { selectedOp } = props;
     const { name, args } = selectedOp;
     // eslint-disable-next-line react/no-unused-state
-    this.state = { name, args: [...args], live: true } as K;
+    this.state = { name, args: [...args], live: true, inputRefs: [] };
   }
 
   updateArgs = (index: number, value: any) => {

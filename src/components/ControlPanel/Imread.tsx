@@ -14,7 +14,7 @@ export default class ImreadControls extends ControlsBase {
     const { name, args } = props.selectedOp;
     const fileArgs = [...args];
     fileArgs[0] = this.pathToRcFile(fileArgs[0]);
-    this.state = { name, args: fileArgs, live: false };
+    this.state = { name, args: fileArgs, live: false, inputRefs: [] };
   }
 
   beforeUpload = (file: RcFile) => {
@@ -40,13 +40,13 @@ export default class ImreadControls extends ControlsBase {
     return file;
   }
 
-  updateArgs(index: number, value: any) {
+  updateArgs = (index: number, value: any) => {
     const { selectedOp } = this.props;
     selectedOp.updateArgs(index, value);
     const fileArgs = [...selectedOp.args];
     fileArgs[0] = this.pathToRcFile(fileArgs[0]);
     this.setState({ name: selectedOp.name, args: fileArgs });
-  }
+  };
 
   render() {
     const { name, args } = this.state;
