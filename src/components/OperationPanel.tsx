@@ -111,7 +111,7 @@ class OperationPanel extends Component<IProps, States> {
     const { operations } = this.props;
     const instructions = operations.map((op) => op.toJson());
     const { canceled, filePath } = await dialog.showSaveDialog({
-      defaultPath: 'sightfile.json',
+      defaultPath: 'Sightfile.json',
       properties: ['createDirectory'],
     });
 
