@@ -3,18 +3,27 @@ from typing import Tuple, Union
 import cv2
 import numpy as np
 
-from . import Contour, Ellipse
+from . import Ellipse
 
 
 def main(
     image: object,
-    _contour: Contour,
+    _ellipse: Ellipse,
+    width_ranage: Tuple[int, int],
+    height_ranage: Tuple[int, int],
     line_thickness=2,
     return_image_mode=1,  # controls what image to return 0=colour image with shape overlay; 1=shape on black background; 2=pass on the input image
 ) -> Tuple[object, Union[Ellipse, None]]:
 
     try:
-        ellipse = cv2.fitEllipse(_contour)
+        _, (w, h), _ = _ellipse
+        w_low, w_high = width_ranage
+        h_low, h_high = height_ranage
+        ellipse = (
+            tuple(_ellipse)
+            if (w_low <= w <= w_high) and (h_low <= h <= h_high)
+            else None
+        )
     except Exception:
         ellipse = None
 

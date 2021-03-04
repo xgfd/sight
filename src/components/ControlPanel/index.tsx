@@ -13,7 +13,9 @@ import ConvexHullControls from './ConvexHull';
 import DefaultControls from './Default';
 import EqualizeHistControls from './EqualizeHist';
 import ExpandDimensionControls from './ExpandDimension';
+import FilterCircleControls from './FilterCircle';
 import FilterContoursControls from './FilterContours';
+import FilterEllipseControls from './FilterEllipse';
 import FindContoursControls from './FindContours';
 import FitEllipseControls from './FitEllipse';
 import GammaCorrectionControls from './GammaCorrection';
@@ -49,6 +51,8 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   euqalizehist: EqualizeHistControls,
   expanddimension: ExpandDimensionControls,
   findcontours: FindContoursControls,
+  filtercircle: FilterCircleControls,
+  filterellipse: FilterEllipseControls,
   filtercontours: FilterContoursControls,
   fitellipse: FitEllipseControls,
   gaussianblur: GaussianControls,

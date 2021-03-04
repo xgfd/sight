@@ -34,36 +34,36 @@ def main(
         if (area_l <= bound_area <= area_h) and (aspect <= (width / length)):
             selected.append(cont)
 
+    circle = None
     if len(selected) > 0:
         selected.sort(key=lambda cont: cv2.boundingRect(cont)[2])
         centre, radius = cv2.minEnclosingCircle(selected[-1])
-    else:
-        centre, radius = (0, 0), 0
+        circle = (centre, radius)
 
     if return_image_mode == 0:
         # colour image with shape overlay
         ret_image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
-        cv2.circle(
-            ret_image,
-            (int(centre[0]), int(centre[1])),
-            int(radius),
-            (255, 255, 0),
-            line_thickness,
-        )
+        if circle is not None:
+            cv2.circle(
+                ret_image,
+                (int(centre[0]), int(centre[1])),
+                int(radius),
+                (255, 255, 0),
+                line_thickness,
+            )
     elif return_image_mode == 1:
         # shape on black background
         ret_image = np.zeros_like(image)
-        cv2.circle(
-            ret_image,
-            (int(centre[0]), int(centre[1])),
-            int(radius),
-            255,
-            line_thickness,
-        )
+        if circle is not None:
+            cv2.circle(
+                ret_image,
+                (int(centre[0]), int(centre[1])),
+                int(radius),
+                255,
+                line_thickness,
+            )
     else:
         # pass on the input image
         ret_image = image
-
-    circle = None if radius <= 0 else (centre, radius)
 
     return ret_image, circle

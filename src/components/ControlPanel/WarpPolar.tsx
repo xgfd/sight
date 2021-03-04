@@ -1,11 +1,11 @@
-import { InputNumber, Select } from 'antd';
+import { InputNumber, Select, Switch } from 'antd';
 import React from 'react';
 import ControlsBase from './ControlsBase';
 
 const { Option } = Select;
 
 export default class WarpPolarControls extends ControlsBase {
-  static defaultValues = [0, 0, 1, 0];
+  static defaultValues = [0, 0, 1, 0, 0];
 
   render() {
     const { name, args } = this.state;
@@ -26,7 +26,7 @@ export default class WarpPolarControls extends ControlsBase {
           value={args[1]}
           onChange={(value) => this.updateArgs(1, value)}
         />
-        <h4>Interpolation flag</h4>
+        <h4>Interpolation method</h4>
         <Select
           value={args[2]}
           showSearch
@@ -43,7 +43,7 @@ export default class WarpPolarControls extends ControlsBase {
           <Option value={6}>NEAREST_EXACT</Option>
           <Option value={7}>MAX</Option>
         </Select>
-        <h4>Warp polar mode </h4>
+        <h4>Linear/Log mode </h4>
         <Select
           value={args[3]}
           showSearch
@@ -54,6 +54,14 @@ export default class WarpPolarControls extends ControlsBase {
           <Option value={0}>POLAR_LINEAR</Option>
           <Option value={256}>POLAR_LOG</Option>
         </Select>
+        <h4>Inverse map</h4>
+        <Switch
+          checked={args[4] === 16}
+          onChange={(checked) => {
+            const inverseMap = checked ? 16 : 0;
+            this.updateArgs(4, inverseMap);
+          }}
+        />
       </>
     );
   }

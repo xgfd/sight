@@ -33,7 +33,7 @@ export default class SobelControls extends ControlsBase {
           checked={args[1] === 1}
           onChange={(checked) => {
             const newDx = checked ? 1 : 0;
-            this.updateArgs(1, checked ? 1 : 0);
+            this.updateArgs(1, newDx);
 
             const dy = args[2];
             if (dy + newDx === 0) {
@@ -46,7 +46,7 @@ export default class SobelControls extends ControlsBase {
           checked={args[2] === 1}
           onChange={(checked) => {
             const newDy = checked ? 1 : 0;
-            this.updateArgs(2, checked ? 1 : 0);
+            this.updateArgs(2, newDy);
 
             const dx = args[1];
             if (dx + newDy === 0) {
