@@ -51,7 +51,6 @@ export default class FilterCircleControls extends ControlsBase {
         <h4>Line thickness</h4>
         <InputNumber
           min={-1}
-          max={10}
           value={args[1]}
           onChange={(value) => this.updateArgs(1, value)}
         />

@@ -60,7 +60,6 @@ export default class CircleROIControls extends ControlsBase {
         <h4>Line thickness</h4>
         <InputNumber
           min={-1}
-          max={10}
           value={args[4]}
           onChange={(value) => this.updateArgs(4, value)}
         />

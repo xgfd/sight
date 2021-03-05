@@ -16,7 +16,6 @@ export default class ConvexHullControls extends ControlsBase {
         <h4>Line thickness</h4>
         <InputNumber
           min={-1}
-          max={10}
           value={args[0]}
           onChange={(value) => this.updateArgs(0, value)}
         />

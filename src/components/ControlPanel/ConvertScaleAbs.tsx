@@ -13,7 +13,7 @@ export default class ConvertScaleAbsControls extends ControlsBase {
         <h2>{name}</h2>
         <h4>Alpha (contrast)</h4>
         <Slider
-          max={10}
+          max={50}
           step={0.1}
           value={args[0]}
           onChange={(value: number) => this.updateArgs(0, value)}

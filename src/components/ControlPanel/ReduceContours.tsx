@@ -43,7 +43,6 @@ export default class ReduceContoursControls extends ControlsBase {
         <h4>Line thickness</h4>
         <InputNumber
           min={-1}
-          max={10}
           value={args[2]}
           onChange={(value) => this.updateArgs(2, value)}
         />

@@ -84,7 +84,6 @@ export default class FilterContoursControls extends ControlsBase {
         <h4>Line thickness</h4>
         <InputNumber
           min={-1}
-          max={10}
           value={args[6]}
           onChange={(value) => this.updateArgs(6, value)}
         />
