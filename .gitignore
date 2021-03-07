@@ -50,4 +50,4 @@ npm-debug.log.*
 *.sass.d.ts
 *.scss.d.ts
 
-vision/custom/custom*.py
+
