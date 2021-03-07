@@ -10,6 +10,7 @@ import CircleROIControls from './CircleROI';
 import ControlsBase from './ControlsBase';
 import ConvertScaleAbsControls from './ConvertScaleAbs';
 import ConvexHullControls from './ConvexHull';
+import CvtColorControls from './CvtColor';
 import DefaultControls from './Default';
 import EqualizeHistControls from './EqualizeHist';
 import ExpandDimensionControls from './ExpandDimension';
@@ -48,6 +49,7 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   convertscaleabs: ConvertScaleAbsControls,
   convexhull: ConvexHullControls,
   circleroi: CircleROIControls,
+  cvtcolor: CvtColorControls,
   euqalizehist: EqualizeHistControls,
   expanddimension: ExpandDimensionControls,
   findcontours: FindContoursControls,
