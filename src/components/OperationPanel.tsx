@@ -26,7 +26,7 @@ import getIcon from './Icons';
 const { Text } = Typography;
 const { dialog } = remote;
 
-interface IProps {
+interface Props {
   operations: OpItem[];
   selectedKey: string;
   resultUpToDate: boolean;
@@ -45,20 +45,28 @@ interface States {
 
 /**
  * Group strings by their upper case first letter.
- * @param names
+ * @param builtinNames
  */
-function groupByFirstChar(names: string[]) {
-  return names.reduce((group, name) => {
+function groupByFirstChar(builtinNames: string[], customNames: string[]) {
+  const builtinGroup = builtinNames.reduce((group, name) => {
     const firstChar = name[0].toUpperCase();
     const charGroup = group[firstChar] || [];
-    charGroup.push(name);
+    charGroup.push(['builtin', name]);
     group[firstChar] = charGroup;
     return group;
-  }, {} as { [key: string]: string[] });
+  }, {} as { [key: string]: [string, string][] });
+
+  return customNames.reduce((group, name) => {
+    const firstChar = name[0].toUpperCase();
+    const charGroup = group[firstChar] || [];
+    charGroup.push(['custom', name]);
+    group[firstChar] = charGroup;
+    return group;
+  }, builtinGroup);
 }
 
-class OperationPanel extends Component<IProps, States> {
-  constructor(props: IProps) {
+class OperationPanel extends Component<Props, States> {
+  constructor(props: Props) {
     super(props);
     this.state = {
       installedScripts: listScripts(),
@@ -185,14 +193,19 @@ class OperationPanel extends Component<IProps, States> {
 
     const { installedScripts, drawerOn, formValid } = this.state;
 
-    // item group for builtin functions
-    const builtinItemGroup = Object.entries(
-      groupByFirstChar(installedScripts.builtin)
+    // function items grouped by first char
+    const fnItemGroup = Object.entries(
+      groupByFirstChar(installedScripts.builtin, installedScripts.custom)
     ).map(([char, names]) => (
       <Menu.ItemGroup key={char} title={char}>
-        {names.map((m_name) => (
-          <Menu.Item key={`builtin.${m_name}`}>{m_name}</Menu.Item>
-        ))}
+        {names.map(([pack, m_name]) => {
+          const color = pack === 'builtin' ? '#f14668' : '#f0a500';
+          return (
+            <Menu.Item style={{ color }} key={`${pack}.${m_name}`}>
+              {m_name}
+            </Menu.Item>
+          );
+        })}
       </Menu.ItemGroup>
     ));
 
@@ -279,12 +292,7 @@ class OperationPanel extends Component<IProps, States> {
           <PlusCircleOutlined />
           <Text strong>New</Text>
         </Menu.Item>
-        {builtinItemGroup}
-        <Menu.ItemGroup key="1" title="Custom">
-          {installedScripts.custom.map((m_name) => (
-            <Menu.Item key={`custom.${m_name}`}>{m_name}</Menu.Item>
-          ))}
-        </Menu.ItemGroup>
+        {fnItemGroup}
       </Menu>
     );
 
