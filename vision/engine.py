@@ -11,12 +11,11 @@ from pathlib import Path
 from typing import Callable, Dict, List, Tuple, TypedDict, Union
 from zipfile import ZipFile
 
-import builtin
-import custom
+# use unique names to avoid possible name confliction caused by import * later
+import builtin as _282d4a2_builtin
+import custom as _282d4a2_custom
 import cv2
 import numpy as np
-
-# import all built/custom functions, see __init__.py of each package
 from builtin import *  # noqa: F401 F403
 from custom import *  # noqa: F401 F403
 
@@ -292,7 +291,7 @@ def _init():
     global FUNCTIONS
     global SIGNATURES
 
-    packages = [builtin, custom]
+    packages = [_282d4a2_builtin, _282d4a2_custom]
     for pack in packages:
         package_name = pack.__name__
         for module_name in pack.__all__:
