@@ -12,6 +12,7 @@ import ConvertScaleAbsControls from './ConvertScaleAbs';
 import ConvexHullControls from './ConvexHull';
 import CvtColorControls from './CvtColor';
 import DefaultControls from './Default';
+import DivideControls from './Divide';
 import EqualizeHistControls from './EqualizeHist';
 import ExpandDimensionControls from './ExpandDimension';
 import FilterCircleControls from './FilterCircle';
@@ -21,6 +22,7 @@ import FindContoursControls from './FindContours';
 import FitEllipseControls from './FitEllipse';
 import GammaCorrectionControls from './GammaCorrection';
 import GaussianControls from './GaussianBlur';
+import GenAdptThControls from './GenAdptTh';
 import HistogramControls from './Histogram';
 import ImreadControls from './Imread';
 import InRangeControls from './InRange';
@@ -50,6 +52,7 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   convexhull: ConvexHullControls,
   circleroi: CircleROIControls,
   cvtcolor: CvtColorControls,
+  divide: DivideControls,
   euqalizehist: EqualizeHistControls,
   expanddimension: ExpandDimensionControls,
   findcontours: FindContoursControls,
@@ -59,6 +62,7 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   fitellipse: FitEllipseControls,
   gaussianblur: GaussianControls,
   gammacorrection: GammaCorrectionControls,
+  genadptth: GenAdptThControls,
   histogram: HistogramControls,
   imread: ImreadControls,
   inrange: InRangeControls,
