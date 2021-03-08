@@ -5,6 +5,8 @@ import {
   shell,
 } from 'electron';
 
+import contextMenu from 'electron-context-menu';
+
 const isMac = process.platform === 'darwin';
 
 export default class MenuBuilder {
@@ -15,12 +17,12 @@ export default class MenuBuilder {
   }
 
   buildMenu(): Menu {
-    if (
-      process.env.NODE_ENV === 'development' ||
-      process.env.DEBUG_PROD === 'true'
-    ) {
-      this.setupDevelopmentEnvironment();
-    }
+    contextMenu({
+      showSaveImage: true,
+      showSearchWithGoogle: false,
+      showLookUpSelection: false,
+      shouldShowMenu: (_, parameters) => !parameters.isEditable,
+    });
 
     const template = this.buildMenuTemplate();
 
@@ -30,20 +32,19 @@ export default class MenuBuilder {
     return menu;
   }
 
-  setupDevelopmentEnvironment(): void {
-    this.mainWindow.webContents.on('context-menu', (_, props) => {
-      const { x, y } = props;
-
-      Menu.buildFromTemplate([
-        {
-          label: 'Inspect element',
-          click: () => {
-            this.mainWindow.webContents.inspectElement(x, y);
-          },
-        },
-      ]).popup({ window: this.mainWindow });
-    });
-  }
+  // setupDevelopmentEnvironment(): void {
+  //   this.mainWindow.webContents.on('context-menu', (_, props) => {
+  //     const { x, y } = props;
+  //     Menu.buildFromTemplate([
+  //       {
+  //         label: 'Inspect element',
+  //         click: () => {
+  //           this.mainWindow.webContents.inspectElement(x, y);
+  //         },
+  //       },
+  //     ]).popup({ window: this.mainWindow });
+  //   });
+  // }
 
   buildMenuTemplate(): MenuItemConstructorOptions[] {
     const subMenuApp: MenuItemConstructorOptions = { role: 'appMenu' };
