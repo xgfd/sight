@@ -15,6 +15,7 @@ import CvtColorControls from './CvtColor';
 import DefaultControls from './Default';
 import DistanceTransformControls from './DistanceTransform';
 import DivideControls from './Divide';
+import DrawControls from './Draw';
 import EqualizeHistControls from './EqualizeHist';
 import ExpandDimensionControls from './ExpandDimension';
 import FilterCircleControls from './FilterCircle';
@@ -56,6 +57,7 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   cvtcolor: CvtColorControls,
   distancetransform: DistanceTransformControls,
   divide: DivideControls,
+  draw: DrawControls,
   euqalizehist: EqualizeHistControls,
   expanddimension: ExpandDimensionControls,
   findcontours: FindContoursControls,

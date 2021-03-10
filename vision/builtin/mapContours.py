@@ -10,7 +10,7 @@ def _minEnclosingCircleInt(contour: Contour) -> Circle:
     return (int(x), int(y)), int(radius)
 
 
-def _to_points(rect: Rectangle) -> Tuple[Point1, Point1]:
+def _rect_to_points(rect: Rectangle) -> Tuple[Point1, Point1]:
     x, y, w, h = rect
     return (x, y), (x + w, y + h)
 
@@ -31,7 +31,7 @@ MAPPERS = {
 DRAWS = {
     "minEnclosingTriangle": _draw_triangles,
     "boundingRect": lambda image, rectangles, colour, thickness: [
-        cv2.rectangle(image, *_to_points(rect), color=colour, thickness=thickness)
+        cv2.rectangle(image, *_rect_to_points(rect), color=colour, thickness=thickness)
         for rect in rectangles
     ],
     "minAreaRect": lambda image, r_rectangles, colour, thickness: cv2.drawContours(
@@ -42,7 +42,8 @@ DRAWS = {
         thickness=thickness,
     ),
     "fitEllipse": lambda image, ellipses, colour, thickness: [
-        cv2.ellipse(image, ellipse, colour, thickness) for ellipse in ellipses
+        cv2.ellipse(image, ellipse, color=colour, thickness=thickness)
+        for ellipse in ellipses
     ],
     "minEnclosingCircle": lambda image, circles, colour, thickness: [
         cv2.circle(image, *circle, color=colour, thickness=thickness)
