@@ -116,6 +116,9 @@ function run(
 
   // make sure there's only one listener at all time
   CVSHELL.removeAllListeners('message');
+
+  let notified = false;
+
   CVSHELL.on('message', (message) => {
     // ignore empty messages
     if (!message.trim()) {
@@ -133,9 +136,10 @@ function run(
       const retOp = operations.find((op) => op.id === rid);
 
       if (retOp) {
-        // notify python execution errors
-        if (error) {
+        // notify the first python execution error
+        if (error && !notified) {
           notify('warning', `${retOp.name}: ${error}`);
+          notified = true;
         }
 
         // in case of error the resultHash should be ""

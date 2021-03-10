@@ -1,3 +1,4 @@
+import { Operation } from '../../type';
 import AdaptiveThresholdControls from './AdaptiveThreshold';
 import AddWeightedControls from './AddWeighted';
 import BilateralControls from './BilateralFilter';
@@ -12,6 +13,7 @@ import ConvertScaleAbsControls from './ConvertScaleAbs';
 import ConvexHullControls from './ConvexHull';
 import CvtColorControls from './CvtColor';
 import DefaultControls from './Default';
+import DistanceTransformControls from './DistanceTransform';
 import DivideControls from './Divide';
 import EqualizeHistControls from './EqualizeHist';
 import ExpandDimensionControls from './ExpandDimension';
@@ -52,6 +54,7 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   convexhull: ConvexHullControls,
   circleroi: CircleROIControls,
   cvtcolor: CvtColorControls,
+  distancetransform: DistanceTransformControls,
   divide: DivideControls,
   euqalizehist: EqualizeHistControls,
   expanddimension: ExpandDimensionControls,
