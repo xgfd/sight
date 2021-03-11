@@ -1,11 +1,12 @@
 import { InputNumber, Select } from 'antd';
 import React from 'react';
+import { BlockPicker } from 'react-color';
 import BitwiseAndControls from './BitwiseAnd';
 
 const { Option } = Select;
 
 export default class DrawControls extends BitwiseAndControls {
-  static defaultValues = ['auto', 2, 1];
+  static defaultValues = ['auto', [110, 0, 255], 2, 1];
 
   static defaultInputRefs = [''];
 
@@ -15,7 +16,7 @@ export default class DrawControls extends BitwiseAndControls {
     let { inputRefs } = this.state;
     const allIDs = operations.map((op) => op.id);
     inputRefs = inputRefs.map((id) => (allIDs.includes(id) ? id : ''));
-
+    const [b, g, r] = args[1];
     return (
       <>
         <h2>{name}</h2>
@@ -47,19 +48,40 @@ export default class DrawControls extends BitwiseAndControls {
           <Option value="triangles">triangles</Option>
           <Option value="rotated rectangles">rotated rectangles</Option>
         </Select>
+        <h4>Colour</h4>
+        <BlockPicker
+          triangle="hide"
+          colors={[
+            '#03bd42',
+            '#b1eb1e',
+            '#ff1b1c',
+            '#ff006e',
+            '#ff7f11',
+            '#8338ec',
+            '#3a86ff',
+            '#ffffff',
+            '#beb7a4',
+            '#000000',
+          ]}
+          color={{ b, g, r }}
+          onChangeComplete={(colour) => {
+            const { b: nb, g: ng, r: nr } = colour.rgb;
+            this.updateArgs(1, [nb, ng, nr]);
+          }}
+        />
         <h4>Line thickness</h4>
         <InputNumber
           min={-1}
-          value={args[1]}
-          onChange={(value) => this.updateArgs(1, value)}
+          value={args[2]}
+          onChange={(value) => this.updateArgs(2, value)}
         />
         <h4>Return image</h4>
         <Select
-          value={args[2]}
+          value={args[3]}
           showSearch
           optionFilterProp="children"
           style={{ width: '100%' }}
-          onChange={(value) => this.updateArgs(2, value)}
+          onChange={(value) => this.updateArgs(3, value)}
         >
           <Option value={0}>Overlay (Colour)</Option>
           <Option value={1}>Contours only</Option>

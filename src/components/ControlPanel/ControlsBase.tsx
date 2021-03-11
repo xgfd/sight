@@ -18,7 +18,7 @@ export default abstract class ControlsBase extends Component<
   OpControlsProp,
   OpControlsState
 > {
-  static defaultValues: (string | number | boolean | [number, number])[] = [];
+  static defaultValues: (string | number | boolean | number[])[] = [];
 
   static defaultInputRefs: string[] = [];
 

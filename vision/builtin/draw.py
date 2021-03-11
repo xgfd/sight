@@ -80,6 +80,7 @@ def main(
     method: Literal[
         "auto", "ellipses", "contours", "rectangles", "circles", "rotated rectangles"
     ],
+    colour: Tuple[int, int, int],
     line_thickness=2,
     return_image_mode=1,  # controls what image to return 0=colour image with shape overlay; 1=shape on black background; 2=pass on the input image
 ) -> Tuple[object, List[Shape]]:
@@ -91,13 +92,14 @@ def main(
 
     if return_image_mode == 0:
         # colour image with shape overlay
-        ret_image = cv2.cvtColor(image1, cv2.COLOR_GRAY2BGR)
-        colour = (255, 255, 0)
+        if len(image1.shape) < 3:
+            ret_image = cv2.cvtColor(image1, cv2.COLOR_GRAY2BGR)
+        else:
+            ret_image = image1
         draw(ret_image, _shapes, colour, line_thickness)
     elif return_image_mode == 1:
         # shape on black background
         ret_image = np.zeros_like(image1)
-        colour = 255
         draw(ret_image, _shapes, colour, line_thickness)
     else:
         # pass on the input image
