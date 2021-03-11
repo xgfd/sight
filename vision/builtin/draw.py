@@ -54,13 +54,13 @@ DRAWS = {
     ],
     "rotated rectangles": lambda image, r_rectangles, colour, thickness: cv2.drawContours(
         image,
-        [np.int0(cv2.boxPoints(rect)) for rect in r_rectangles],
+        [np.int0(cv2.boxPoints(tuple(rect))) for rect in r_rectangles],
         -1,
         color=colour,
         thickness=thickness,
     ),
     "ellipses": lambda image, ellipses, colour, thickness: [
-        cv2.ellipse(image, ellipse, color=colour, thickness=thickness)
+        cv2.ellipse(image, tuple(ellipse), color=colour, thickness=thickness)
         for ellipse in ellipses
     ],
     "circles": lambda image, circles, colour, thickness: [

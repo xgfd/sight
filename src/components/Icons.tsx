@@ -49,6 +49,7 @@ const IconMap: { [key: string]: React.ReactNode } = {
   contours: <HeatMapOutlined />,
   dilate: <SplitCellsOutlined />,
   divide: <CalculatorOutlined />,
+  draw: <HighlightOutlined />,
   erode: <MergeCellsOutlined />,
   equalizehist: <BarChartOutlined />,
   filter2d: <BlockOutlined />,

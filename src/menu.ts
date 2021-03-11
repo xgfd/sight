@@ -3,11 +3,26 @@ import {
   Menu,
   MenuItemConstructorOptions,
   shell,
+  systemPreferences,
 } from 'electron';
 
 import contextMenu from 'electron-context-menu';
 
 const isMac = process.platform === 'darwin';
+
+if (isMac) {
+  systemPreferences.setUserDefault(
+    'NSDisabledDictationMenuItem',
+    'boolean',
+    true as any
+  );
+
+  systemPreferences.setUserDefault(
+    'NSDisabledCharacterPaletteMenuItem',
+    'boolean',
+    true as any
+  );
+}
 
 export default class MenuBuilder {
   mainWindow: BrowserWindow;
@@ -21,7 +36,6 @@ export default class MenuBuilder {
       showSaveImage: true,
       showSearchWithGoogle: false,
       showLookUpSelection: false,
-      shouldShowMenu: (_, parameters) => !parameters.isEditable,
     });
 
     const template = this.buildMenuTemplate();
@@ -60,7 +74,7 @@ export default class MenuBuilder {
               },
             },
             {
-              label: 'Save Operations',
+              label: 'Save',
               accelerator: 'Command+S',
               click: () => {
                 this.mainWindow.webContents.send('SAVE');
@@ -86,7 +100,7 @@ export default class MenuBuilder {
               },
             },
             {
-              label: '&Save Operations',
+              label: '&Save',
               accelerator: 'Ctrl+S',
               click: () => {
                 this.mainWindow.webContents.send('SAVE');
@@ -101,6 +115,18 @@ export default class MenuBuilder {
             },
           ],
         };
+
+    const subMenuEdit: MenuItemConstructorOptions = {
+      label: 'Edit',
+      submenu: [
+        { role: 'undo' },
+        { role: 'redo' },
+        { type: 'separator' },
+        { role: 'cut' },
+        { role: 'copy' },
+        { role: 'paste' },
+      ],
+    };
 
     const subMenuView: MenuItemConstructorOptions = { role: 'viewMenu' };
 
@@ -130,6 +156,7 @@ export default class MenuBuilder {
     return [
       ...(isMac ? [subMenuApp] : []),
       subMenuFile,
+      subMenuEdit,
       subMenuView,
       subMenuWindow,
       subMenuHelp,
