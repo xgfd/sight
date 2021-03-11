@@ -1,7 +1,7 @@
 {
   "name": "sight",
   "productName": "Sight",
-  "version": "1.1.0-rc8",
+  "version": "1.1.0-rc9",
   "description": "See your computer vision algorithms live",
   "main": "./main.prod.js",
   "author": {
