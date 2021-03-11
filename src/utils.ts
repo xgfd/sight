@@ -52,6 +52,9 @@ function initPyEnvironment() {
     mode: 'text' as const,
     pythonOptions: ['-u'], // get print results in real-time
     scriptPath: VISION,
+    env: {
+      PYTHONIOENCODING: 'utf8',
+    },
     cwd: VISION,
   };
   CVSHELL = new PythonShell('engine.py', options);
