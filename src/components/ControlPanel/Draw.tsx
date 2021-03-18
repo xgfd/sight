@@ -6,7 +6,7 @@ import BitwiseAndControls from './BitwiseAnd';
 const { Option } = Select;
 
 export default class DrawControls extends BitwiseAndControls {
-  static defaultValues = ['auto', [110, 0, 255], 2, 1];
+  static defaultValues = ['auto', [110, 0, 255], 2, 0];
 
   static defaultInputRefs = [''];
 

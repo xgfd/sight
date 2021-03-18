@@ -5,6 +5,7 @@ from typing import List, Tuple, Union
 Point1 = Tuple[float, float]
 Point2 = Tuple[Tuple[float, float]]
 Point = Union[Point1, Point2]
+Triangle = Tuple[Point2, Point2, Point2]
 Circle = Tuple[Point1, float]
 RotatedRectangle = Tuple[Point1, Tuple[float, float], float]
 Ellipse = RotatedRectangle
