@@ -1,3 +1,4 @@
+import path from 'path';
 import {
   DeleteOutlined,
   PlusCircleOutlined,
@@ -20,7 +21,7 @@ import fs from 'fs';
 import React, { Component } from 'react';
 import OpItem from '../Operation';
 import { OpJSON } from '../type';
-import { exportScript, listScripts, rmScript, upsert } from '../utils';
+import { exportScript, listScripts, notify, rmScript, upsert } from '../utils';
 import getIcon from './Icons';
 
 const { Text } = Typography;
@@ -98,32 +99,40 @@ class OperationPanel extends Component<Props, States> {
 
   openOpList = async () => {
     const options = {
-      filters: [{ name: 'json', extensions: ['json'] }],
+      properties: ['openFile' as const, 'openDirectory' as const],
+      filters: [{ name: 'sightfile', extensions: ['json'] }],
     };
     const { canceled, filePaths } = await dialog.showOpenDialog(options);
 
     if (!canceled) {
-      const filepath = filePaths[0];
-      const response = await fetch(filepath);
+      let sightfilePath = filePaths[0];
+      if (fs.lstatSync(sightfilePath).isDirectory()) {
+        sightfilePath = path.join(sightfilePath, 'Sightfile.json');
+      }
+      try {
+        const response = await fetch(sightfilePath);
 
-      const opListJson: OpJSON[] = await response.json();
+        const opListJson: OpJSON[] = await response.json();
 
-      const operations = opListJson.map(OpItem.fromJson);
+        const operations = opListJson.map(OpItem.fromJson);
 
-      const { setOperations } = this.props;
-      setOperations(operations);
+        const { setOperations } = this.props;
+        setOperations(operations);
+      } catch (e) {
+        notify('warning', 'Unable to load Sightfile');
+      }
     }
   };
 
   saveOpList = async () => {
-    const { operations } = this.props;
-    const instructions = operations.map((op) => op.toJson());
     const { canceled, filePath } = await dialog.showSaveDialog({
       defaultPath: 'Sightfile.json',
       properties: ['createDirectory'],
     });
 
     if (!canceled) {
+      const { operations } = this.props;
+      const instructions = operations.map((op) => op.toJson());
       fs.writeFileSync(
         filePath as string,
         JSON.stringify(instructions, null, 2)
@@ -134,17 +143,22 @@ class OperationPanel extends Component<Props, States> {
   idsToIndices = (ids: string[], operations: OpItem[]) =>
     ids.map((opID) => operations.findIndex((o) => o.id === opID));
 
-  exportAsPython = () => {
-    const { operations } = this.props;
-    exportScript(operations, async (filepath) => {
-      const response = await fetch(filepath);
-      const content = await response.blob();
-      const file = new Blob([content], { type: 'application/zip' });
-      const element = document.createElement('a');
-      element.href = URL.createObjectURL(file);
-      element.download = 'sight.zip';
-      element.click();
+  exportAsPython = async () => {
+    const { canceled, filePath: saveTo } = await dialog.showSaveDialog({
+      defaultPath: 'Sight.zip',
+      properties: ['createDirectory'],
     });
+
+    if (!canceled) {
+      const { operations } = this.props;
+      exportScript(operations, async (err, archive) => {
+        if (err) {
+          notify('warning', 'Failed to export');
+        } else {
+          fs.renameSync(archive, saveTo as string);
+        }
+      });
+    }
   };
 
   insertOp = (fullOpName: string, index: number) => {

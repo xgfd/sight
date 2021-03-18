@@ -87,15 +87,19 @@ function upsert(pack: string, module: string, cb: (err: boolean) => void) {
   CVSHELL.on('message', onMessage);
 }
 
-function exportScript(operations: OpItem[], cb: (filepath: string) => void) {
+function exportScript(
+  operations: OpItem[],
+  cb: (err: Error | null, filepath: string) => void
+) {
   const instructions = operations.map((op) => op.toJson());
   CVSHELL.send(`export '${JSON.stringify(instructions)}'`);
 
   const onMessage = (message: string) => {
     try {
       const archivePath = JSON.parse(message);
-      cb(archivePath);
+      cb(null, archivePath);
     } catch (e) {
+      cb(new Error('Failed to export'), '');
       console.error(message);
     }
 
