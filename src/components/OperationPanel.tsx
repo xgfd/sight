@@ -245,7 +245,8 @@ class OperationPanel extends Component<Props, States> {
             rules={[
               () => ({
                 validator: (_, value: string) => {
-                  const pattern = /^[A-Za-z_]\w+$/;
+                  // at least three letters
+                  const pattern = /^[A-Za-z_]\w{2,}$/;
 
                   if (!pattern.test(value)) {
                     this.setState({ formValid: false });
