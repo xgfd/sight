@@ -137,23 +137,24 @@ def _run_step(
             sig = SIGNATURES[fn_name]
             fn_arg_count = len(sig.parameters)
             ctrl_arg_count = len(control_args)
+            image_count = len(images)
 
-            # fill the right number of inputs to the function
+            # feed the right number of inputs to the function
             # with the following precedence:
             # control panel args > control panel images
             # > previous result image > previous result data
             if fn_arg_count == ctrl_arg_count:
                 # only control panel args, i.e. imread
                 result = fn(*control_args)
-            elif fn_arg_count == ctrl_arg_count + len(images) - 1:
+            elif fn_arg_count == ctrl_arg_count + image_count - 1:
                 # control panel images and args, i.e. addWeighted
                 result = fn(*images[1:], *control_args)
-            elif fn_arg_count == ctrl_arg_count + len(images):
-                # previous result image, control panel images and args, i.e. Canny, blur, bitwise_and
-                result = fn(*images, *control_args)
             else:
-                # previous result image, control panel images (if any), previous result data and control panel args, i.e. filterContours, warpPolar
-                result = fn(*images, *data, *control_args)
+                arg_vacant = fn_arg_count - ctrl_arg_count - image_count
+                if arg_vacant < 0:
+                    raise Exception("Too many arguments")
+                # feed with result image, control panel images (if any), control panel args, and fill remaining vacant with result data, i.e. filterContours, warpPolar
+                result = fn(*images, *data[:arg_vacant], *control_args)
 
             # function returned multiple values
             if isinstance(result, tuple):
@@ -306,15 +307,11 @@ def echo(line):
     print(line)
 
 
-def _img_var(index, operations: List[Op]):
-    # the first imread is removed from operations and its id maps to -1, which means that the current variable referrs to the input image
-    if index < 0:
-        return "image"
-
+def _var(index, operations: List[Op], suffix="img"):
     op = operations[index]
     # take the first 3 letters from the function's name as the image var name
     name = op["fn"].split(".")[1][:3]
-    return f"{name}_{index+1}"
+    return f"{name}_{index+1}_{suffix}"
 
 
 def export(req: str):
@@ -325,7 +322,8 @@ def export(req: str):
     """
     operations: List[Op] = json.loads(req)
 
-    id2var = {}
+    id2img = {}
+    id2data = {}
 
     config = {}
 
@@ -347,14 +345,15 @@ def main($images$):
 
         for index, op in enumerate(operations):
             fn_name = op["fn"]
+            op_id = op["rid"]
 
             if fn_name == "builtin.imread":
                 imread_count += 1
-                id2var[op["rid"]] = f"image{imread_count}"
+                id2img[op_id] = f"image{imread_count}"
             elif fn_name == "builtin.refImage":
-                extra_img_refs = [id2var.get(id, "None") for id in op["extra_inputs"]]
+                extra_img_refs = [id2img.get(id, "None") for id in op["extra_inputs"]]
                 ret_img_var = extra_img_refs[0]
-                id2var[op["rid"]] = ret_img_var
+                id2img[op_id] = ret_img_var
             else:
                 package, module = fn_name.split(".")
                 scriptfile = Path(__file__).parent / package / f"{module}.py"
@@ -378,41 +377,51 @@ def main($images$):
                 fn_arg_count = len(sig.parameters)
                 ctrl_arg_count = len(args)
 
-                extra_img_refs = [id2var.get(id, "None") for id in op["extra_inputs"]]
+                extra_img_refs = [id2img.get(id, "None") for id in op["extra_inputs"]]
 
                 fn_call_left = ""
                 fn_call_right = ""
 
-                ret_img_var: str = _img_var(index, operations)
-                id2var[op["rid"]] = ret_img_var
+                ret_img_var = _var(index, operations)
+                id2img[op_id] = ret_img_var
 
                 if getattr(sig.return_annotation, "_name", "") == "Tuple":
-                    fn_call_left = f"{ret_img_var}, *data"
+                    ret_data_var = _var(index, operations, "da")
+                    id2data[op_id] = ret_data_var
+                    fn_call_left = f"{ret_img_var}, *{ret_data_var}"
                 else:
                     fn_call_left = ret_img_var
 
-                last_img_var = id2var[operations[index - 1]["rid"]]
+                last_op = operations[index - 1]
+                last_img_var = id2img[last_op["rid"]]
+                extra_img_count = len(extra_img_refs)
                 if fn_arg_count == ctrl_arg_count:
                     # require only UI args, i.e. imread
                     fn_call_right = f"{module}(*args)"
-                elif fn_arg_count == ctrl_arg_count + len(extra_img_refs):
+                elif fn_arg_count == ctrl_arg_count + extra_img_count:
                     # UI images + UI args
                     input_images = extra_img_refs
                     fn_call_right = f"{module}({', '.join(input_images)}, *args)"
-                elif fn_arg_count == ctrl_arg_count + len(extra_img_refs) + 1:
+                elif fn_arg_count == ctrl_arg_count + extra_img_count + 1:
                     # last image + UI images + UI args
                     input_images = [last_img_var, *extra_img_refs]
                     fn_call_right = f"{module}({', '.join(input_images)}, *args)"
                 else:
+                    vacant = fn_arg_count - ctrl_arg_count - extra_img_count - 1
                     # previous image + UI images + previous data + UI args
+                    last_data_var = id2data[last_op["rid"]]
                     input_images = [last_img_var, *extra_img_refs]
-                    fn_call_right = f"{module}({', '.join(input_images)}, *data, *args)"
+                    fn_call_right = f"{module}({', '.join(input_images)}, *{last_data_var}[:{vacant}], *args)"
 
                 fn_call_line = f"{fn_call_left} = {fn_call_right}"
                 main_body.append(f"{config_line}\n{indentation}{fn_call_line}")
 
         if ret_img_var is not None:
-            main_body.append(f"return {ret_img_var}, *data")
+            last_data_var = id2data.get(operations[-1]["rid"], None)
+            if last_data_var is not None:
+                main_body.append(f"return {ret_img_var}, *{last_data_var}")
+            else:
+                main_body.append(f"return {ret_img_var}")
 
         import_str = "\n".join(sorted(list(imports), reverse=True))
 

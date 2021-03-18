@@ -8,6 +8,7 @@ from . import Contour
 def main(
     image: object,
     _contours: List[Contour],
+    _hierarchy: List[Tuple[int, int, int, int]],
     area_range: Tuple[float, float],
     bound_area_range: Tuple[float, float],
     length_range: Tuple[float, float],
@@ -16,7 +17,7 @@ def main(
     intensity_range: Tuple[float, float],
     line_thickness,
     return_image_mode,  # controls what image to return 0=colour image with shape overlay; 1=shape on black background; 2=pass on the input image
-) -> Tuple[object, List[Contour]]:
+) -> Tuple[object, List[Contour], List[Tuple[int, int, int, int]]]:
 
     area_l, area_h = area_range
     bound_area_l, bound_area_h = bound_area_range
@@ -25,8 +26,9 @@ def main(
     aspect_l, aspect_h = aspect_range
 
     selected_contours = []
+    hierarchy_index = []
 
-    for cont in _contours:
+    for i, cont in enumerate(_contours):
         area = cv2.contourArea(cont)
         _, (w, h), _ = cv2.minAreaRect(cont)
         bound_area = w * h
@@ -44,6 +46,7 @@ def main(
             and (aspect_l <= aspect <= aspect_h)
         ):
             selected_contours.append(cont)
+            hierarchy_index.append(i)
 
     if return_image_mode == 0:
         # colour image with shape overlay
@@ -59,4 +62,4 @@ def main(
         # pass on the input image
         ret_image = image
 
-    return ret_image, selected_contours
+    return ret_image, selected_contours, _hierarchy[:, hierarchy_index, :]
