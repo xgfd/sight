@@ -67,7 +67,7 @@ def _ret_hash(fn: Callable, inputhash: str, args: List) -> str:
 def _run_step(
     fn_name: str,
     images: List[Union[None, object]],
-    extra_input_refs: List[Union[str, int]],
+    extra_input_hashes: List[Union[str, int]],
     data: Tuple,
     control_args: List,
     rid: str,
@@ -84,6 +84,7 @@ def _run_step(
     Args:
         fn_name (str): The full function name (package.module).
         images (List[Union[None, object]]): Input images.
+        extra_input_hashes (List[Union[str, int]]): Result hashes of referenced ops.
         data (Tuple): Other data returned from the last execution.
         control_args (List): Input arguments from the frontend.
         rid (str): Request id of this run.
@@ -127,7 +128,7 @@ def _run_step(
     # before run we can predicate the result hash
     # there's no need to run the function if the result hash matches a cached image
     input_hash = "" if module_name == "imread" else input_hash
-    ret_hash = _ret_hash(fn, input_hash, [*extra_input_refs, *control_args])
+    ret_hash = _ret_hash(fn, input_hash, [*extra_input_hashes, *control_args])
     ret_image, ret_data = _get_result(ret_hash)
     error: Union[str, None] = None
 
@@ -212,7 +213,7 @@ def _ref2image(ref: Union[int, str], history: List[object]) -> Union[None, objec
         history (List[object]): Images produced by previous ops of the current op sequence.
 
     Returns:
-        Union[None, object]: The referred image or None.
+        Union[None, object]: The referenced image or None.
     """
     image = None
     try:
