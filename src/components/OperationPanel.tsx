@@ -320,6 +320,7 @@ class OperationPanel extends Component<Props, States> {
 
       return (
         <Menu.Item
+          style={{ paddingRight: '0' }}
           key={op.id}
           icon={getIcon(op)}
           onClick={(info) => {
@@ -340,7 +341,7 @@ class OperationPanel extends Component<Props, States> {
             disabled={popconfirmDisabled}
           >
             <Space size="small">
-              <Text ellipsis={{ tooltip: op.name }} style={{ width: 75 }}>
+              <Text ellipsis={{ tooltip: op.name }} style={{ width: 85 }}>
                 {op.name}
               </Text>
               <div>
@@ -373,7 +374,7 @@ class OperationPanel extends Component<Props, States> {
                 >
                   -
                 </Button>
-                {op.package === 'custom' && (
+                {!op.loading && op.package === 'custom' && (
                   <Popconfirm
                     title={
                       <Text>
@@ -388,7 +389,12 @@ class OperationPanel extends Component<Props, States> {
                       this.removeScript(op);
                     }}
                   >
-                    <Button type="text" size="small" danger>
+                    <Button
+                      style={{ width: '24px', padding: '0px 4px' }}
+                      type="text"
+                      size="small"
+                      danger
+                    >
                       <DeleteOutlined />
                     </Button>
                   </Popconfirm>

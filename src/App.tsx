@@ -323,7 +323,7 @@ class App extends Component<unknown, IAppState> {
         <Layout>
           <Sider
             theme="light"
-            width={235}
+            width={220}
             trigger={null}
             collapsible
             collapsedWidth="0"
