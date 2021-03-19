@@ -150,7 +150,7 @@ function run(
         }
 
         // in case of error the resultHash should be ""
-        retOp.resultImageHash = resultHash;
+        retOp.resultHash = resultHash;
         retOp.resultUpToDate = true;
         cb(null, retOp, resultHash);
       } else {

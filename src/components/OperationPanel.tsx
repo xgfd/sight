@@ -116,8 +116,9 @@ class OperationPanel extends Component<Props, States> {
 
         const operations = opListJson.map(OpItem.fromJson);
 
-        const { setOperations } = this.props;
+        const { setOperations, selectOp } = this.props;
         setOperations(operations);
+        selectOp(operations[0], 0);
       } catch (e) {
         notify('warning', 'Unable to load Sightfile');
       }
@@ -344,7 +345,6 @@ class OperationPanel extends Component<Props, States> {
               </Text>
               <div>
                 <Dropdown
-                  // disabled={!op.resultImageHash}
                   trigger={['click']}
                   overlay={dropdownMenu(index)}
                   overlayStyle={{

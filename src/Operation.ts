@@ -88,7 +88,7 @@ class OpItem implements Operation {
 
   inputImageHash: string;
 
-  resultImageHash: string;
+  resultHash: string;
 
   ControlPanel;
 
@@ -125,7 +125,7 @@ class OpItem implements Operation {
     }
 
     this.inputImageHash = '';
-    this.resultImageHash = '';
+    this.resultHash = '';
   }
 
   public updateScript(script: string) {

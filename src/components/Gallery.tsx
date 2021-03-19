@@ -25,8 +25,8 @@ export default function Gallery(props: IProps) {
     } else {
       badgeCount = 0;
     }
-    const imgPath = op.resultImageHash
-      ? path.join(IMAGE_CACHE, `${op.resultImageHash}.png`)
+    const imgPath = op.resultHash
+      ? path.join(IMAGE_CACHE, `${op.resultHash}.png`)
       : '';
     return (
       <Badge key={op.id} dot count={badgeCount}>
@@ -35,7 +35,7 @@ export default function Gallery(props: IProps) {
     );
   });
   return (
-    <Image.PreviewGroup key={selectedOp.resultImageHash}>
+    <Image.PreviewGroup key={selectedOp.resultHash}>
       <Space>{imageComponents}</Space>
     </Image.PreviewGroup>
   );

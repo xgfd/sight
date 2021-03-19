@@ -57,8 +57,8 @@ class App extends Component<unknown, IAppState> {
       findcontours,
       filtercontours,
     ];
-    const selectionIndex = 0;
-    const selection = operations[selectionIndex];
+    const selectionIndex = 0; // index of the currently selected op
+    const selection = operations[selectionIndex]; // the currently selected op
     this.state = {
       collapsed: false,
       selectedOp: selection,
@@ -76,14 +76,15 @@ class App extends Component<unknown, IAppState> {
     }
 
     if (index < selectionIndex) {
-      return operations[index].resultImageHash;
+      return operations[index].resultHash;
     }
 
     return index - selectionIndex;
   };
 
   execOperations = (index?: number) => {
-    const { operations, selectionIndex } = this.state;
+    let { operations } = this.state;
+    const { selectionIndex } = this.state;
 
     const seqStartIndx = index || selectionIndex;
 
@@ -92,7 +93,7 @@ class App extends Component<unknown, IAppState> {
     // use the last result hash as the input hash of this operation sequence
     // unless this operation sequence starts from the beginning
     const lastResultHash =
-      seqStartIndx > 0 ? operations[seqStartIndx - 1].resultImageHash : '';
+      seqStartIndx > 0 ? operations[seqStartIndx - 1].resultHash : '';
 
     // cancel execution and ask to evaluate an immediately previous `imread` if the first operation doesn't have an input result hash
     if (
@@ -139,6 +140,7 @@ class App extends Component<unknown, IAppState> {
     execSequence.forEach((o: OpItem) => {
       o.loading = true;
     });
+
     this.setState({ operations });
 
     try {
@@ -155,6 +157,8 @@ class App extends Component<unknown, IAppState> {
               execSequence.forEach((o: OpItem) => {
                 o.loading = false;
               });
+              // the operation list might have changed during execution
+              operations = this.state.operations; //eslint-disable-line
               this.setState({ operations });
             } else {
               // shouldn't reach this point
@@ -169,21 +173,23 @@ class App extends Component<unknown, IAppState> {
               // this op failed
               notify('warning', `${op.name}: ${err.message}`);
               // reset its own result hash and input hash
-              op.resultImageHash = '';
+              op.resultHash = '';
               op.inputImageHash = '';
             } else {
               // everything's fine, update the result hash and if applicable the input hash
 
-              op.resultImageHash = result;
+              op.resultHash = result;
               // get the immediate predecessor and update this op's inputImageHash
               const selfIndx = operations.findIndex((p) => p.id === op.id);
               const preIndx = selfIndx - 1;
               if (preIndx >= 0 && op.name !== 'imread') {
-                op.inputImageHash = operations[preIndx].resultImageHash;
+                op.inputImageHash = operations[preIndx].resultHash;
               }
             }
           }
           // all set, update operations' status
+          // the operation list might have changed during execution
+          operations = this.state.operations; //eslint-disable-line
           this.setState({ operations });
         }
       );
@@ -191,6 +197,8 @@ class App extends Component<unknown, IAppState> {
       execSequence.forEach((op: OpItem) => {
         op.loading = false;
       });
+      // the operation list might have changed during execution
+      operations = this.state.operations; //eslint-disable-line
       this.setState({ operations });
       notify('error', e);
     }
@@ -219,9 +227,7 @@ class App extends Component<unknown, IAppState> {
     // 3) its input hash is different from the predecessor's output hash.
     if (selection.name !== 'imread') {
       const preResultHash =
-        selectionIndex > 0
-          ? operations[selectionIndex - 1].resultImageHash
-          : '';
+        selectionIndex > 0 ? operations[selectionIndex - 1].resultHash : '';
 
       if (preResultHash && selection.inputImageHash !== preResultHash) {
         this.evalDebounced(selectionIndex);
