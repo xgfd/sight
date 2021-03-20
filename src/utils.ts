@@ -152,6 +152,7 @@ function run(
         // in case of error the resultHash should be ""
         retOp.resultHash = resultHash;
         retOp.resultUpToDate = true;
+        console.log(retOp);
         cb(null, retOp, resultHash);
       } else {
         // shouldn't reach this point

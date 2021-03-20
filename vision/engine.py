@@ -191,13 +191,14 @@ def _save_result(hash: str, image: object, data: Tuple = ()) -> bool:
         bool: True if the result is saved.
     """
     imagepath = str(CACHE / f"{hash}.png")
-    datapath = str(CACHE / f"{hash}.npy")
+    datapath = str(CACHE / f"{hash}.npz")
     # save as loseless png
     try:
         cv2.imwrite(imagepath, image)
-        np.save(datapath, data)
+        np.savez(datapath, *data)
         return True
-    except Exception:
+    except Exception as e:
+        print("failed to save result: ", e)
         return False
 
 
@@ -234,12 +235,14 @@ def _get_result(hash: str) -> Union[Tuple[None, None], Tuple[object, Tuple]]:
     """
     imagepath = str(CACHE / f"{hash}.png")
     image = None
-    datapath = str(CACHE / f"{hash}.npy")
+    datapath = str(CACHE / f"{hash}.npz")
     data = ()
     try:
         image = cv2.imread(imagepath, cv2.IMREAD_UNCHANGED)
-        data = np.load(datapath, allow_pickle=True)
+        with np.load(datapath, allow_pickle=True) as arrays:
+            data = tuple(arrays.values())
     except Exception:
+        # print(e)
         pass
     return image, data
 
