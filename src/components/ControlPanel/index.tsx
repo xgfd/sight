@@ -1,5 +1,6 @@
 import { Operation } from '../../type';
 import AdaptiveThresholdControls from './AdaptiveThreshold';
+import AddControls from './Add';
 import AddWeightedControls from './AddWeighted';
 import BilateralControls from './BilateralFilter';
 import BitwiseAndControls from './BitwiseAnd';
@@ -37,15 +38,18 @@ import MapContoursControls from './MapContours';
 import MedianControls from './MedianBlur';
 import MinEnclosingCircleControls from './MinEnclosingCircle';
 import MorphologyExControls from './MorphologyEx';
+import MultiplyControls from './Multiply';
 import NormalizeControls from './Normalize';
 import ReduceContoursControls from './ReduceContours';
 import RefImageControls from './RefImage';
 import SobelControls from './Sobel';
+import SubtractControls from './Subtract';
 import ThresholdControls from './Threshold';
 import WarpPolarControls from './WarpPolar';
 
 const controlComponents: { [key: string]: typeof ControlsBase } = {
   adaptivethreshold: AdaptiveThresholdControls,
+  add: AddControls,
   addweighted: AddWeightedControls,
   blur: BlurControls,
   boxfilter: BoxFilterControls,
@@ -83,8 +87,10 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   minenclosingcircle: MinEnclosingCircleControls,
   medianblur: MedianControls,
   morphologyex: MorphologyExControls,
+  multiply: MultiplyControls,
   reducecontours: ReduceContoursControls,
   sobel: SobelControls,
+  subtract: SubtractControls,
   threshold: ThresholdControls,
   warppolar: WarpPolarControls,
 };
