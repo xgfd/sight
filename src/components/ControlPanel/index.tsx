@@ -43,6 +43,7 @@ import NormalizeControls from './Normalize';
 import ReduceContoursControls from './ReduceContours';
 import RefImageControls from './RefImage';
 import SobelControls from './Sobel';
+import SobelAmpControls from './SobelAmp';
 import SubtractControls from './Subtract';
 import ThresholdControls from './Threshold';
 import WarpPolarControls from './WarpPolar';
@@ -90,6 +91,7 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   multiply: MultiplyControls,
   reducecontours: ReduceContoursControls,
   sobel: SobelControls,
+  sobelamp: SobelAmpControls,
   subtract: SubtractControls,
   threshold: ThresholdControls,
   warppolar: WarpPolarControls,
