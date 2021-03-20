@@ -99,13 +99,13 @@
       "provider": "github",
       "owner": "xgfd",
       "repo": "sight-release",
-      "releaseType": "prerelease",
+      "releaseType": "release",
       "private": false
     }
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/xgfd/cv-fiddle.git"
+    "url": "https://github.com/xgfd/sight.git"
   },
   "author": {
     "name": "Xin Wang",

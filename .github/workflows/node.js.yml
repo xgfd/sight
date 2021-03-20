@@ -36,6 +36,6 @@ jobs:
       - name: Publish
         env:
           # This is used for uploading release assets to github
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.SIGHT_RELEASE }}
         run: |
           yarn postinstall && yarn build && yarn electron-builder --publish always --win --mac
