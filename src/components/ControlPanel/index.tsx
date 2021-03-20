@@ -13,6 +13,7 @@ import ConvertScaleAbsControls from './ConvertScaleAbs';
 import ConvexHullControls from './ConvexHull';
 import CvtColorControls from './CvtColor';
 import DefaultControls from './Default';
+import DeshadeControls from './Deshade';
 import DistanceTransformControls from './DistanceTransform';
 import DivideControls from './Divide';
 import DrawControls from './Draw';
@@ -26,6 +27,8 @@ import FitEllipseControls from './FitEllipse';
 import GammaCorrectionControls from './GammaCorrection';
 import GaussianControls from './GaussianBlur';
 import GenAdptThControls from './GenAdptTh';
+import GenHighpassControls from './GenHighpass';
+import HighpassControls from './Highpass';
 import HistogramControls from './Histogram';
 import ImreadControls from './Imread';
 import InRangeControls from './InRange';
@@ -55,6 +58,7 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   convexhull: ConvexHullControls,
   circleroi: CircleROIControls,
   cvtcolor: CvtColorControls,
+  deshade: DeshadeControls,
   distancetransform: DistanceTransformControls,
   divide: DivideControls,
   draw: DrawControls,
@@ -68,6 +72,8 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   gaussianblur: GaussianControls,
   gammacorrection: GammaCorrectionControls,
   genadptth: GenAdptThControls,
+  genhighpass: GenHighpassControls,
+  highpass: HighpassControls,
   histogram: HistogramControls,
   imread: ImreadControls,
   inrange: InRangeControls,
