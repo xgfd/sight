@@ -6,6 +6,7 @@ import BilateralControls from './BilateralFilter';
 import BitwiseAndControls from './BitwiseAnd';
 import BitwiseOrControls from './BitwiseOr';
 import BlurControls from './Blur';
+import BoundingRectControls from './BoundingRect';
 import BoxFilterControls from './BoxFilter';
 import CannyControls from './Canny';
 import CircleROIControls from './CircleROI';
@@ -42,6 +43,7 @@ import MultiplyControls from './Multiply';
 import NormalizeControls from './Normalize';
 import ReduceContoursControls from './ReduceContours';
 import RefImageControls from './RefImage';
+import ScharrControls from './Scharr';
 import SobelControls from './Sobel';
 import SobelAmpControls from './SobelAmp';
 import SubtractControls from './Subtract';
@@ -54,6 +56,7 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   addweighted: AddWeightedControls,
   blur: BlurControls,
   boxfilter: BoxFilterControls,
+  boundingrect: BoundingRectControls,
   bitwise_and: BitwiseAndControls,
   bitwise_or: BitwiseOrControls,
   bilateralfilter: BilateralControls,
@@ -90,6 +93,7 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   morphologyex: MorphologyExControls,
   multiply: MultiplyControls,
   reducecontours: ReduceContoursControls,
+  scharr: ScharrControls,
   sobel: SobelControls,
   sobelamp: SobelAmpControls,
   subtract: SubtractControls,
