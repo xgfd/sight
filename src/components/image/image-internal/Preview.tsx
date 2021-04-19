@@ -1,3 +1,6 @@
+/* eslint react/jsx-props-no-spreading: "off" */
+/* eslint import/no-cycle: "off" */
+/* eslint jsx-a11y/click-events-have-key-events: "off" */
 import classnames from 'classnames';
 import Dialog, { DialogProps as IDialogPropTypes } from 'rc-dialog';
 import * as React from 'react';
@@ -21,7 +24,7 @@ export interface PreviewProps extends Omit<IDialogPropTypes, 'onClose'> {
 
 let zoom: ProvidedZoom | undefined;
 
-const Preview: React.FC<PreviewProps> = (props) => {
+const Preview: React.FC<PreviewProps> = (props: PreviewProps) => {
   const {
     prefixCls,
     src,
@@ -38,8 +41,10 @@ const Preview: React.FC<PreviewProps> = (props) => {
   );
   const previewGroupCount = previewUrls.size;
   const previewUrlsKeys = Array.from(previewUrls.keys());
-  const currentPreviewIndex = previewUrlsKeys.indexOf(current);
-  const combinationSrc = isPreviewGroup ? previewUrls.get(current) : src;
+  const currentPreviewIndex = previewUrlsKeys.indexOf(current as number);
+  const combinationSrc = isPreviewGroup
+    ? previewUrls.get(current as number)
+    : src;
   const showLeftOrRightSwitches = isPreviewGroup && previewGroupCount > 1;
 
   const onAfterClose = () => {
@@ -113,28 +118,33 @@ const Preview: React.FC<PreviewProps> = (props) => {
     >
       <ul className={`${prefixCls}-operations`}>
         {tools.map(({ icon, onClick, type }) => (
-          <li
-            className={classnames(toolClassName, {
-              [`${prefixCls}-operations-operation-disabled`]: false,
-            })}
-            onClick={onClick}
-            key={type}
-          >
-            {React.isValidElement(icon)
-              ? React.cloneElement(icon, { className: iconClassName })
-              : icon}
+          <li key={type}>
+            <div
+              role="button"
+              tabIndex={-1}
+              className={classnames(toolClassName, {
+                [`${prefixCls}-operations-operation-disabled`]: false,
+              })}
+              onClick={onClick}
+            >
+              {React.isValidElement(icon)
+                ? React.cloneElement(icon, { className: iconClassName })
+                : icon}
+            </div>
           </li>
         ))}
       </ul>
       <ZoomViewer
         className={`${prefixCls}-zoom`}
-        imgRef={combinationSrc}
+        imgRef={combinationSrc as string}
         exposeZoom={(z) => {
           zoom = z;
         }}
       />
       {showLeftOrRightSwitches && (
         <div
+          role="button"
+          tabIndex={-1}
           className={classnames(`${prefixCls}-switch-left`, {
             [`${prefixCls}-switch-left-disabled`]: currentPreviewIndex === 0,
           })}
@@ -145,6 +155,8 @@ const Preview: React.FC<PreviewProps> = (props) => {
       )}
       {showLeftOrRightSwitches && (
         <div
+          role="button"
+          tabIndex={-1}
           className={classnames(`${prefixCls}-switch-right`, {
             [`${prefixCls}-switch-right-disabled`]:
               currentPreviewIndex === previewGroupCount - 1,

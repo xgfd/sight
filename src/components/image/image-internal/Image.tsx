@@ -21,6 +21,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+/* eslint react/jsx-props-no-spreading: "off" */
+/* eslint import/no-cycle: "off" */
+/* eslint jsx-a11y/click-events-have-key-events: "off" */
 import cn from 'classnames';
 import { IDialogPropTypes } from 'rc-dialog/lib/IDialogPropTypes';
 import { getOffset } from 'rc-util/lib/Dom/css';
@@ -108,7 +111,7 @@ const ImageInternal: CompoundedComponent<ImageProps> = ({
   srcSet,
   useMap,
   ...otherProps
-}) => {
+}: ImageProps) => {
   const isCustomPlaceholder = placeholder && placeholder !== true;
   const {
     src: previewSrc,
@@ -188,7 +191,7 @@ const ImageInternal: CompoundedComponent<ImageProps> = ({
   };
 
   const onPreviewClose = (e: React.SyntheticEvent<Element>) => {
-    // e.stopPropagation();
+    e.stopPropagation();
     setShowPreview(false);
     if (!isControlled) {
       setMousePosition(null);
@@ -208,13 +211,13 @@ const ImageInternal: CompoundedComponent<ImageProps> = ({
   // Resolve https://github.com/ant-design/ant-design/issues/28881
   // Only need unRegister when component unMount
   React.useEffect(() => {
-    const unRegister = registerImage(currentId, src);
+    const unRegister = registerImage(currentId, src as string);
 
     return unRegister;
   }, []);
 
   React.useEffect(() => {
-    registerImage(currentId, src, canPreview);
+    registerImage(currentId, src as string, canPreview);
   }, [src, canPreview]);
   // Keep order end
 
@@ -257,6 +260,8 @@ const ImageInternal: CompoundedComponent<ImageProps> = ({
   return (
     <>
       <div
+        role="button"
+        tabIndex={-1}
         {...otherProps}
         className={wrapperClass}
         onClick={preview && !isError ? onPreview : onClick}
@@ -269,7 +274,7 @@ const ImageInternal: CompoundedComponent<ImageProps> = ({
         <img
           alt=""
           {...imgCommonProps}
-          ref={getImgRef}
+          ref={getImgRef as any}
           {...(isError && fallback
             ? {
                 src: fallback,
@@ -296,7 +301,7 @@ const ImageInternal: CompoundedComponent<ImageProps> = ({
           visible={isShowPreview}
           prefixCls={previewPrefixCls}
           onClose={onPreviewClose}
-          mousePosition={mousePosition}
+          mousePosition={mousePosition as any}
           src={mergedSrc}
           alt={alt}
           getContainer={getPreviewContainer}

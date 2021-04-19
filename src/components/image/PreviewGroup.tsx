@@ -26,7 +26,7 @@ const InternalPreviewGroup: React.FC<GroupConsumerProps> = ({
   previewPrefixCls: customizePrefixCls,
   preview,
   ...props
-}) => {
+}: GroupConsumerProps) => {
   const { getPrefixCls } = React.useContext(ConfigContext);
   const prefixCls = getPrefixCls('image-preview', customizePrefixCls);
   const rootPrefixCls = getPrefixCls();
@@ -35,6 +35,7 @@ const InternalPreviewGroup: React.FC<GroupConsumerProps> = ({
     if (preview === false) {
       return preview;
     }
+    // eslint-disable-next-line
     const _preview = typeof preview === 'object' ? preview : {};
 
     return {

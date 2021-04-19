@@ -1,3 +1,4 @@
+/* eslint react/jsx-props-no-spreading: "off" */
 import EyeOutlined from '@ant-design/icons/EyeOutlined';
 import { ConfigContext } from 'antd/lib/config-provider';
 import defaultLocale from 'antd/lib/locale/en_US';
@@ -15,7 +16,7 @@ const Image: CompositionImage<ImageProps> = ({
   prefixCls: customizePrefixCls,
   preview,
   ...otherProps
-}) => {
+}: ImageProps) => {
   const { getPrefixCls } = useContext(ConfigContext);
   const prefixCls = getPrefixCls('image', customizePrefixCls);
   const rootPrefixCls = getPrefixCls();
@@ -27,6 +28,7 @@ const Image: CompositionImage<ImageProps> = ({
     if (preview === false) {
       return preview;
     }
+    // eslint-disable-next-line
     const _preview = typeof preview === 'object' ? preview : {};
 
     return {

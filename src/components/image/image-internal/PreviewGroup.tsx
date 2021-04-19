@@ -21,6 +21,9 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+/* eslint react/jsx-props-no-spreading: "off" */
+/* eslint import/no-cycle: "off" */
+/* eslint react/prop-types: "off" */
 import * as React from 'react';
 import { useState } from 'react';
 import useMergedState from 'rc-util/lib/hooks/useMergedState';
@@ -51,20 +54,21 @@ export interface GroupConsumerValue extends GroupConsumerProps {
   isPreviewGroup?: boolean;
   previewUrls: Map<number, string>;
   setPreviewUrls: React.Dispatch<React.SetStateAction<Map<number, PreviewUrl>>>;
-  current: number;
-  setCurrent: React.Dispatch<React.SetStateAction<number>>;
-  setShowPreview: React.Dispatch<React.SetStateAction<boolean>>;
+  current: number | undefined;
+  setCurrent: React.Dispatch<React.SetStateAction<number | undefined>>;
+  setShowPreview:
+    | React.Dispatch<React.SetStateAction<boolean | undefined>>
+    | ((value: boolean) => void);
   setMousePosition: React.Dispatch<
     React.SetStateAction<null | { x: number; y: number }>
   >;
   registerImage: (id: number, url: string, canPreview?: boolean) => () => void;
 }
 
-/* istanbul ignore next */
 export const context = React.createContext<GroupConsumerValue>({
   previewUrls: new Map(),
   setPreviewUrls: () => null,
-  current: null,
+  current: -1,
   setCurrent: () => null,
   setShowPreview: () => null,
   setMousePosition: () => null,
@@ -107,11 +111,7 @@ const Group: React.FC<GroupConsumerProps> = ({
       .map(([id, { url }]) => [id, url])
   );
 
-  const registerImage = (
-    id: number,
-    url: string,
-    canPreview: boolean = true
-  ) => {
+  const registerImage = (id: number, url: string, canPreview = true) => {
     const unRegister = () => {
       setPreviewUrls((oldPreviewUrls) => {
         const clonePreviewUrls = new Map(oldPreviewUrls);
@@ -165,8 +165,8 @@ const Group: React.FC<GroupConsumerProps> = ({
         visible={isShowPreview}
         prefixCls={previewPrefixCls}
         onClose={onPreviewClose}
-        mousePosition={mousePosition}
-        src={canPreviewUrls.get(current)}
+        mousePosition={mousePosition as any}
+        src={canPreviewUrls.get(current as number)}
         icons={icons}
         getContainer={getContainer}
         {...dialogProps}
