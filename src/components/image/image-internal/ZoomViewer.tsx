@@ -39,9 +39,9 @@ export default function ZoomViewer({
             style={{ pointerEvents: 'auto' }}
             width={width}
             height={height}
-            scaleXMin={1 / 2}
+            scaleXMin={0.8}
             scaleXMax={100}
-            scaleYMin={1 / 2}
+            scaleYMin={0.8}
             scaleYMax={100}
             transformMatrix={initialTransform}
           >
