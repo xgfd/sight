@@ -1,10 +1,11 @@
 import { ClockCircleOutlined } from '@ant-design/icons';
-import { Badge, Image, Space } from 'antd';
+import { Badge, Space } from 'antd';
 import path from 'path';
 import React from 'react';
 import fallback from '../../assets/fallback.png';
 import { IMAGE_CACHE } from '../constants';
 import OpItem from '../Operation';
+import Image from './image';
 
 interface IProps {
   operations: OpItem[];

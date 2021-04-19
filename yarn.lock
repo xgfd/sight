@@ -1715,7 +1715,7 @@
   dependencies:
     "@types/lodash" "*"
 
-"@types/lodash@*":
+"@types/lodash@*", "@types/lodash@^4.14.146":
   version "4.14.168"
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.168.tgz#fe24632e79b7ade3f132891afff86caa5e5ce008"
   integrity sha512-oVfRvqHV/V6D1yifJbVRU3TMp8OT6o6BG+U9MkwuJ3U8/CsDHvalRpsxBqivn71ztOFZBTfJMvETbqHiaNSj7Q==
@@ -1957,6 +1957,47 @@
   dependencies:
     "@typescript-eslint/types" "4.8.1"
     eslint-visitor-keys "^2.0.0"
+
+"@visx/clip-path@^1.7.0":
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/@visx/clip-path/-/clip-path-1.7.0.tgz#684ea6ae15c877d139c0b8f3cdfacb106c6bf4f9"
+  integrity sha512-PuEz/2Clmx3qb0gat4kzjoq/rLush1nhNOT1DV7ui/fipC7z+KpB53OXHeOviB4udD+u233W5kY1uSErLysPRQ==
+  dependencies:
+    "@types/react" "*"
+    prop-types "^15.5.10"
+
+"@visx/event@1.7.0", "@visx/event@^1.7.0":
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/@visx/event/-/event-1.7.0.tgz#76a1e726dfb72f33dffb957fd7e0c49488f426fe"
+  integrity sha512-RbAoKxvy+ildX2dVXC9/ZX94lQXPwjKgtO9jy7COc15knG4zmzsMCDYDC3uLd0+jE2o/+gSaZ/9r52p6zG5+IQ==
+  dependencies:
+    "@types/react" "*"
+    "@visx/point" "1.7.0"
+
+"@visx/point@1.7.0":
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/@visx/point/-/point-1.7.0.tgz#1df3c3425eae464f498473bcdda2fcae05c8ecbe"
+  integrity sha512-oaoY/HXYHhmpkkeKI4rBPmFtjHWtxSrIhZCVm1ipPoyQp3voJ8L6JD5eUIVmmaUCdUGUGwL1lFLnJiQ2p1Vlwg==
+
+"@visx/responsive@^1.7.0":
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/@visx/responsive/-/responsive-1.7.0.tgz#7b6c0b028b3f0788c30fb9a823925ac5564e8f18"
+  integrity sha512-1S78uLxT1wLMz36pocON3ddZMNJH93lHRYNRC0bcWOFKJKGNTuiUL1/nKXIIm9IZCvuxgh/KuBOGXdO+WnCJkg==
+  dependencies:
+    "@types/lodash" "^4.14.146"
+    "@types/react" "*"
+    lodash "^4.17.10"
+    prop-types "^15.6.1"
+    resize-observer-polyfill "1.5.1"
+
+"@visx/zoom@^1.7.0":
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/@visx/zoom/-/zoom-1.7.0.tgz#e037780211bd370019bd73cbf9ef7349c4f499a4"
+  integrity sha512-3r1fJ84CIiKDDBBm+0t0okzBF2s56FaZD84Ut2g52A7CJGmNz6v8O613zTFVxRyEK3gRieOfm0IlWCt1LpFRqg==
+  dependencies:
+    "@types/react" "*"
+    "@visx/event" "1.7.0"
+    prop-types "^15.6.2"
 
 "@webassemblyjs/ast@1.9.0":
   version "1.9.0"
@@ -9492,7 +9533,7 @@ prop-types-exact@^1.2.0:
     object.assign "^4.1.0"
     reflect.ownkeys "^0.2.0"
 
-prop-types@^15.5.10, prop-types@^15.6.2, prop-types@^15.7.2:
+prop-types@^15.5.10, prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2:
   version "15.7.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
   integrity sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ==
@@ -10388,7 +10429,7 @@ requires-port@^1.0.0:
   resolved "https://registry.yarnpkg.com/requires-port/-/requires-port-1.0.0.tgz#925d2601d39ac485e091cf0da5c6e694dc3dcaff"
   integrity sha1-kl0mAdOaxIXgkc8NpcbmlNw9yv8=
 
-resize-observer-polyfill@^1.5.0, resize-observer-polyfill@^1.5.1:
+resize-observer-polyfill@1.5.1, resize-observer-polyfill@^1.5.0, resize-observer-polyfill@^1.5.1:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/resize-observer-polyfill/-/resize-observer-polyfill-1.5.1.tgz#0e9020dd3d21024458d4ebd27e23e40269810464"
   integrity sha512-LwZrotdHOo12nQuZlHEmtuXdqGoOD0OhaxopaNFxWzInpEgaLWoVuAMbTzixuosCx2nEG58ngzW3vxdWoxIgdg==
@@ -11931,11 +11972,6 @@ universalify@^0.1.0:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/universalify/-/universalify-0.1.2.tgz#b646f69be3942dabcecc9d6639c80dc105efaa66"
   integrity sha512-rBJeI5CXAlmy1pV+617WB9J63U6XcazHHF2f2dbJix4XzpUF0RS3Zbj0FGIOCAva5P/d/GBOYaACQ1w+0azUkg==
-
-universalify@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/universalify/-/universalify-1.0.0.tgz#b61a1da173e8435b2fe3c67d29b9adf8594bd16d"
-  integrity sha512-rb6X1W158d7pRQBg5gkR8uPaSfiids68LTJQYOtEUhoJUWBdaQHsuT/EUduxXYxcrt4r5PJ4fuHW1MHT6p0qug==
 
 universalify@^2.0.0:
   version "2.0.0"
