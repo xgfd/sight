@@ -5,7 +5,8 @@ import defaultLocale from 'antd/lib/locale/en_US';
 import { getTransitionName } from 'antd/lib/_util/motion';
 import * as React from 'react';
 import { useContext } from 'react';
-import RcImage, { ImageProps } from './image-internal';
+import RcImage from './image-internal';
+import type { ImageProps } from './image-internal';
 import PreviewGroup, { icons } from './PreviewGroup';
 
 export interface CompositionImage<P> extends React.FC<P> {
@@ -58,7 +59,7 @@ const Image: CompositionImage<ImageProps> = ({
   );
 };
 
-export { ImageProps };
+export type { ImageProps };
 
 Image.PreviewGroup = PreviewGroup;
 

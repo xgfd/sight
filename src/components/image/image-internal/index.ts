@@ -22,6 +22,7 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import Image from './Image';
+import type { ImageProps, ImagePreviewType } from './Image';
 
-export * from './Image';
 export default Image;
+export type { ImageProps, ImagePreviewType };
