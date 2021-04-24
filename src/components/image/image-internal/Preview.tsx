@@ -180,7 +180,7 @@ const Preview: React.FC<PreviewProps> = (props: PreviewProps) => {
       </ul>
       <ZoomViewer
         className={`${prefixCls}-zoom`}
-        imgRef={combinationSrc as string}
+        imgSrc={combinationSrc as string}
         exposeZoom={(z) => {
           zoom = z;
         }}

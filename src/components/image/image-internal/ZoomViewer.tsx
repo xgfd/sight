@@ -4,7 +4,7 @@ import { localPoint } from '@visx/event';
 import ParentSize from '@visx/responsive/lib/components/ParentSize';
 import { Zoom } from '@visx/zoom';
 import { ProvidedZoom, TransformMatrix } from '@visx/zoom/lib/types';
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import styles from './ZoomViewer.module.css';
 
 const bg = '#0a0a0a';
@@ -34,22 +34,23 @@ type ZoomState = {
 function drawImage(
   src: string,
   canvas: HTMLCanvasElement,
-  setImageSrc: React.Dispatch<React.SetStateAction<string>>
+  setSrc: React.Dispatch<React.SetStateAction<string>>,
+  setCanvas: React.Dispatch<React.SetStateAction<HTMLCanvasElement>>
 ) {
   const ctx = canvas.getContext('2d');
-
-  const image = new Image();
-  image.src = src;
-  image.onload = () => {
-    if (ctx !== null) {
+  if (ctx !== null) {
+    const image = new Image();
+    image.src = src;
+    image.onload = () => {
       // clear canvas before updating its dimension
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       canvas.height = image.height;
       canvas.width = image.width;
       ctx.drawImage(image, 0, 0);
-    }
-    setImageSrc(src);
-  };
+      setCanvas(canvas);
+      setSrc(src);
+    };
+  }
 }
 
 function createIntensityLayer(
@@ -70,20 +71,18 @@ function createIntensityLayer(
   const y0 = Math.max(0, Math.floor(viewPortTopLeft.y));
   const xn = Math.min(width - 1, Math.floor(viewPortBottomRight.x));
   const yn = Math.min(height - 1, Math.floor(viewPortBottomRight.y));
-
+  // console.log('int');
   const intensities = [];
   if (zoomedInEnough) {
     const ctx = imageCanvas.getContext('2d');
     if (ctx !== null) {
-      // const pixelIntensities = ctx.getImageData(x0, y0, 2, 2).data;
-      // console.log(pixelIntensities);
       const stride = xn - x0 + 1;
       for (let y = y0; y <= yn; y += 1) {
         for (let x = x0; x <= xn; x += 1) {
           const pixelIntensity = ctx.getImageData(x, y, 1, 1).data;
           // const pixelIntensity = pixelIntensities[y * stride + x];
           intensities.push(
-            <g key={y * stride + x}>
+            <g key={`${y * stride + x}`}>
               <text
                 x={x}
                 y={y + fontSize}
@@ -132,26 +131,31 @@ function createIntensityLayer(
 export { ProvidedZoom };
 
 export default function ZoomViewer({
-  imgRef,
+  imgSrc,
   className,
   initialTransform,
   exposeZoom,
 }: {
-  imgRef: string;
+  imgSrc: string;
   className?: string;
   initialTransform?: Transform;
   exposeZoom: (z: ProvidedZoom) => void;
 }) {
   const [showMiniMap, setShowMiniMap] = useState<boolean>(true);
-  const [srcUpdate, setSrcUpdate] = useState<string>(imgRef);
-  const [imageCanvas, setImageCanvas] = useState<HTMLCanvasElement>(
+  const [imgState, setImgState] = useState<{
+    src: string;
+    width: number;
+    height: number;
+  }>({ src: '', width: 0, height: 0 });
+  const [src, setSrc] = useState<string>('');
+  const [canvas, setCanvas] = useState<HTMLCanvasElement>(
     document.createElement<'canvas'>('canvas')
   );
-  drawImage(imgRef, imageCanvas, setSrcUpdate);
+  drawImage(imgSrc, canvas, setSrc, setCanvas);
   return (
     <ParentSize>
       {({ width: viewWidth, height: viewHeight }) => {
-        const { width, height } = imageCanvas;
+        const { width, height } = canvas;
         return (
           <Zoom
             className={className}
@@ -166,12 +170,6 @@ export default function ZoomViewer({
           >
             {(zoom) => {
               exposeZoom(zoom);
-              const intensityTexts = createIntensityLayer(
-                viewWidth,
-                viewHeight,
-                zoom,
-                imageCanvas
-              );
 
               return (
                 <div>
@@ -186,10 +184,15 @@ export default function ZoomViewer({
                       <image
                         imageRendering="pixelated"
                         transform={zoom.toString()}
-                        href={imgRef}
+                        href={imgSrc}
                       />
                       <g width="100%" height="100%" transform={zoom.toString()}>
-                        {intensityTexts}
+                        {createIntensityLayer(
+                          viewWidth,
+                          viewHeight,
+                          zoom,
+                          canvas
+                        )}
                       </g>
                     </g>
                     <rect
@@ -223,7 +226,7 @@ export default function ZoomViewer({
                         }, ${height * 4 - height - 60})`}
                       >
                         <rect width={width} height={height} fill="#1a1a1a" />
-                        <image width={width} height={height} href={imgRef} />
+                        <image width={width} height={height} href={imgSrc} />
                         <rect
                           width={width}
                           height={height}
