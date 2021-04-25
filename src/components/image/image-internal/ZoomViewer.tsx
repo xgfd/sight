@@ -275,8 +275,14 @@ export default function ZoomViewer({
                       <g
                         clipPath="url(#zoom-clip)"
                         transform={`scale(0.25) translate(${
-                          width * 4 - width - 60
-                        }, ${height * 4 - height - 60})`}
+                          (width + (viewPort.width - width) / 2) * 4 -
+                          width -
+                          60
+                        }, ${
+                          (height + (viewPort.height - height) / 2) * 4 -
+                          height -
+                          60
+                        })`}
                       >
                         <rect width={width} height={height} fill="#1a1a1a" />
                         <image width={width} height={height} href={imgSrc} />
