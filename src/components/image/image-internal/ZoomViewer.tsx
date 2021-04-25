@@ -101,7 +101,7 @@ function viewPortRect(
   // we want the mouse layer (picks up scaling and panning) to cover
   // the whole parent element so need to shift and expand the mouse layer
   // the top-left corner of the view port inside the image coordinate system is the offsets for the mouse layer
-  const { width, height } = image;
+  const { width = viewWidth, height = viewHeight } = image;
   const viewAsp = viewHeight / viewWidth;
   const imgAsp = height / width;
   // conversion ratio from view coordinates to image coordinates
@@ -124,25 +124,32 @@ function viewPortRect(
     view2ImgRatio = width / viewWidth;
     vw = width;
     vh = viewHeight * view2ImgRatio;
-    // image is centred so the offset is half of the width diff
+    // image is centred so the offset is half of the height diff
     vx0 = 0;
-    vy0 = (viewHeight * view2ImgRatio - height) / 2;
+    vy0 = -(viewHeight * view2ImgRatio - height) / 2;
   }
 
-  return { x: vx0, y: vy0, width: vw, height: vh };
+  return { x: vx0, y: vy0, width: vw, height: vh, ratio: view2ImgRatio };
 }
 
 function createIntensityLayer(
-  viewPort: { x: number; y: number; width: number; height: number },
+  viewPort: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    ratio: number;
+  },
   zoom: ProvidedZoom & ZoomState,
   image: HTMLCanvasElement
 ) {
   const { width, height } = image;
   const scale = zoom.transformMatrix.scaleX; // scaleX==scaleY
-  const lineHeight = Math.floor(16 * window.devicePixelRatio) / scale;
-  const fontSize = Math.floor(14 * window.devicePixelRatio) / scale;
+  const lineHeight =
+    (Math.floor(6 * window.devicePixelRatio) * viewPort.ratio) / scale;
+  const fontSize =
+    (Math.floor(6 * window.devicePixelRatio) * viewPort.ratio) / scale;
   const zoomedInEnough = 3 * lineHeight < 0.9;
-
   const viewPortTopLeft = zoom.applyInverseToPoint({
     x: viewPort.x,
     y: viewPort.y,
@@ -233,6 +240,9 @@ export default function ZoomViewer({
   return (
     <ParentSize>
       {({ width: viewWidth, height: viewHeight }) => {
+        if (viewHeight * viewWidth === 0) {
+          return undefined;
+        }
         const viewPort = viewPortRect(viewWidth, viewHeight, canvas);
         const { width, height } = canvas;
 
@@ -243,9 +253,10 @@ export default function ZoomViewer({
             width={width}
             height={height}
             scaleXMin={0.8}
-            scaleXMax={150}
+            // 1 image pixel scale to 40 css pixel at most
+            scaleXMax={30 * window.devicePixelRatio * viewPort.ratio}
             scaleYMin={0.8}
-            scaleYMax={150}
+            scaleYMax={30 * window.devicePixelRatio * viewPort.ratio}
             transformMatrix={initialTransform}
           >
             {(zoom) => {
