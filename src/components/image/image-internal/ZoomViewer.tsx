@@ -53,28 +53,111 @@ function drawImage(
   }
 }
 
-function createIntensityLayer(
+function createMouseLayer(
+  viewPort: { x: number; y: number; width: number; height: number },
+  zoom: ProvidedZoom & ZoomState
+) {
+  const { x, y, width, height } = viewPort;
+  return (
+    <rect
+      style={{
+        cursor: zoom.isDragging ? 'grabbing' : 'grab',
+      }}
+      x={x}
+      y={y}
+      width={width}
+      height={height}
+      rx={0}
+      fill="transparent"
+      onTouchStart={zoom.dragStart}
+      onTouchMove={zoom.dragMove}
+      onTouchEnd={zoom.dragEnd}
+      onMouseDown={zoom.dragStart}
+      onMouseMove={zoom.dragMove}
+      onMouseUp={zoom.dragEnd}
+      onMouseLeave={() => {
+        if (zoom.isDragging) zoom.dragEnd();
+      }}
+      onDoubleClick={(event) => {
+        const point = localPoint(event) || { x: 0, y: 0 };
+        zoom.scale({ scaleX: 1.1, scaleY: 1.1, point });
+      }}
+    />
+  );
+}
+/**
+ * Get the view port rectangle in the image coordinate system.
+ * @param viewWidth View port width.
+ * @param viewHeight View port height.
+ * @param image Image canvas.
+ */
+function viewPortRect(
   viewWidth: number,
   viewHeight: number,
-  zoom: ProvidedZoom & ZoomState,
-  imageCanvas: HTMLCanvasElement
+  image: HTMLCanvasElement
 ) {
-  const { width, height } = imageCanvas;
+  // the image is scaled and centred to fit into the view port (the parent element in this case)
+  // and doesn't necessarily cover the whole view port
+  // we want the mouse layer (picks up scaling and panning) to cover
+  // the whole parent element so need to shift and expand the mouse layer
+  // the top-left corner of the view port inside the image coordinate system is the offsets for the mouse layer
+  const { width, height } = image;
+  const viewAsp = viewHeight / viewWidth;
+  const imgAsp = height / width;
+  // conversion ratio from view coordinates to image coordinates
+  let view2ImgRatio;
+  // in the image coordinate system, the coordinates of the origin of the view coordinate system
+  let vx0;
+  let vy0;
+  // in the image coordinate system, the width and height of the origin of the view coordinate system
+  let vw;
+  let vh;
+  // view is wider than the image
+  if (viewAsp <= imgAsp) {
+    view2ImgRatio = height / viewHeight;
+    vw = viewWidth * view2ImgRatio;
+    vh = height;
+    // image is centred so the offset is half of the width diff
+    vx0 = -(vw - width) / 2;
+    vy0 = 0;
+  } else {
+    view2ImgRatio = width / viewWidth;
+    vw = width;
+    vh = viewHeight * view2ImgRatio;
+    // image is centred so the offset is half of the width diff
+    vx0 = 0;
+    vy0 = (viewHeight * view2ImgRatio - height) / 2;
+  }
+
+  return { x: vx0, y: vy0, width: vw, height: vh };
+}
+
+function createIntensityLayer(
+  viewPort: { x: number; y: number; width: number; height: number },
+  zoom: ProvidedZoom & ZoomState,
+  image: HTMLCanvasElement
+) {
+  const { width, height } = image;
   const scale = zoom.transformMatrix.scaleX; // scaleX==scaleY
   const lineHeight = Math.floor(16 * window.devicePixelRatio) / scale;
   const fontSize = Math.floor(14 * window.devicePixelRatio) / scale;
   const zoomedInEnough = 3 * lineHeight < 0.9;
 
-  const viewPortTopLeft = zoom.applyInverseToPoint({ x: 0, y: 0 });
-  const viewPortBottomRight = zoom.applyInverseToPoint({ x: width, y: height });
+  const viewPortTopLeft = zoom.applyInverseToPoint({
+    x: viewPort.x,
+    y: viewPort.y,
+  });
+  const viewPortBottomRight = zoom.applyInverseToPoint({
+    x: viewPort.x + viewPort.width,
+    y: viewPort.y + viewPort.height,
+  });
   const x0 = Math.max(0, Math.floor(viewPortTopLeft.x));
   const y0 = Math.max(0, Math.floor(viewPortTopLeft.y));
   const xn = Math.min(width - 1, Math.floor(viewPortBottomRight.x));
   const yn = Math.min(height - 1, Math.floor(viewPortBottomRight.y));
-  // console.log('int');
   const intensities = [];
   if (zoomedInEnough) {
-    const ctx = imageCanvas.getContext('2d');
+    const ctx = image.getContext('2d');
     if (ctx !== null) {
       const stride = xn - x0 + 1;
       for (let y = y0; y <= yn; y += 1) {
@@ -142,11 +225,6 @@ export default function ZoomViewer({
   exposeZoom: (z: ProvidedZoom) => void;
 }) {
   const [showMiniMap, setShowMiniMap] = useState<boolean>(true);
-  const [imgState, setImgState] = useState<{
-    src: string;
-    width: number;
-    height: number;
-  }>({ src: '', width: 0, height: 0 });
   const [src, setSrc] = useState<string>('');
   const [canvas, setCanvas] = useState<HTMLCanvasElement>(
     document.createElement<'canvas'>('canvas')
@@ -155,7 +233,9 @@ export default function ZoomViewer({
   return (
     <ParentSize>
       {({ width: viewWidth, height: viewHeight }) => {
+        const viewPort = viewPortRect(viewWidth, viewHeight, canvas);
         const { width, height } = canvas;
+
         return (
           <Zoom
             className={className}
@@ -179,45 +259,18 @@ export default function ZoomViewer({
                     viewBox={`0 0 ${width} ${height}`}
                   >
                     <RectClipPath id="zoom-clip" width="100%" height="100%" />
-                    <rect width="100%" height="100%" rx={0} fill={bg} />
-                    <g clipPath="url(#zoom-clip)">
+                    {/* <rect width="100%" height="100%" rx={0} fill={bg} /> */}
+                    <g>
                       <image
                         imageRendering="pixelated"
                         transform={zoom.toString()}
                         href={imgSrc}
                       />
                       <g width="100%" height="100%" transform={zoom.toString()}>
-                        {createIntensityLayer(
-                          viewWidth,
-                          viewHeight,
-                          zoom,
-                          canvas
-                        )}
+                        {createIntensityLayer(viewPort, zoom, canvas)}
                       </g>
                     </g>
-                    <rect
-                      style={{
-                        cursor: zoom.isDragging ? 'grabbing' : 'grab',
-                      }}
-                      viewBox={`0 0 ${viewWidth} ${viewHeight}`}
-                      width="100%"
-                      height="100%"
-                      rx={0}
-                      fill="transparent"
-                      onTouchStart={zoom.dragStart}
-                      onTouchMove={zoom.dragMove}
-                      onTouchEnd={zoom.dragEnd}
-                      onMouseDown={zoom.dragStart}
-                      onMouseMove={zoom.dragMove}
-                      onMouseUp={zoom.dragEnd}
-                      onMouseLeave={() => {
-                        if (zoom.isDragging) zoom.dragEnd();
-                      }}
-                      onDoubleClick={(event) => {
-                        const point = localPoint(event) || { x: 0, y: 0 };
-                        zoom.scale({ scaleX: 1.1, scaleY: 1.1, point });
-                      }}
-                    />
+                    {createMouseLayer(viewPort, zoom)}
                     {showMiniMap && (
                       <g
                         clipPath="url(#zoom-clip)"
