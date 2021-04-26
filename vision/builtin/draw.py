@@ -101,7 +101,7 @@ def main(
     ],
     colour: Tuple[int, int, int],
     line_thickness=2,
-    return_image_mode=1,  # controls what image to return 0=colour image with shape overlay; 1=shape on black background; 2=pass on the input image
+    return_image_mode=1,  # controls what image to return 0=colour image with shape overlay; 1=shape on black background; 2=pass on the input image; 3=gray image with shape overlay
 ) -> Tuple[object, Union[Shape, List[Shape]]]:
 
     shape_list = (
@@ -124,8 +124,15 @@ def main(
         # shape on black background
         ret_image = np.zeros_like(image1)
         draw(ret_image, shape_list, colour, line_thickness)
+    # 2 had been used to return the original image
+    elif return_image_mode == 3:
+        if len(image1.shape) >= 3:
+            ret_image = cv2.cvtColor(image1, cv2.COLOR_BGR2GRAY)
+        else:
+            ret_image = image1
+        draw(ret_image, shape_list, colour, line_thickness)
     else:
-        # pass on the input image
+        # pass on the input image by default
         ret_image = image1
 
     return ret_image, _shapes

@@ -84,6 +84,7 @@ export default class DrawControls extends BitwiseAndControls {
           onChange={(value) => this.updateArgs(3, value)}
         >
           <Option value={0}>Overlay (Colour)</Option>
+          <Option value={3}>Overlay (Gray)</Option>
           <Option value={1}>Contours only</Option>
           <Option value={2}>Original image</Option>
         </Select>

@@ -33,6 +33,7 @@ import GenHighpassControls from './GenHighpass';
 import HighpassControls from './Highpass';
 import HistogramControls from './Histogram';
 import ImreadControls from './Imread';
+import InvertControls from './InRange';
 import InRangeControls from './InRange';
 import InscribedCircleControls from './InscribedCircle';
 import MapContoursControls from './MapContours';
@@ -61,7 +62,6 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   bitwise_or: BitwiseOrControls,
   bilateralfilter: BilateralControls,
   canny: CannyControls,
-  refimage: RefImageControls,
   convertscaleabs: ConvertScaleAbsControls,
   convexhull: ConvexHullControls,
   circleroi: CircleROIControls,
@@ -86,6 +86,7 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   imread: ImreadControls,
   inrange: InRangeControls,
   inscribedcircle: InscribedCircleControls,
+  invert: InvertControls,
   normalize: NormalizeControls,
   mapcontours: MapContoursControls,
   minenclosingcircle: MinEnclosingCircleControls,
@@ -93,6 +94,7 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   morphologyex: MorphologyExControls,
   multiply: MultiplyControls,
   reducecontours: ReduceContoursControls,
+  refimage: RefImageControls,
   scharr: ScharrControls,
   sobel: SobelControls,
   sobelamp: SobelAmpControls,
