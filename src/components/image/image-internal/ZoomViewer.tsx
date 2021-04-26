@@ -7,7 +7,10 @@ import { ProvidedZoom, TransformMatrix } from '@visx/zoom/lib/types';
 import React, { useState } from 'react';
 import styles from './ZoomViewer.module.css';
 
-const bg = '#0a0a0a';
+// the current image on display
+// cannot use a state since it contains Uint8ClampedArray
+// and will cause infinite updates
+let currentImageData: ImageData;
 
 interface Transform {
   scaleX: number;
@@ -42,11 +45,11 @@ function drawImage(
     const image = new Image();
     image.src = src;
     image.onload = () => {
-      // clear canvas before updating its dimension
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      canvas.height = image.height;
-      canvas.width = image.width;
+      const { naturalWidth: width, naturalHeight: height } = image;
+      canvas.height = height;
+      canvas.width = width;
       ctx.drawImage(image, 0, 0);
+      currentImageData = ctx.getImageData(0, 0, width, height);
       setCanvas(canvas);
       setSrc(src);
     };
@@ -85,6 +88,7 @@ function createMouseLayer(
     />
   );
 }
+
 /**
  * Get the view port rectangle in the image coordinate system.
  * @param viewWidth View port width.
@@ -132,6 +136,12 @@ function viewPortRect(
   return { x: vx0, y: vy0, width: vw, height: vh, ratio: view2ImgRatio };
 }
 
+function getColorIndicesForCoord(x: number, y: number, width: number) {
+  const red = y * (width * 4) + x * 4;
+  // [r,g,b,a]
+  return [red, red + 1, red + 2, red + 3];
+}
+
 function createIntensityLayer(
   viewPort: {
     x: number;
@@ -141,73 +151,70 @@ function createIntensityLayer(
     ratio: number;
   },
   zoom: ProvidedZoom & ZoomState,
-  image: HTMLCanvasElement
+  image: ImageData
 ) {
-  const { width, height } = image;
-  const scale = zoom.transformMatrix.scaleX; // scaleX==scaleY
-  const lineHeight =
-    (Math.floor(6 * window.devicePixelRatio) * viewPort.ratio) / scale;
-  const fontSize =
-    (Math.floor(6 * window.devicePixelRatio) * viewPort.ratio) / scale;
-  const zoomedInEnough = 3 * lineHeight < 0.9;
-  const viewPortTopLeft = zoom.applyInverseToPoint({
-    x: viewPort.x,
-    y: viewPort.y,
-  });
-  const viewPortBottomRight = zoom.applyInverseToPoint({
-    x: viewPort.x + viewPort.width,
-    y: viewPort.y + viewPort.height,
-  });
-  const x0 = Math.max(0, Math.floor(viewPortTopLeft.x));
-  const y0 = Math.max(0, Math.floor(viewPortTopLeft.y));
-  const xn = Math.min(width - 1, Math.floor(viewPortBottomRight.x));
-  const yn = Math.min(height - 1, Math.floor(viewPortBottomRight.y));
   const intensities = [];
-  if (zoomedInEnough) {
-    const ctx = image.getContext('2d');
-    if (ctx !== null) {
-      const stride = xn - x0 + 1;
+  if (image !== undefined) {
+    const { width, height } = image;
+    const scale = zoom.transformMatrix.scaleX; // scaleX==scaleY
+    // adjust for device resolution, convert to image coordinate system and compensate scaling to keep font and line height invariant on different devices, image sizes and scaling
+    const lineHeight =
+      (Math.floor(6 * window.devicePixelRatio) * viewPort.ratio) / scale;
+    const fontSize =
+      (Math.floor(6 * window.devicePixelRatio) * viewPort.ratio) / scale;
+    const zoomedInEnough = 3 * lineHeight < 0.9;
+    // calculate the top-left and bottom-right corners of the viewport in the image coordinate system
+    const viewPortTopLeft = zoom.applyInverseToPoint({
+      x: viewPort.x,
+      y: viewPort.y,
+    });
+    const viewPortBottomRight = zoom.applyInverseToPoint({
+      x: viewPort.x + viewPort.width,
+      y: viewPort.y + viewPort.height,
+    });
+    // top-left and bottom-right of visible image area
+    // it is the intersection of the image and the viewport
+    const x0 = Math.max(0, Math.floor(viewPortTopLeft.x));
+    const y0 = Math.max(0, Math.floor(viewPortTopLeft.y));
+    const xn = Math.min(width - 1, Math.floor(viewPortBottomRight.x));
+    const yn = Math.min(height - 1, Math.floor(viewPortBottomRight.y));
+    if (zoomedInEnough) {
+      const pixels = image.data;
       for (let y = y0; y <= yn; y += 1) {
         for (let x = x0; x <= xn; x += 1) {
-          const pixelIntensity = ctx.getImageData(x, y, 1, 1).data;
-          // const pixelIntensity = pixelIntensities[y * stride + x];
+          const colorIndices = getColorIndicesForCoord(x, y, width);
+          const [redIndex, greenIndex, blueIndex, alphaIndex] = colorIndices;
           intensities.push(
-            <g key={`${y * stride + x}`}>
+            <g key={`${x},${y}`}>
               <text
                 x={x}
                 y={y + fontSize}
-                dx={8 / scale}
-                dy={(1 - 3 * lineHeight) / 2}
                 style={{
-                  font: `${fontSize}px serif`,
+                  font: `${fontSize}px monospace`,
                   fill: 'red',
                 }}
               >
-                {pixelIntensity[0]}
+                {pixels[redIndex]}
               </text>
               <text
                 x={x}
                 y={y + fontSize + lineHeight}
-                dx={8 / scale}
-                dy={(1 - 3 * lineHeight) / 2}
                 style={{
-                  font: `${fontSize}px serif`,
+                  font: `${fontSize}px monospace`,
                   fill: 'green',
                 }}
               >
-                {pixelIntensity[1]}
+                {pixels[greenIndex]}
               </text>
               <text
                 x={x}
                 y={y + fontSize + lineHeight * 2}
-                dx={8 / scale}
-                dy={(1 - 3 * lineHeight) / 2}
                 style={{
-                  font: `${fontSize}px serif`,
+                  font: `${fontSize}px monospace`,
                   fill: 'blue',
                 }}
               >
-                {pixelIntensity[2]}
+                {pixels[blueIndex]}
               </text>
             </g>
           );
@@ -280,7 +287,7 @@ export default function ZoomViewer({
                         href={imgSrc}
                       />
                       <g width="100%" height="100%" transform={zoom.toString()}>
-                        {createIntensityLayer(viewPort, zoom, canvas)}
+                        {createIntensityLayer(viewPort, zoom, currentImageData)}
                       </g>
                     </g>
                     {createMouseLayer(viewPort, zoom)}
