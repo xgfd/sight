@@ -207,7 +207,7 @@ function createIntensityLayer(
                   fill: 'blue',
                 }}
               >
-                {pixelIntensity[1]}
+                {pixelIntensity[2]}
               </text>
             </g>
           );
@@ -245,6 +245,9 @@ export default function ZoomViewer({
         }
         const viewPort = viewPortRect(viewWidth, viewHeight, canvas);
         const { width, height } = canvas;
+        // 1 image pixel scale to 30 css pixel at most
+        // 1 css pixel is converted to physical pixels then to pixels in the image coordinate system
+        const maxScale = 30 * window.devicePixelRatio * viewPort.ratio;
 
         return (
           <Zoom
@@ -253,10 +256,9 @@ export default function ZoomViewer({
             width={width}
             height={height}
             scaleXMin={0.8}
-            // 1 image pixel scale to 40 css pixel at most
-            scaleXMax={30 * window.devicePixelRatio * viewPort.ratio}
+            scaleXMax={maxScale}
             scaleYMin={0.8}
-            scaleYMax={30 * window.devicePixelRatio * viewPort.ratio}
+            scaleYMax={maxScale}
             transformMatrix={initialTransform}
           >
             {(zoom) => {
@@ -303,7 +305,9 @@ export default function ZoomViewer({
                           fill="white"
                           fillOpacity={0.2}
                           stroke="white"
-                          strokeWidth={4}
+                          strokeWidth={
+                            2 * window.devicePixelRatio * viewPort.ratio
+                          }
                           transform={zoom.toStringInvert()}
                         />
                       </g>
