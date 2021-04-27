@@ -62,4 +62,7 @@ def main(
         # pass on the input image
         ret_image = image
 
+    if _hierarchy is None:
+        _hierarchy = np.array([[[]]])
+
     return ret_image, selected_contours, _hierarchy[:, hierarchy_index, :]
