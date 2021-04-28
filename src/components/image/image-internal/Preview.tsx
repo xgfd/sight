@@ -23,6 +23,7 @@ export interface PreviewProps extends Omit<IDialogPropTypes, 'onClose'> {
     rotateLeft?: React.ReactNode;
     rotateRight?: React.ReactNode;
     zoomIn?: React.ReactNode;
+    resetZoom?: React.ReactNode;
     zoomOut?: React.ReactNode;
     close?: React.ReactNode;
     left?: React.ReactNode;
@@ -43,7 +44,16 @@ const Preview: React.FC<PreviewProps> = (props: PreviewProps) => {
     icons = {},
     ...restProps
   } = props;
-  const { saveImage, copyImage, zoomIn, zoomOut, close, left, right } = icons;
+  const {
+    saveImage,
+    copyImage,
+    zoomIn,
+    resetZoom,
+    zoomOut,
+    close,
+    left,
+    right,
+  } = icons;
   const { previewUrls, current, isPreviewGroup, setCurrent } = React.useContext(
     context
   );
@@ -93,6 +103,12 @@ const Preview: React.FC<PreviewProps> = (props: PreviewProps) => {
     }
   };
 
+  const onResetZoom = () => {
+    if (zoom !== undefined) {
+      zoom.reset();
+    }
+  };
+
   const onZoomOut = () => {
     if (zoom !== undefined) {
       zoom.scale({ scaleX: 0.8, scaleY: 0.8 });
@@ -129,6 +145,11 @@ const Preview: React.FC<PreviewProps> = (props: PreviewProps) => {
       icon: zoomIn,
       onClick: onZoomIn,
       type: 'zoomIn',
+    },
+    {
+      icon: resetZoom,
+      onClick: onResetZoom,
+      type: 'resetZoom',
     },
     {
       icon: zoomOut,

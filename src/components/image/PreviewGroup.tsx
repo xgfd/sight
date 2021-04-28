@@ -1,6 +1,7 @@
 /* eslint react/jsx-props-no-spreading: "off" */
 import CloseOutlined from '@ant-design/icons/CloseOutlined';
 import CopyOutlined from '@ant-design/icons/CopyOutlined';
+import ExpandOutlined from '@ant-design/icons/ExpandOutlined';
 import LeftOutlined from '@ant-design/icons/LeftOutlined';
 import RightOutlined from '@ant-design/icons/RightOutlined';
 import SaveOutlined from '@ant-design/icons/SaveOutlined';
@@ -27,6 +28,11 @@ export const icons = {
   zoomIn: (
     <Tooltip title="Zoom In" style={{ zIndex: 2000 }}>
       <ZoomInOutlined />
+    </Tooltip>
+  ),
+  resetZoom: (
+    <Tooltip title="Rest Zoom" style={{ zIndex: 2000 }}>
+      <ExpandOutlined />
     </Tooltip>
   ),
   zoomOut: (

@@ -34,7 +34,7 @@ type ZoomState = {
  * @param src Image URL.
  * @returns A canvas with the image drawn on it.
  */
-function drawImage(
+function loadImageData(
   src: string,
   canvas: HTMLCanvasElement,
   setSrc: React.Dispatch<React.SetStateAction<string>>,
@@ -225,25 +225,27 @@ function createIntensityLayer(
   return intensities;
 }
 
-export { ProvidedZoom };
+export type { ProvidedZoom, ZoomState };
 
 export default function ZoomViewer({
   imgSrc,
   className,
   initialTransform,
+  background = 'transparent',
   exposeZoom,
 }: {
   imgSrc: string;
   className?: string;
   initialTransform?: Transform;
-  exposeZoom: (z: ProvidedZoom) => void;
+  background?: string;
+  exposeZoom: (z: ProvidedZoom & ZoomState) => void;
 }) {
   const [showMiniMap, setShowMiniMap] = useState<boolean>(true);
   const [src, setSrc] = useState<string>('');
   const [canvas, setCanvas] = useState<HTMLCanvasElement>(
     document.createElement<'canvas'>('canvas')
   );
-  drawImage(imgSrc, canvas, setSrc, setCanvas);
+  loadImageData(imgSrc, canvas, setSrc, setCanvas);
   return (
     <ParentSize>
       {({ width: viewWidth, height: viewHeight }) => {
@@ -279,16 +281,17 @@ export default function ZoomViewer({
                     viewBox={`0 0 ${width} ${height}`}
                   >
                     <RectClipPath id="zoom-clip" width="100%" height="100%" />
-                    {/* <rect width="100%" height="100%" rx={0} fill={bg} /> */}
-                    <g>
-                      <image
-                        imageRendering="pixelated"
-                        transform={zoom.toString()}
-                        href={imgSrc}
-                      />
-                      <g width="100%" height="100%" transform={zoom.toString()}>
-                        {createIntensityLayer(viewPort, zoom, currentImageData)}
-                      </g>
+                    <rect
+                      x={viewPort.x}
+                      y={viewPort.y}
+                      width={viewPort.width}
+                      height={viewPort.height}
+                      rx={0}
+                      fill={background}
+                    />
+                    <g width="100%" height="100%" transform={zoom.toString()}>
+                      <image imageRendering="pixelated" href={imgSrc} />
+                      {createIntensityLayer(viewPort, zoom, currentImageData)}
                     </g>
                     {createMouseLayer(viewPort, zoom)}
                     {showMiniMap && (
