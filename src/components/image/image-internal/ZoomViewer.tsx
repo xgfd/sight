@@ -56,7 +56,7 @@ function loadImageData(
   }
 }
 
-function createMouseLayer(
+function mouseLayer(
   viewPort: { x: number; y: number; width: number; height: number },
   zoom: ProvidedZoom & ZoomState
 ) {
@@ -142,7 +142,7 @@ function getColorIndicesForCoord(x: number, y: number, width: number) {
   return [red, red + 1, red + 2, red + 3];
 }
 
-function createIntensityLayer(
+function intensityLayer(
   viewPort: {
     x: number;
     y: number;
@@ -158,28 +158,56 @@ function createIntensityLayer(
     const { width, height } = image;
     const scale = zoom.transformMatrix.scaleX; // scaleX==scaleY
     // adjust for device resolution, convert to image coordinate system and compensate scaling to keep font and line height invariant on different devices, image sizes and scaling
-    const lineHeight =
-      (Math.floor(6 * window.devicePixelRatio) * viewPort.ratio) / scale;
-    const fontSize =
-      (Math.floor(6 * window.devicePixelRatio) * viewPort.ratio) / scale;
-    const zoomedInEnough = 3 * lineHeight < 0.9;
-    // calculate the top-left and bottom-right corners of the viewport in the image coordinate system
-    const viewPortTopLeft = zoom.applyInverseToPoint({
-      x: viewPort.x,
-      y: viewPort.y,
-    });
-    const viewPortBottomRight = zoom.applyInverseToPoint({
-      x: viewPort.x + viewPort.width,
-      y: viewPort.y + viewPort.height,
-    });
-    // top-left and bottom-right of visible image area
-    // it is the intersection of the image and the viewport
-    const x0 = Math.max(0, Math.floor(viewPortTopLeft.x));
-    const y0 = Math.max(0, Math.floor(viewPortTopLeft.y));
-    const xn = Math.min(width - 1, Math.floor(viewPortBottomRight.x));
-    const yn = Math.min(height - 1, Math.floor(viewPortBottomRight.y));
+    const fontSize = (6 * window.devicePixelRatio * viewPort.ratio) / scale;
+    const strokeWidth =
+      (0.2 * window.devicePixelRatio * viewPort.ratio) / scale;
+    const strokeColour = '#7F7F7F'; // gray
+    // display intensities when all texts fit into 0.9 pixel
+    const zoomedInEnough = 3 * fontSize < 0.9;
     if (zoomedInEnough) {
+      // calculate the top-left and bottom-right corners of the viewport in the image coordinate system
+      const viewPortTopLeft = zoom.applyInverseToPoint({
+        x: viewPort.x,
+        y: viewPort.y,
+      });
+      const viewPortBottomRight = zoom.applyInverseToPoint({
+        x: viewPort.x + viewPort.width,
+        y: viewPort.y + viewPort.height,
+      });
+      // top-left and bottom-right of visible image area
+      // it is the intersection of the image and the viewport
+      const x0 = Math.max(0, Math.floor(viewPortTopLeft.x));
+      const y0 = Math.max(0, Math.floor(viewPortTopLeft.y));
+      const xn = Math.min(width - 1, Math.floor(viewPortBottomRight.x));
+      const yn = Math.min(height - 1, Math.floor(viewPortBottomRight.y));
       const pixels = image.data;
+      // pixel grid horizontal lines
+      for (let y = y0; y <= yn; y += 1) {
+        intensities.push(
+          <line
+            x1={x0}
+            y1={y}
+            x2={xn + 1}
+            y2={y}
+            stroke={strokeColour}
+            strokeWidth={strokeWidth}
+          />
+        );
+      }
+      // pixel grid vertical lines
+      for (let x = x0; x <= xn; x += 1) {
+        intensities.push(
+          <line
+            x1={x}
+            y1={y0}
+            x2={x}
+            y2={yn + 1}
+            stroke={strokeColour}
+            strokeWidth={strokeWidth}
+          />
+        );
+      }
+      // pixel intensity values
       for (let y = y0; y <= yn; y += 1) {
         for (let x = x0; x <= xn; x += 1) {
           const colorIndices = getColorIndicesForCoord(x, y, width);
@@ -187,8 +215,10 @@ function createIntensityLayer(
           intensities.push(
             <g key={`${x},${y}`}>
               <text
-                x={x}
-                y={y + fontSize}
+                x={x + 0.5}
+                y={y + 0.5 - fontSize}
+                textAnchor="middle"
+                dominantBaseline="middle"
                 style={{
                   font: `${fontSize}px monospace`,
                   fill: 'red',
@@ -197,8 +227,10 @@ function createIntensityLayer(
                 {pixels[redIndex]}
               </text>
               <text
-                x={x}
-                y={y + fontSize + lineHeight}
+                x={x + 0.5}
+                y={y + 0.5}
+                textAnchor="middle"
+                dominantBaseline="middle"
                 style={{
                   font: `${fontSize}px monospace`,
                   fill: 'green',
@@ -207,8 +239,10 @@ function createIntensityLayer(
                 {pixels[greenIndex]}
               </text>
               <text
-                x={x}
-                y={y + fontSize + lineHeight * 2}
+                x={x + 0.5}
+                y={y + 0.5 + fontSize}
+                textAnchor="middle"
+                dominantBaseline="middle"
                 style={{
                   font: `${fontSize}px monospace`,
                   fill: 'blue',
@@ -264,9 +298,9 @@ export default function ZoomViewer({
             style={{ pointerEvents: 'auto' }}
             width={width}
             height={height}
-            scaleXMin={0.8}
+            scaleXMin={0.9}
             scaleXMax={maxScale}
-            scaleYMin={0.8}
+            scaleYMin={0.9}
             scaleYMax={maxScale}
             transformMatrix={initialTransform}
           >
@@ -291,9 +325,9 @@ export default function ZoomViewer({
                     />
                     <g width="100%" height="100%" transform={zoom.toString()}>
                       <image imageRendering="pixelated" href={imgSrc} />
-                      {createIntensityLayer(viewPort, zoom, currentImageData)}
+                      {intensityLayer(viewPort, zoom, currentImageData)}
                     </g>
-                    {createMouseLayer(viewPort, zoom)}
+                    {mouseLayer(viewPort, zoom)}
                     {showMiniMap && (
                       <g
                         clipPath="url(#zoom-clip)"
