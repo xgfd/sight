@@ -1,9 +1,9 @@
-import path from 'path';
 import {
   DeleteOutlined,
   PlusCircleOutlined,
   SyncOutlined,
 } from '@ant-design/icons';
+import { dialog } from '@electron/remote';
 import {
   Button,
   Drawer,
@@ -16,8 +16,9 @@ import {
   Spin,
   Typography,
 } from 'antd';
-import { ipcRenderer, remote } from 'electron';
+import { ipcRenderer } from 'electron';
 import fs from 'fs';
+import path from 'path';
 import React, { Component } from 'react';
 import OpItem from '../Operation';
 import { OpJSON } from '../type';
@@ -25,7 +26,6 @@ import { exportScript, listScripts, notify, rmScript, upsert } from '../utils';
 import getIcon from './Icons';
 
 const { Text } = Typography;
-const { dialog } = remote;
 
 interface Props {
   operations: OpItem[];

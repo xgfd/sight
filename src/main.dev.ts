@@ -9,14 +9,16 @@
  * `./src/main.prod.js` using webpack. This gives us some performance wins.
  */
 import 'core-js/stable';
-import 'regenerator-runtime/runtime';
-import path from 'path';
 import { app, BrowserWindow, shell } from 'electron';
-import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import { autoUpdater } from 'electron-updater';
 import fs from 'fs';
-import MenuBuilder from './menu';
+import path from 'path';
+import 'regenerator-runtime/runtime';
 import { IMAGE_CACHE } from './constants';
+import MenuBuilder from './menu';
+
+require('@electron/remote/main').initialize();
 
 export default class AppUpdater {
   constructor() {
@@ -76,6 +78,7 @@ const createWindow = async () => {
     icon: getAssetPath('icon.png'),
     webPreferences: {
       nodeIntegration: true,
+      contextIsolation: false,
       enableRemoteModule: true,
     },
   });

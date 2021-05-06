@@ -1,17 +1,16 @@
 /* eslint react/jsx-props-no-spreading: "off" */
 /* eslint import/no-cycle: "off" */
 /* eslint jsx-a11y/click-events-have-key-events: "off" */
+import { dialog } from '@electron/remote';
 import { message } from 'antd';
 import classnames from 'classnames';
-import { clipboard, remote } from 'electron';
+import { clipboard } from 'electron';
 import fs from 'fs';
 import path from 'path';
 import Dialog, { DialogProps as IDialogPropTypes } from 'rc-dialog';
 import * as React from 'react';
 import { context } from './PreviewGroup';
 import ZoomViewer, { ProvidedZoom } from './ZoomViewer';
-
-const { dialog } = remote;
 
 export interface PreviewProps extends Omit<IDialogPropTypes, 'onClose'> {
   onClose?: (e: React.SyntheticEvent<Element>) => void;
