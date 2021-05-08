@@ -327,7 +327,6 @@ export default function ZoomViewer({
                       <image imageRendering="pixelated" href={imgSrc} />
                       {intensityLayer(viewPort, zoom, currentImageData)}
                     </g>
-                    {mouseLayer(viewPort, zoom)}
                     {showMiniMap && (
                       <g
                         clipPath="url(#zoom-clip)"
@@ -356,6 +355,8 @@ export default function ZoomViewer({
                         />
                       </g>
                     )}
+                    {/* place the mouse layer on top of everything else */}
+                    {mouseLayer(viewPort, zoom)}
                   </svg>
                   <div className={styles['mini-map']}>
                     <button
