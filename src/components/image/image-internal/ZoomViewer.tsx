@@ -333,11 +333,11 @@ export default function ZoomViewer({
                         transform={`scale(0.25) translate(${
                           (width + (viewPort.width - width) / 2) * 4 -
                           width -
-                          60
+                          40 * viewPort.ratio
                         }, ${
                           (height + (viewPort.height - height) / 2) * 4 -
                           height -
-                          60
+                          40 * viewPort.ratio
                         })`}
                       >
                         <rect width={width} height={height} fill="#1a1a1a" />
