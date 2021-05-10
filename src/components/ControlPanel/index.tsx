@@ -33,15 +33,16 @@ import GenHighpassControls from './GenHighpass';
 import HighpassControls from './Highpass';
 import HistogramControls from './Histogram';
 import ImreadControls from './Imread';
-import InvertControls from './InRange';
 import InRangeControls from './InRange';
 import InscribedCircleControls from './InscribedCircle';
+import InvertControls from './Invert';
 import MapContoursControls from './MapContours';
 import MedianControls from './MedianBlur';
 import MinEnclosingCircleControls from './MinEnclosingCircle';
 import MorphologyExControls from './MorphologyEx';
 import MultiplyControls from './Multiply';
 import NormalizeControls from './Normalize';
+import NpSum from './NpSum';
 import ReduceContoursControls from './ReduceContours';
 import RefImageControls from './RefImage';
 import ScharrControls from './Scharr';
@@ -88,6 +89,7 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   inscribedcircle: InscribedCircleControls,
   invert: InvertControls,
   normalize: NormalizeControls,
+  npsum: NpSum,
   mapcontours: MapContoursControls,
   minenclosingcircle: MinEnclosingCircleControls,
   medianblur: MedianControls,
