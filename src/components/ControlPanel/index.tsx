@@ -45,6 +45,7 @@ import NormalizeControls from './Normalize';
 import NpSum from './NpSum';
 import ReduceContoursControls from './ReduceContours';
 import RefImageControls from './RefImage';
+import RidgeFilterControls from './RidgeFilter';
 import ScharrControls from './Scharr';
 import SobelControls from './Sobel';
 import SobelAmpControls from './SobelAmp';
@@ -97,6 +98,7 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   multiply: MultiplyControls,
   reducecontours: ReduceContoursControls,
   refimage: RefImageControls,
+  ridgefilter: RidgeFilterControls,
   scharr: ScharrControls,
   sobel: SobelControls,
   sobelamp: SobelAmpControls,
