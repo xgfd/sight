@@ -25,7 +25,7 @@ export default class MorphologyExControls extends ControlsBase {
           <Option value={1}>CROSS</Option>
           <Option value={2}>ELLIPSE</Option>
         </Select>
-        <h4>K-Size (h, w)</h4>
+        <h4>K-Size (w, h)</h4>
         <InputNumber
           min={3}
           step={2}
