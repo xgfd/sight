@@ -37,9 +37,10 @@ function initPyEnvironment() {
           notify(
             'error',
             `Missing module ${missingModule}`,
-            `Using ${
+            `Sight is using Python ${
               (res as string[])[0]
-            }. \nMake sure ${missingModule} is installed in this Python environment.`
+            }. Is ${missingModule} installed in this Python?
+            `
           );
         }
       );
@@ -53,6 +54,7 @@ function initPyEnvironment() {
     pythonOptions: ['-u'], // get print results in real-time
     scriptPath: VISION,
     env: {
+      ...process.env,
       PYTHONIOENCODING: 'utf8',
     },
     cwd: VISION,
@@ -61,8 +63,8 @@ function initPyEnvironment() {
 
   CVSHELL.send('echo ""');
 
-  CVSHELL.once('message', () => CVSHELL.removeAllListeners('error'));
-  CVSHELL.on('error', startErrorHandler);
+  CVSHELL.once('message', () => CVSHELL.removeAllListeners('pythonError'));
+  CVSHELL.on('pythonError', startErrorHandler);
 }
 
 function upsert(pack: string, module: string, cb: (err: boolean) => void) {
@@ -100,7 +102,7 @@ function exportScript(
       cb(null, archivePath);
     } catch (e) {
       cb(new Error('Failed to export'), '');
-      console.error(message);
+      console.error(message); /* eslint-disable-line no-console */
     }
 
     CVSHELL.removeListener('message', onMessage);
@@ -152,7 +154,7 @@ function run(
         // in case of error the resultHash should be ""
         retOp.resultHash = resultHash;
         retOp.resultUpToDate = true;
-        console.log(retOp);
+        console.log(retOp); /* eslint-disable-line no-console */
         cb(null, retOp, resultHash);
       } else {
         // shouldn't reach this point
@@ -173,8 +175,8 @@ function run(
     }
   });
 
-  CVSHELL.removeAllListeners('error');
-  CVSHELL.on('error', (err) => {
+  CVSHELL.removeAllListeners('pythonError');
+  CVSHELL.on('pythonError', (err) => {
     if (err) {
       cb(err, null, '');
     }

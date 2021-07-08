@@ -582,6 +582,8 @@ def run(req: str):
 
 _init()
 
+import skimage
+
 if __name__ == "__main__":
 
     try:
