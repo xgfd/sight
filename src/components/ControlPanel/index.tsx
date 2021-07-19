@@ -36,6 +36,7 @@ import ImreadControls from './Imread';
 import InRangeControls from './InRange';
 import InscribedCircleControls from './InscribedCircle';
 import InvertControls from './Invert';
+import LaplacianControls from './Laplacian';
 import MapContoursControls from './MapContours';
 import MedianControls from './MedianBlur';
 import MinEnclosingCircleControls from './MinEnclosingCircle';
@@ -89,13 +90,14 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   inrange: InRangeControls,
   inscribedcircle: InscribedCircleControls,
   invert: InvertControls,
-  normalize: NormalizeControls,
-  npsum: NpSum,
+  laplacian: LaplacianControls,
   mapcontours: MapContoursControls,
   minenclosingcircle: MinEnclosingCircleControls,
   medianblur: MedianControls,
   morphologyex: MorphologyExControls,
   multiply: MultiplyControls,
+  normalize: NormalizeControls,
+  npsum: NpSum,
   reducecontours: ReduceContoursControls,
   refimage: RefImageControls,
   ridgefilter: RidgeFilterControls,
