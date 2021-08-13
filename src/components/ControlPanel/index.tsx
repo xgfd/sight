@@ -38,6 +38,7 @@ import InscribedCircleControls from './InscribedCircle';
 import InvertControls from './Invert';
 import LaplacianControls from './Laplacian';
 import MapContoursControls from './MapContours';
+import MatchTemplateControls from './MatchTemplate';
 import MedianControls from './MedianBlur';
 import MinEnclosingCircleControls from './MinEnclosingCircle';
 import MorphologyExControls from './MorphologyEx';
@@ -92,6 +93,7 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   invert: InvertControls,
   laplacian: LaplacianControls,
   mapcontours: MapContoursControls,
+  matchtemplate: MatchTemplateControls,
   minenclosingcircle: MinEnclosingCircleControls,
   medianblur: MedianControls,
   morphologyex: MorphologyExControls,
