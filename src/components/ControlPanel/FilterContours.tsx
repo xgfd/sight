@@ -10,7 +10,7 @@ export default class FilterContoursControls extends ControlsBase {
     [25, 5_000_000] as [number, number],
     [5, 3_000] as [number, number],
     [10, 10_000] as [number, number],
-    [0.01, 1] as [number, number],
+    [0, 1] as [number, number],
     [0, 128] as [number, number],
     2,
     1,
