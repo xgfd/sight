@@ -1,19 +1,14 @@
 {
   "name": "sight",
   "productName": "Sight",
-  "version": "1.4.2",
+  "version": "1.4.4",
   "description": "See your computer vision algorithms live",
   "main": "./main.prod.js",
   "author": {
     "name": "Xin Wang",
     "email": "x.wang@sigmasquares.com"
   },
-  "contributors": [
-    {
-      "name": "Chaohai Ding",
-      "email": "c.ding@sigmasquares.com"
-    }
-  ],
+  "contributors": [],
   "scripts": {
     "electron-rebuild": "node -r ../.erb/scripts/BabelRegister.js ../.erb/scripts/ElectronRebuild.js",
     "postinstall": "yarn electron-rebuild"
