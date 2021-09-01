@@ -48,11 +48,13 @@ import NpSum from './NpSum';
 import ReduceContoursControls from './ReduceContours';
 import RefImageControls from './RefImage';
 import RidgeFilterControls from './RidgeFilter';
+import RotateControls from './Rotate';
 import ScharrControls from './Scharr';
 import SobelControls from './Sobel';
 import SobelAmpControls from './SobelAmp';
 import SubtractControls from './Subtract';
 import ThresholdControls from './Threshold';
+import TransformEllipseControls from './TransformEllipse';
 import WarpPolarControls from './WarpPolar';
 
 const controlComponents: { [key: string]: typeof ControlsBase } = {
@@ -103,11 +105,13 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   reducecontours: ReduceContoursControls,
   refimage: RefImageControls,
   ridgefilter: RidgeFilterControls,
+  rotate: RotateControls,
   scharr: ScharrControls,
   sobel: SobelControls,
   sobelamp: SobelAmpControls,
   subtract: SubtractControls,
   threshold: ThresholdControls,
+  transformellipse: TransformEllipseControls,
   warppolar: WarpPolarControls,
 };
 
