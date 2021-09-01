@@ -195,7 +195,7 @@ def _save_result(hash: str, image: object, data: Tuple = ()) -> bool:
     # save as loseless png
     try:
         cv2.imwrite(imagepath, image)
-        np.savez(datapath, *data)
+        np.savez(datapath, image, *data)
         return True
     except Exception as e:
         print("failed to save result: ", e)
@@ -233,16 +233,13 @@ def _get_result(hash: str) -> Union[Tuple[None, None], Tuple[object, Tuple]]:
     Returns:
         None or Tuple: Cached image followed by optional data if it's found in cache. None otherwise.
     """
-    imagepath = str(CACHE / f"{hash}.png")
     image = None
     datapath = str(CACHE / f"{hash}.npz")
     data = ()
     try:
-        image = cv2.imread(imagepath, cv2.IMREAD_UNCHANGED)
         with np.load(datapath, allow_pickle=True) as arrays:
-            data = tuple(arrays.values())
+            image, *data = arrays.values()
     except Exception:
-        # print(e)
         pass
     return image, data
 
