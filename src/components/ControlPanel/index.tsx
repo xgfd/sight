@@ -13,6 +13,7 @@ import CircleROIControls from './CircleROI';
 import ControlsBase from './ControlsBase';
 import ConvertScaleAbsControls from './ConvertScaleAbs';
 import ConvexHullControls from './ConvexHull';
+import CornerHarrisControls from './CornerHarris';
 import CvtColorControls from './CvtColor';
 import DefaultControls from './Default';
 import DeshadeControls from './Deshade';
@@ -70,6 +71,7 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   canny: CannyControls,
   convertscaleabs: ConvertScaleAbsControls,
   convexhull: ConvexHullControls,
+  cornerharris: CornerHarrisControls,
   circleroi: CircleROIControls,
   cvtcolor: CvtColorControls,
   deshade: DeshadeControls,
