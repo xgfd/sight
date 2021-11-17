@@ -9,9 +9,9 @@ export default class FilterContoursControls extends ControlsBase {
     [25, 5_000_000] as [number, number],
     [25, 5_000_000] as [number, number],
     [5, 3_000] as [number, number],
-    [10, 10_000] as [number, number],
+    [10, 100_000] as [number, number],
     [0, 1] as [number, number],
-    [0, 128] as [number, number],
+    [0, 1] as [number, number],
     2,
     1,
   ];
@@ -72,12 +72,12 @@ export default class FilterContoursControls extends ControlsBase {
           value={args[4]}
           onChange={(value: [number, number]) => this.updateArgs(4, value)}
         />
-        <h4>Intensity range</h4>
+        <h4>Straightness range</h4>
         <Slider
-          disabled
-          marks={{ 0: '0', 127: '127', 255: '255' }}
+          marks={{ 0: '0', 0.5: '0.5', 1: '1' }}
           range
-          max={255}
+          max={1}
+          step={0.01}
           value={args[5]}
           onChange={(value: [number, number]) => this.updateArgs(5, value)}
         />
