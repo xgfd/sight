@@ -1,8 +1,8 @@
 {
   "name": "sight",
   "productName": "Sight",
-  "version": "1.4.6",
-  "description": "See your computer vision algorithms live",
+  "version": "1.4.7",
+  "description": "Graphical computer vision development tool. Compose workflows using OpenCV and other functions, and generate Python code.",
   "main": "./main.prod.js",
   "author": {
     "name": "Xin Wang",
