@@ -57,6 +57,7 @@ const IconMap: { [key: string]: React.ReactNode } = {
   filter: <BuildOutlined />,
   findcontours: <RadarChartOutlined />,
   filtercontours: <FilterOutlined />,
+  filterintensity: <FilterOutlined />,
   gaussianblur: <UngroupOutlined />,
   histogram: <BarChartOutlined />,
   imread: <FileImageOutlined />,

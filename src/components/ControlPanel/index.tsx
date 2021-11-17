@@ -25,6 +25,7 @@ import ExpandDimensionControls from './ExpandDimension';
 import FilterCircleControls from './FilterCircle';
 import FilterContoursControls from './FilterContours';
 import FilterEllipseControls from './FilterEllipse';
+import FilterIntensityControls from './FilterIntensity';
 import FindContoursControls from './FindContours';
 import FitEllipseControls from './FitEllipse';
 import GammaCorrectionControls from './GammaCorrection';
@@ -84,6 +85,7 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   filtercircle: FilterCircleControls,
   filterellipse: FilterEllipseControls,
   filtercontours: FilterContoursControls,
+  filterintensity: FilterIntensityControls,
   fitellipse: FitEllipseControls,
   gaussianblur: GaussianControls,
   gammacorrection: GammaCorrectionControls,
