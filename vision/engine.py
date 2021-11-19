@@ -326,13 +326,11 @@ def export(req: str):
     id2img = {}
     id2data = {}
 
-    config = {}
-
     imports = {"import json", "from os import path"}
 
     main_header = """
 def main($images$):
-    with open(path.join(path.dirname(__file__), "config.json")) as c:
+    with open(path.join(path.dirname(__file__), "Sightfile.json")) as c:
         config = json.load(c)"""
 
     main_body = []
@@ -366,13 +364,11 @@ def main($images$):
 
                 # function invocation statement
                 # line to read args
-                config_key = f"{module}_{index}"
-                config_line = f'args = config["{config_key}"]'
+                config_line = f'args = config[{index}]["args"]'
 
                 # construct the actual call depending on the return annotation
                 # and the number of accepted parameters of the function
                 args = op["args"]
-                config[config_key] = args
                 sig = SIGNATURES[fn_name]
 
                 fn_arg_count = len(sig.parameters)
@@ -444,7 +440,6 @@ def main($images$):
             zip.write(initfile, arcname)
 
         zip.writestr("index.py", index_py)
-        zip.writestr("config.json", json.dumps(config, indent=4))
         zip.writestr("Sightfile.json", req)
 
     return str(Path("archive.zip").resolve())
@@ -579,7 +574,6 @@ def run(req: str):
 
 _init()
 
-import skimage
 
 if __name__ == "__main__":
 
