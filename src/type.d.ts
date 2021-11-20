@@ -9,14 +9,14 @@ interface Operation {
 
 interface OpJSON {
   fn: string;
-  args: (string | number | boolean | [number, number])[];
+  args: (string | number | boolean | number[])[];
   rid?: string;
   extra_inputs: string[];
 }
 
 interface Instruction {
   fn: string;
-  args: (string | number | boolean | [number, number])[];
+  args: (string | number | boolean | number[])[];
   rid: string;
   last_hash?: string;
   extra_inputs: (string | number)[];

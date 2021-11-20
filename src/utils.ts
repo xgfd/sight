@@ -3,7 +3,7 @@ import fg from 'fast-glob';
 import fs from 'fs';
 import path from 'path';
 import { PythonShell } from 'python-shell';
-import { BUILTIN, CUSTOM, VISION } from './constants';
+import { BUILTIN, CUSTOM, VISION, getPyPath } from './constants';
 import OpItem from './Operation';
 import { Instruction } from './type';
 
@@ -23,48 +23,52 @@ function notify(
 }
 
 function initPyEnvironment() {
-  // notify if failed to start the Python engine
-  const startErrorHandler = (e: Error) => {
-    if (e.message.indexOf('ModuleNotFoundError') !== -1) {
-      const missingModule = e.message.replace(
-        'ModuleNotFoundError: No module named ',
-        ''
-      );
-      PythonShell.runString(
-        'import sys; print(sys.executable)',
-        undefined,
-        (_, res) => {
-          notify(
-            'error',
-            `Missing module ${missingModule}`,
-            `Sight is using Python ${
-              (res as string[])[0]
-            }. Is ${missingModule} installed in this Python?
+  getPyPath((pythonPath) => {
+    const options = {
+      pythonPath,
+      mode: 'text' as const,
+      pythonOptions: ['-u'], // get print results in real-time
+      scriptPath: VISION,
+      env: {
+        ...process.env,
+        PYTHONIOENCODING: 'utf8',
+      },
+      cwd: VISION,
+    };
+
+    // notify if failed to start the Python engine
+    const startErrorHandler = (e: Error) => {
+      if (e.message.indexOf('ModuleNotFoundError') !== -1) {
+        const missingModule = e.message.replace(
+          'ModuleNotFoundError: No module named ',
+          ''
+        );
+        PythonShell.runString(
+          'import sys; print(sys.executable)',
+          options,
+          (_, res) => {
+            notify(
+              'error',
+              `Missing module ${missingModule}`,
+              `Sight is using Python ${
+                (res as string[])[0]
+              }. Is ${missingModule} installed in this Python?
             `
-          );
-        }
-      );
-    } else {
-      notify('error', e.message, e.stack);
-    }
-  };
+            );
+          }
+        );
+      } else {
+        notify('error', e.message, e.stack);
+      }
+    };
 
-  const options = {
-    mode: 'text' as const,
-    pythonOptions: ['-u'], // get print results in real-time
-    scriptPath: VISION,
-    env: {
-      ...process.env,
-      PYTHONIOENCODING: 'utf8',
-    },
-    cwd: VISION,
-  };
-  CVSHELL = new PythonShell('engine.py', options);
+    CVSHELL = new PythonShell('engine.py', options);
 
-  CVSHELL.send('echo ""');
+    CVSHELL.send('echo ""');
 
-  CVSHELL.once('message', () => CVSHELL.removeAllListeners('pythonError'));
-  CVSHELL.on('pythonError', startErrorHandler);
+    CVSHELL.once('message', () => CVSHELL.removeAllListeners('pythonError'));
+    CVSHELL.on('pythonError', startErrorHandler);
+  });
 }
 
 function upsert(pack: string, module: string, cb: (err: boolean) => void) {
@@ -170,7 +174,7 @@ function run(
         notify('info', message);
       } else {
         // shouldn't reach this point
-        notify('warning', error);
+        notify('warning', (error as Error).message);
       }
     }
   });

@@ -93,7 +93,7 @@ class OpItem implements Operation {
   ControlPanel;
 
   // arguments from the control panel
-  args: ([number, number] | string | number | boolean)[] = [];
+  args: (number[] | string | number | boolean)[] = [];
 
   inputRefs: string[] = [];
 

@@ -1,12 +1,13 @@
 import {
   BrowserWindow,
+  dialog,
   Menu,
   MenuItemConstructorOptions,
   shell,
   systemPreferences,
 } from 'electron';
-
 import contextMenu from 'electron-context-menu';
+import { BUILTIN, CUSTOM, IMAGE_CACHE, getPyPath } from './constants';
 
 const isMac = process.platform === 'darwin';
 
@@ -45,20 +46,6 @@ export default class MenuBuilder {
 
     return menu;
   }
-
-  // setupDevelopmentEnvironment(): void {
-  //   this.mainWindow.webContents.on('context-menu', (_, props) => {
-  //     const { x, y } = props;
-  //     Menu.buildFromTemplate([
-  //       {
-  //         label: 'Inspect element',
-  //         click: () => {
-  //           this.mainWindow.webContents.inspectElement(x, y);
-  //         },
-  //       },
-  //     ]).popup({ window: this.mainWindow });
-  //   });
-  // }
 
   buildMenuTemplate(): MenuItemConstructorOptions[] {
     const subMenuApp: MenuItemConstructorOptions = { role: 'appMenu' };
@@ -140,14 +127,24 @@ export default class MenuBuilder {
           label: 'Documentation',
           click() {
             shell.openExternal(
-              'https://github.com/xgfd/cv-fiddle/blob/main/README.md'
+              'https://github.com/xgfd/sight-release/blob/main/README.md'
             );
           },
         },
         {
           label: 'Issues',
           click() {
-            shell.openExternal('https://github.com/xgfd/cv-fiddle/issues');
+            shell.openExternal('https://github.com/xgfd/sight-release/issues');
+          },
+        },
+        {
+          label: 'Environment',
+          click: () => {
+            getPyPath((pyPath) =>
+              dialog.showMessageBox({
+                message: `Python: ${pyPath}\n\nBuilt-in functions: ${BUILTIN}\n\nCustom functions: ${CUSTOM}\n\nImage cache: ${IMAGE_CACHE}`,
+              })
+            );
           },
         },
       ],

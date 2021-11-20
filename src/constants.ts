@@ -16,48 +16,42 @@ const TEMPLATES = path.join(VISION, 'templates');
 const APP_DATA = path.join(os.homedir(), '.sight');
 const IMAGE_CACHE = path.join(APP_DATA, 'cache');
 
+let PY_PATH = '';
+
+function getPyPath(cb: (pyPath: string) => void) {
+  if (PY_PATH !== '') {
+    cb(PY_PATH);
+  } else {
+    PythonShell.runString(
+      'import sys; print(sys.executable)',
+      {
+        mode: 'text' as const,
+        // pythonOptions: ['-u'], // get print results in real-time
+        // scriptPath: VISION,
+        env: {
+          ...process.env,
+          PYTHONIOENCODING: 'utf8',
+        },
+        cwd: VISION,
+      },
+      (err, res) => {
+        if (err) {
+          /* eslint-disable-next-line no-console */
+          console.error(err);
+          cb('Could not find Python path');
+        } else {
+          /* eslint-disable-next-line prefer-destructuring */
+          PY_PATH = (res as string[])[0];
+          cb(PY_PATH);
+        }
+      }
+    );
+  }
+}
+
 fs.mkdir(IMAGE_CACHE, { recursive: true }, (err) => {
   /* eslint-disable-next-line no-console */
   if (err) console.error(err);
 });
 
-PythonShell.runString(
-  'import sys; print(sys.executable)',
-  {
-    mode: 'text' as const,
-    // pythonOptions: ['-u'], // get print results in real-time
-    // scriptPath: VISION,
-    env: {
-      ...process.env,
-      PYTHONIOENCODING: 'utf8',
-    },
-    cwd: VISION,
-  },
-  (err, res) => {
-    if (err) {
-      /* eslint-disable-next-line no-console */
-      console.error(err);
-      /* eslint-disable-next-line no-console */
-      console.log({
-        VISION_ENGINE: VISION,
-        CV_BUILTIN: BUILTIN,
-        CV_TEMPLATES: TEMPLATES,
-        CV_CUSTOM: CUSTOM,
-        IMAGE_CACHE,
-      });
-    } else {
-      const pyExec = (res as string[])[0];
-      /* eslint-disable-next-line no-console */
-      console.log({
-        VISION_ENGINE: VISION,
-        CV_BUILTIN: BUILTIN,
-        CV_TEMPLATES: TEMPLATES,
-        CV_CUSTOM: CUSTOM,
-        IMAGE_CACHE,
-        PY_PATH: pyExec,
-      });
-    }
-  }
-);
-
-export { VISION, BUILTIN, TEMPLATES, CUSTOM, IMAGE_CACHE };
+export { VISION, BUILTIN, TEMPLATES, CUSTOM, IMAGE_CACHE, getPyPath };
