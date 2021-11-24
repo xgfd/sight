@@ -5,6 +5,7 @@ import AddWeightedControls from './AddWeighted';
 import BilateralControls from './BilateralFilter';
 import BitwiseAndControls from './BitwiseAnd';
 import BitwiseOrControls from './BitwiseOr';
+import BitwiseXorControls from './BitwiseXor';
 import BlurControls from './Blur';
 import BoundingRectControls from './BoundingRect';
 import BoxFilterControls from './BoxFilter';
@@ -68,6 +69,7 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   boundingrect: BoundingRectControls,
   bitwise_and: BitwiseAndControls,
   bitwise_or: BitwiseOrControls,
+  bitwise_xor: BitwiseXorControls,
   bilateralfilter: BilateralControls,
   canny: CannyControls,
   convertscaleabs: ConvertScaleAbsControls,
