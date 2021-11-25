@@ -15,13 +15,13 @@ export default class GaussianControls extends ControlsBase {
         <h2>{name}</h2>
         <h4>K-Size (h, w)</h4>
         <InputNumber
-          min={3}
+          min={1}
           step={2}
           value={args[0]}
           onChange={(value) => this.updateArgs(0, value)}
         />
         <InputNumber
-          min={3}
+          min={1}
           step={2}
           value={args[1]}
           onChange={(value) => this.updateArgs(1, value)}

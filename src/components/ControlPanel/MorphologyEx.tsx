@@ -27,13 +27,13 @@ export default class MorphologyExControls extends ControlsBase {
         </Select>
         <h4>K-Size (w, h)</h4>
         <InputNumber
-          min={3}
+          min={1}
           step={2}
           value={args[1]}
           onChange={(value) => this.updateArgs(1, value)}
         />
         <InputNumber
-          min={3}
+          min={1}
           step={2}
           value={args[2]}
           onChange={(value) => this.updateArgs(2, value)}
