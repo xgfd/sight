@@ -10,6 +10,9 @@
  */
 import 'core-js/stable';
 import { app, BrowserWindow, shell } from 'electron';
+import installExtension, {
+  REACT_DEVELOPER_TOOLS,
+} from 'electron-devtools-installer';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import fs from 'fs';
@@ -18,7 +21,9 @@ import 'regenerator-runtime/runtime';
 import { IMAGE_CACHE } from './constants';
 import MenuBuilder from './menu';
 
-require('@electron/remote/main').initialize();
+const mainRemote = require('@electron/remote/main');
+
+mainRemote.initialize();
 
 export default class AppUpdater {
   constructor() {
@@ -35,34 +40,7 @@ if (process.env.NODE_ENV === 'production') {
   sourceMapSupport.install();
 }
 
-if (
-  process.env.NODE_ENV === 'development' ||
-  process.env.DEBUG_PROD === 'true'
-) {
-  require('electron-debug')();
-}
-
-const installExtensions = async () => {
-  const installer = require('electron-devtools-installer');
-  const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
-  const extensions = ['REACT_DEVELOPER_TOOLS'];
-
-  return installer
-    .default(
-      extensions.map((name) => installer[name]),
-      forceDownload
-    )
-    .catch(console.log);
-};
-
 const createWindow = async () => {
-  if (
-    process.env.NODE_ENV === 'development' ||
-    process.env.DEBUG_PROD === 'true'
-  ) {
-    await installExtensions();
-  }
-
   const RESOURCES_PATH = app.isPackaged
     ? path.join(process.resourcesPath, 'assets')
     : path.join(__dirname, '../assets');
@@ -76,12 +54,18 @@ const createWindow = async () => {
     width: 1224,
     height: 900,
     icon: getAssetPath('icon.png'),
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-      enableRemoteModule: true,
-    },
+    webPreferences: { nodeIntegration: true, contextIsolation: false },
   });
+
+  if (
+    process.env.NODE_ENV === 'development' ||
+    process.env.DEBUG_PROD === 'true'
+  ) {
+    require('electron-debug')({ showDevTools: false });
+    installExtension(REACT_DEVELOPER_TOOLS);
+  }
+
+  mainRemote.enable(mainWindow.webContents);
 
   mainWindow.loadURL(`file://${__dirname}/index.html`);
 
@@ -100,7 +84,7 @@ const createWindow = async () => {
   });
 
   mainWindow.on('closed', () => {
-    fs.rmdirSync(IMAGE_CACHE, { recursive: true });
+    fs.rmSync(IMAGE_CACHE, { recursive: true });
     mainWindow = null;
   });
 
@@ -108,9 +92,9 @@ const createWindow = async () => {
   menuBuilder.buildMenu();
 
   // Open urls in the user's browser
-  mainWindow.webContents.on('new-window', (event, url) => {
-    event.preventDefault();
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
+    return { action: 'deny' };
   });
 
   // Remove this if your app does not use auto updates

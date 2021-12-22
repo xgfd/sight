@@ -21,9 +21,9 @@ module.exports = (api) => {
   return {
     presets: [
       // @babel/preset-env will automatically target our browserslist targets
-      require('@babel/preset-env'),
-      require('@babel/preset-typescript'),
-      [require('@babel/preset-react'), { development }],
+      ['@babel/preset-env', { loose: true, shippedProposals: true }],
+      '@babel/preset-typescript',
+      ['@babel/preset-react', { development }],
     ],
     plugins: [
       // Stage 0
