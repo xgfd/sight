@@ -14,20 +14,20 @@ interface OpControlsState {
   live: boolean;
   inputRefs: string[];
 }
-export default abstract class ControlsBase extends Component<
-  OpControlsProp,
-  OpControlsState
-> {
+export default abstract class ControlsBase<
+  P extends OpControlsProp = OpControlsProp,
+  S extends OpControlsState = OpControlsState
+> extends Component<P, S> {
   static defaultValues: (string | number | boolean | number[])[] = [];
 
   static defaultInputRefs: string[] = [];
 
-  constructor(props: OpControlsProp) {
+  constructor(props: P) {
     super(props);
     const { selectedOp } = props;
     const { name, args } = selectedOp;
-    // eslint-disable-next-line react/no-unused-state
-    this.state = { name, args: [...args], live: true, inputRefs: [] };
+    // eslint-disable-next-line react/no-unused-state, @typescript-eslint/no-explicit-any
+    this.state = { name, args: [...args], live: true, inputRefs: [] } as any;
   }
 
   updateArgs = (index: number, value: any) => {

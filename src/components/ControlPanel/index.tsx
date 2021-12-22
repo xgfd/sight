@@ -48,8 +48,11 @@ import MorphologyExControls from './MorphologyEx';
 import MultiplyControls from './Multiply';
 import NormalizeControls from './Normalize';
 import NpSum from './NpSum';
+import PyrDownControls from './PyrDown';
+import PyrUpControls from './PyrUp';
 import ReduceContoursControls from './ReduceContours';
 import RefImageControls from './RefImage';
+import ResizeControls from './Resize';
 import RidgeFilterControls from './RidgeFilter';
 import RotateControls from './Rotate';
 import ScharrControls from './Scharr';
@@ -108,9 +111,12 @@ const controlComponents: { [key: string]: typeof ControlsBase } = {
   multiply: MultiplyControls,
   normalize: NormalizeControls,
   npsum: NpSum,
+  pyrdown: PyrDownControls,
+  pyrup: PyrUpControls,
   reducecontours: ReduceContoursControls,
   refimage: RefImageControls,
   ridgefilter: RidgeFilterControls,
+  resize: ResizeControls,
   rotate: RotateControls,
   scharr: ScharrControls,
   sobel: SobelControls,
