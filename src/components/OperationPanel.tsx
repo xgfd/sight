@@ -1,10 +1,12 @@
 import {
   DeleteOutlined,
   PlusCircleOutlined,
+  SearchOutlined,
   SyncOutlined,
 } from '@ant-design/icons';
 import { dialog } from '@electron/remote';
 import {
+  AutoComplete,
   Button,
   Drawer,
   Dropdown,
@@ -42,6 +44,7 @@ interface States {
   drawerOn: boolean;
   insertionIndex: number;
   formValid: boolean;
+  filter: string;
 }
 
 /**
@@ -67,6 +70,8 @@ function groupByFirstChar(builtinNames: string[], customNames: string[]) {
 }
 
 class OperationPanel extends Component<Props, States> {
+  menuRef: React.RefObject<Menu>;
+
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -74,7 +79,9 @@ class OperationPanel extends Component<Props, States> {
       drawerOn: false,
       insertionIndex: 0,
       formValid: false,
+      filter: '',
     };
+    this.menuRef = React.createRef();
   }
 
   componentDidMount() {
@@ -198,19 +205,50 @@ class OperationPanel extends Component<Props, States> {
   toggleDrawer = () => this.setState({ drawerOn: false });
 
   render() {
-    const {
-      operations,
-      selectedKey,
-      resultUpToDate,
-      selectOp,
-      removeOp,
-    } = this.props;
+    const { operations, selectedKey, resultUpToDate, selectOp, removeOp } =
+      this.props;
 
-    const { installedScripts, drawerOn, formValid } = this.state;
+    const { installedScripts, drawerOn, formValid, filter } = this.state;
+
+    const autocomplateOptions = installedScripts.builtin
+      .map((name) => ({
+        label: name,
+        value: `builtin.${name}`,
+      }))
+      .concat(
+        installedScripts.custom.map((name) => ({
+          label: name,
+          value: `custom.${name}`,
+        }))
+      );
+
+    // operator filter menu item
+    const filterItem = (index: number) => (
+      <Menu.Item key="filter">
+        <AutoComplete
+          style={{ width: 232 }}
+          placeholder="filter operators"
+          options={autocomplateOptions}
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+          filterOption={(inputValue, option) =>
+            option?.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+          }
+          onSelect={(value, _) => {
+            this.insertOp(value, index);
+            this.menuRef.current?.props.onClick?.({ key: 'filter' } as any);
+          }}
+        />
+      </Menu.Item>
+    );
 
     // function items grouped by first char
     const fnItemGroup = Object.entries(
-      groupByFirstChar(installedScripts.builtin, installedScripts.custom)
+      groupByFirstChar(
+        installedScripts.builtin.filter((name) => name.includes(filter)),
+        installedScripts.custom.filter((name) => name.includes(filter))
+      )
     ).map(([char, names]) => (
       <Menu.ItemGroup key={char} title={char}>
         {names.map(([pack, m_name]) => {
@@ -295,18 +333,44 @@ class OperationPanel extends Component<Props, States> {
     // dropdown menu for the "+" button
     const dropdownMenu = (index: number) => (
       <Menu
+        ref={this.menuRef}
         onClick={(info) => {
-          info.domEvent.stopPropagation();
+          if (info.key === 'filter') {
+            return;
+          }
+
           if (info.key === 'new') {
+            // create a custom operator
             this.setState({ drawerOn: true, insertionIndex: index });
           } else {
+            // selected an operator
             this.insertOp(info.key as string, index);
           }
         }}
       >
         <Menu.Item key="new">
           <PlusCircleOutlined />
-          <Text strong>New</Text>
+          <Text strong> New</Text>
+        </Menu.Item>
+        <Menu.Item key="filter">
+          <Input
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+            style={{ width: 232 }}
+            suffix={
+              <SearchOutlined
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              />
+            }
+            placeholder="filter operators"
+            onChange={(e) => this.setState({ filter: e.target.value })}
+            onPressEnter={(e) => {
+              e.stopPropagation();
+            }}
+          />
         </Menu.Item>
         {fnItemGroup}
       </Menu>
@@ -350,7 +414,7 @@ class OperationPanel extends Component<Props, States> {
                   overlay={dropdownMenu(index)}
                   overlayStyle={{
                     width: 256,
-                    maxHeight: '100vh',
+                    maxHeight: 400,
                     overflowY: 'auto',
                   }}
                 >
