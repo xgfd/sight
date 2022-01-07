@@ -210,8 +210,12 @@ class OperationPanel extends Component<Props, States> {
     // function items grouped by first char
     const fnItemGroup = Object.entries(
       groupByFirstChar(
-        installedScripts.builtin.filter((name) => name.includes(filter)),
-        installedScripts.custom.filter((name) => name.includes(filter))
+        installedScripts.builtin.filter((name) =>
+          name.toLowerCase().includes(filter)
+        ),
+        installedScripts.custom.filter((name) =>
+          name.toLowerCase().includes(filter)
+        )
       )
     ).map(([char, names]) => (
       <Menu.ItemGroup key={char} title={char}>
