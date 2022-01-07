@@ -70,8 +70,6 @@ function groupByFirstChar(builtinNames: string[], customNames: string[]) {
 }
 
 class OperationPanel extends Component<Props, States> {
-  menuRef: React.RefObject<Menu>;
-
   constructor(props: Props) {
     super(props);
     this.state = {
@@ -81,7 +79,6 @@ class OperationPanel extends Component<Props, States> {
       formValid: false,
       filter: '',
     };
-    this.menuRef = React.createRef();
   }
 
   componentDidMount() {
@@ -188,12 +185,12 @@ class OperationPanel extends Component<Props, States> {
     }
   };
 
-  removeScript = (rmop: OpItem) => {
+  removeScript = (rmOp: OpItem) => {
     const { operations, setOperations } = this.props;
 
-    rmScript(rmop.package, rmop.name);
+    rmScript(rmOp.package, rmOp.name);
     const reducedOperations = operations.filter(
-      (o) => o.package !== rmop.package || o.name !== rmop.name
+      (o) => o.package !== rmOp.package || o.name !== rmOp.name
     );
     this.setState({
       installedScripts: listScripts(),
@@ -209,39 +206,6 @@ class OperationPanel extends Component<Props, States> {
       this.props;
 
     const { installedScripts, drawerOn, formValid, filter } = this.state;
-
-    const autocomplateOptions = installedScripts.builtin
-      .map((name) => ({
-        label: name,
-        value: `builtin.${name}`,
-      }))
-      .concat(
-        installedScripts.custom.map((name) => ({
-          label: name,
-          value: `custom.${name}`,
-        }))
-      );
-
-    // operator filter menu item
-    const filterItem = (index: number) => (
-      <Menu.Item key="filter">
-        <AutoComplete
-          style={{ width: 232 }}
-          placeholder="filter operators"
-          options={autocomplateOptions}
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-          filterOption={(inputValue, option) =>
-            option?.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
-          }
-          onSelect={(value, _) => {
-            this.insertOp(value, index);
-            this.menuRef.current?.props.onClick?.({ key: 'filter' } as any);
-          }}
-        />
-      </Menu.Item>
-    );
 
     // function items grouped by first char
     const fnItemGroup = Object.entries(
@@ -333,7 +297,6 @@ class OperationPanel extends Component<Props, States> {
     // dropdown menu for the "+" button
     const dropdownMenu = (index: number) => (
       <Menu
-        ref={this.menuRef}
         onClick={(info) => {
           if (info.key === 'filter') {
             return;
@@ -354,6 +317,7 @@ class OperationPanel extends Component<Props, States> {
         </Menu.Item>
         <Menu.Item key="filter">
           <Input
+            value={filter}
             onClick={(e) => {
               e.stopPropagation();
             }}
@@ -421,7 +385,10 @@ class OperationPanel extends Component<Props, States> {
                   <Button
                     type="text"
                     size="small"
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      this.setState({ filter: '' });
+                      e.stopPropagation();
+                    }}
                   >
                     +
                   </Button>
