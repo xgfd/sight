@@ -127,7 +127,13 @@ def _run_step(
     # the arguments consist of an input image (represent by the input_hash) followed by args
     # before run we can predicate the result hash
     # there's no need to run the function if the result hash matches a cached image
-    input_hash = "" if module_name == "imread" else input_hash
+
+    # for imread the input_hash is the modification time of the image file
+    input_hash = (
+        str(Path(control_args[0]).stat().st_mtime)
+        if module_name == "imread"
+        else input_hash
+    )
     ret_hash = _ret_hash(fn, input_hash, [*extra_input_hashes, *control_args])
     ret_image, ret_data = _get_result(ret_hash)
     error: Union[str, None] = None
@@ -142,18 +148,24 @@ def _run_step(
 
             # feed the right number of inputs to the function
             # with the following precedence:
-            # control panel args > control panel images
-            # > previous result image > previous result data
+            # 1. control panel args
+            # 2. control panel images
+            # 3. previous result image
+            # 4. previous result data
+
+            # only control panel args, i.e. imread
             if fn_arg_count == ctrl_arg_count:
-                # only control panel args, i.e. imread
                 result = fn(*control_args)
+
+            # control panel images and args, i.e. addWeighted
+            # image_count - 1 is the number of control panel images
             elif fn_arg_count == ctrl_arg_count + image_count - 1:
-                # control panel images and args, i.e. addWeighted
                 result = fn(*images[1:], *control_args)
             else:
                 arg_vacant = fn_arg_count - ctrl_arg_count - image_count
                 if arg_vacant < 0:
                     raise Exception("Too many arguments")
+
                 # feed with result image, control panel images (if any), control panel args, and fill remaining vacant with result data, i.e. filterContours, warpPolar
                 result = fn(*images, *data[:arg_vacant], *control_args)
 
