@@ -6,12 +6,13 @@ import BilateralControls from './BilateralFilter';
 import BitwiseAndControls from './BitwiseAnd';
 import BitwiseOrControls from './BitwiseOr';
 import BitwiseXorControls from './BitwiseXor';
+import Blend8Controls from './Blend8';
 import BlurControls from './Blur';
 import BoundingRectControls from './BoundingRect';
 import BoxFilterControls from './BoxFilter';
 import CannyControls from './Canny';
 import CircleROIControls from './CircleROI';
-import ControlsBase from './ControlsBase';
+import ControlsBase, { OpControlsProp, OpControlsState } from './ControlsBase';
 import ConvertScaleAbsControls from './ConvertScaleAbs';
 import ConvexHullControls from './ConvexHull';
 import CornerHarrisControls from './CornerHarris';
@@ -63,10 +64,17 @@ import ThresholdControls from './Threshold';
 import TransformEllipseControls from './TransformEllipse';
 import WarpPolarControls from './WarpPolar';
 
-const controlComponents: { [key: string]: typeof ControlsBase } = {
+type ControlPanelType<
+  P extends OpControlsProp,
+  S extends OpControlsState
+> = new (props: P) => ControlsBase<P, S>;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const controlComponents: { [key: string]: ControlPanelType<any, any> } = {
   adaptivethreshold: AdaptiveThresholdControls,
   add: AddControls,
   addweighted: AddWeightedControls,
+  blend8: Blend8Controls,
   blur: BlurControls,
   boxfilter: BoxFilterControls,
   boundingrect: BoundingRectControls,
