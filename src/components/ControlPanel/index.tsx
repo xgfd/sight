@@ -64,10 +64,11 @@ import ThresholdControls from './Threshold';
 import TransformEllipseControls from './TransformEllipse';
 import WarpPolarControls from './WarpPolar';
 
-type ControlPanelType<
-  P extends OpControlsProp,
-  S extends OpControlsState
-> = new (props: P) => ControlsBase<P, S>;
+type ControlPanelType<P extends OpControlsProp, S extends OpControlsState> = {
+  new (props: P): ControlsBase<P, S>;
+  defaultValues: (string | number | boolean | number[])[];
+  defaultInputRefs: string[];
+};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const controlComponents: { [key: string]: ControlPanelType<any, any> } = {
