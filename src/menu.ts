@@ -6,6 +6,7 @@ import {
   shell,
   systemPreferences,
 } from 'electron';
+import fs from 'fs';
 import contextMenu from 'electron-context-menu';
 import { BUILTIN, CUSTOM, IMAGE_CACHE, getPyPath } from './constants';
 
@@ -74,6 +75,18 @@ export default class MenuBuilder {
                 this.mainWindow.webContents.send('EXPORT_PYTHON');
               },
             },
+            { type: 'separator' },
+            {
+              label: 'Clear Cache',
+              click: () => {
+                fs.rmSync(IMAGE_CACHE, { recursive: true });
+                fs.mkdirSync(IMAGE_CACHE, { recursive: true });
+                dialog.showMessageBox({
+                  message:
+                    'Cache is cleared. Run your workflow again to see changes.',
+                });
+              },
+            },
           ],
         }
       : {
@@ -98,6 +111,18 @@ export default class MenuBuilder {
               accelerator: 'Shift+Ctrl+S',
               click: () => {
                 this.mainWindow.webContents.send('EXPORT_PYTHON');
+              },
+            },
+            { type: 'separator' },
+            {
+              label: 'Clear Cache',
+              click: () => {
+                fs.rmSync(IMAGE_CACHE, { recursive: true });
+                fs.mkdirSync(IMAGE_CACHE, { recursive: true });
+                dialog.showMessageBox({
+                  message:
+                    'Cache is cleared. Run your workflow again to see changes.',
+                });
               },
             },
           ],

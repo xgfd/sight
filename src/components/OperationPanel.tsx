@@ -6,7 +6,6 @@ import {
 } from '@ant-design/icons';
 import { dialog } from '@electron/remote';
 import {
-  AutoComplete,
   Button,
   Drawer,
   Dropdown,
@@ -22,6 +21,7 @@ import { ipcRenderer } from 'electron';
 import fs from 'fs';
 import path from 'path';
 import React, { Component } from 'react';
+import { IMAGE_CACHE } from '../constants';
 import OpItem from '../Operation';
 import { OpJSON } from '../type';
 import { exportScript, listScripts, notify, rmScript, upsert } from '../utils';
@@ -84,6 +84,10 @@ class OperationPanel extends Component<Props, States> {
   componentDidMount() {
     ipcRenderer.on('OPEN', async () => {
       await this.openOpList();
+      fs.rmSync(IMAGE_CACHE, { recursive: true });
+      fs.mkdirSync(IMAGE_CACHE, { recursive: true });
+      /* eslint-disable-next-line no-console */
+      console.log('cache cleared');
     });
 
     ipcRenderer.on('SAVE', async () => {
