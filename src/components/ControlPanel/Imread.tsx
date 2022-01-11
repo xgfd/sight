@@ -50,7 +50,7 @@ export default class ImreadControls extends ControlsBase {
 
   render() {
     const { name, args } = this.state;
-    const file = args[0];
+    const file: RcFile = args[0];
     const fileList = file.name ? [file] : [];
     return (
       <>
@@ -59,6 +59,10 @@ export default class ImreadControls extends ControlsBase {
         <Upload
           beforeUpload={this.beforeUpload}
           fileList={fileList}
+          onRemove={() => {
+            this.updateArgs(0, '');
+            return true;
+          }}
           maxCount={1}
         >
           <Button icon={<UploadOutlined />}>Select File</Button>
