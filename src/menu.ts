@@ -79,7 +79,7 @@ export default class MenuBuilder {
             {
               label: 'Clear Cache',
               click: () => {
-                fs.rmSync(IMAGE_CACHE, { recursive: true });
+                fs.rmSync(IMAGE_CACHE, { recursive: true, force: true });
                 fs.mkdirSync(IMAGE_CACHE, { recursive: true });
                 dialog.showMessageBox({
                   message:
@@ -117,7 +117,7 @@ export default class MenuBuilder {
             {
               label: 'Clear Cache',
               click: () => {
-                fs.rmSync(IMAGE_CACHE, { recursive: true });
+                fs.rmSync(IMAGE_CACHE, { recursive: true, force: true });
                 fs.mkdirSync(IMAGE_CACHE, { recursive: true });
                 dialog.showMessageBox({
                   message:

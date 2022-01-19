@@ -84,7 +84,7 @@ class OperationPanel extends Component<Props, States> {
   componentDidMount() {
     ipcRenderer.on('OPEN', async () => {
       await this.openOpList();
-      fs.rmSync(IMAGE_CACHE, { recursive: true });
+      fs.rmSync(IMAGE_CACHE, { recursive: true, force: true });
       fs.mkdirSync(IMAGE_CACHE, { recursive: true });
       /* eslint-disable-next-line no-console */
       console.log('cache cleared');
