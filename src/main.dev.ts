@@ -9,7 +9,7 @@
  * `./src/main.prod.js` using webpack. This gives us some performance wins.
  */
 import 'core-js/stable';
-import { app, BrowserWindow, shell } from 'electron';
+import { app, BrowserWindow, dialog, shell } from 'electron';
 import installExtension, {
   REACT_DEVELOPER_TOOLS,
 } from 'electron-devtools-installer';
@@ -25,12 +25,61 @@ const mainRemote = require('@electron/remote/main');
 
 mainRemote.initialize();
 
-export default class AppUpdater {
-  constructor() {
-    log.transports.file.level = 'info';
-    autoUpdater.logger = log;
-    autoUpdater.checkForUpdatesAndNotify();
-  }
+function initAutoUpdater() {
+  autoUpdater.on('error', (error) => {
+    dialog.showErrorBox(
+      'Error: ',
+      error == null ? 'unknown' : (error.stack || error).toString()
+    );
+  });
+
+  autoUpdater.on('update-available', () => {
+    return dialog
+      .showMessageBox({
+        type: 'info',
+        title: 'Found Updates',
+        message: 'Found updates, do you want update now?',
+        buttons: ['Sure', 'No'],
+      })
+      .then((buttonIndex) => {
+        if (buttonIndex.response === 0) {
+          autoUpdater.downloadUpdate();
+        }
+        return null;
+      });
+  });
+
+  // autoUpdater.on('update-not-available', () => {
+  //   dialog.showMessageBox({
+  //     title: 'No Updates',
+  //     message: 'Current version is up-to-date.',
+  //   });
+  // });
+
+  autoUpdater.on('update-downloaded', () => {
+    return dialog
+      .showMessageBox({
+        type: 'info',
+        title: 'Install Updates',
+        message: 'Updates downloaded. Restart now to install updates?',
+        buttons: ['Sure', 'No'],
+      })
+      .then((buttonIndex) => {
+        if (buttonIndex.response === 0) {
+          setImmediate(() => autoUpdater.quitAndInstall());
+        }
+        return null;
+      });
+    // dialog.showMessageBox({
+    //   title: 'Install Updates',
+    //   message:
+    //     'Updates downloaded, application will be updated the next time the application starts.',
+    // });
+  });
+
+  log.transports.file.level = 'info';
+  autoUpdater.logger = log;
+  autoUpdater.autoDownload = false;
 }
 
 let mainWindow: BrowserWindow | null = null;
@@ -97,9 +146,9 @@ const createWindow = async () => {
     return { action: 'deny' };
   });
 
+  initAutoUpdater();
   // Remove this if your app does not use auto updates
-  // eslint-disable-next-line
-  // new AppUpdater();
+  autoUpdater.checkForUpdates();
 };
 
 /**
