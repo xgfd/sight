@@ -1,0 +1,6 @@
+owner: xgfd
+repo: sight-release
+provider: github
+releaseType: release
+private: false
+updaterCacheDirName: sight-updater
