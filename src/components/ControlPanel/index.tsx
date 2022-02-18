@@ -12,6 +12,7 @@ import BoundingRectControls from './BoundingRect';
 import BoxFilterControls from './BoxFilter';
 import CannyControls from './Canny';
 import CircleROIControls from './CircleROI';
+import ClusterContoursControls from './ClusterContours';
 import ControlsBase, { OpControlsProp, OpControlsState } from './ControlsBase';
 import ConvertScaleAbsControls from './ConvertScaleAbs';
 import ConvexHullControls from './ConvexHull';
@@ -93,6 +94,7 @@ const controlComponents: { [key: string]: ControlPanelType<any, any> } = {
   distancetransform: DistanceTransformControls,
   divide: DivideControls,
   draw: DrawControls,
+  clustercontours: ClusterContoursControls,
   euqalizehist: EqualizeHistControls,
   expanddimension: ExpandDimensionControls,
   findcontours: FindContoursControls,
