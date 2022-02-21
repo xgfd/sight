@@ -1,3 +1,4 @@
+import log from 'electron-log';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
@@ -15,10 +16,13 @@ const TEMPLATES = path.join(VISION, 'templates');
 // the following folders must point to the same locations in vision/engine.py
 const APP_DATA = path.join(os.homedir(), '.sight');
 const IMAGE_CACHE = path.join(APP_DATA, 'cache');
+const CONFIG_PATH = path.join(APP_DATA, 'settings.json');
 
-let PY_PATH = '';
+const DEFAULT_CONFIG = { PY_PATH: '' };
+let CONFIG = DEFAULT_CONFIG;
 
 function getPyPath(cb: (pyPath: string) => void) {
+  let { PY_PATH } = CONFIG;
   if (PY_PATH !== '') {
     cb(PY_PATH);
   } else {
@@ -49,9 +53,53 @@ function getPyPath(cb: (pyPath: string) => void) {
   }
 }
 
+function loadConfig() {
+  try {
+    CONFIG = {
+      ...DEFAULT_CONFIG,
+      ...JSON.parse(fs.readFileSync(CONFIG_PATH, 'utf8')),
+    };
+  } catch (err) {
+    log.warn(err);
+  }
+}
+
+function updateConfig(config: any) {
+  try {
+    CONFIG = { ...CONFIG, ...config };
+    fs.writeFileSync(CONFIG_PATH, JSON.stringify(CONFIG));
+  } catch (err) {
+    log.warn(err);
+  }
+}
+
+function initConfig() {
+  if (!fs.existsSync(CONFIG_PATH)) {
+    CONFIG = DEFAULT_CONFIG;
+    try {
+      fs.writeFileSync(CONFIG_PATH, JSON.stringify(DEFAULT_CONFIG));
+    } catch (err) {
+      log.warn(err);
+    }
+  } else {
+    loadConfig();
+  }
+}
+
 fs.mkdir(IMAGE_CACHE, { recursive: true }, (err) => {
   /* eslint-disable-next-line no-console */
   if (err) console.error(err);
 });
 
-export { VISION, BUILTIN, TEMPLATES, CUSTOM, IMAGE_CACHE, getPyPath };
+initConfig();
+
+export {
+  VISION,
+  BUILTIN,
+  TEMPLATES,
+  CUSTOM,
+  IMAGE_CACHE,
+  getPyPath,
+  updateConfig,
+  loadConfig,
+};

@@ -71,6 +71,18 @@ function initPyEnvironment() {
   });
 }
 
+function reloadPython() {
+  if (CVSHELL) {
+    CVSHELL.end((err) => {
+      if (err) {
+        notify('error', err.message);
+      }
+    });
+    CVSHELL.kill();
+  }
+  initPyEnvironment();
+}
+
 function upsert(pack: string, module: string, cb: (err: boolean) => void) {
   const fullModuleName = `${pack}.${module}`;
   CVSHELL.send(`upsert ${JSON.stringify(fullModuleName)}`);
@@ -218,4 +230,12 @@ function listScripts() {
 
 initPyEnvironment();
 
-export { listScripts, notify, run, upsert, rmScript, exportScript };
+export {
+  reloadPython,
+  listScripts,
+  notify,
+  run,
+  upsert,
+  rmScript,
+  exportScript,
+};

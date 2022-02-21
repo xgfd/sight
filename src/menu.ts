@@ -6,9 +6,16 @@ import {
   shell,
   systemPreferences,
 } from 'electron';
-import fs from 'fs';
 import contextMenu from 'electron-context-menu';
-import { BUILTIN, CUSTOM, IMAGE_CACHE, getPyPath } from './constants';
+import fs from 'fs';
+import {
+  BUILTIN,
+  CUSTOM,
+  getPyPath,
+  IMAGE_CACHE,
+  updateConfig,
+} from './constants';
+import { reloadPython } from './utils';
 
 const isMac = process.platform === 'darwin';
 
@@ -170,6 +177,36 @@ export default class MenuBuilder {
                 message: `Python: ${pyPath}\n\nBuilt-in functions: ${BUILTIN}\n\nCustom functions: ${CUSTOM}\n\nImage cache: ${IMAGE_CACHE}`,
               })
             );
+          },
+        },
+        {
+          label: 'Reload Python',
+          click: async () => {
+            reloadPython();
+            dialog.showMessageBox({
+              message: `Python environment reloaded`,
+            });
+          },
+        },
+        {
+          label: 'Change Python Interpretor',
+          click: async () => {
+            const options = {
+              properties: ['openFile' as const],
+              filters: [{ name: 'python', extensions: ['', 'exe'] }],
+            };
+            const { canceled, filePaths } = await dialog.showOpenDialog(
+              options
+            );
+
+            if (!canceled) {
+              const pythonPath = filePaths[0];
+              updateConfig({ PY_PATH: pythonPath });
+              reloadPython();
+              dialog.showMessageBox({
+                message: `Using Python at ${pythonPath}`,
+              });
+            }
           },
         },
       ],
