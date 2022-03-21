@@ -48,6 +48,7 @@ import MedianControls from './MedianBlur';
 import MinEnclosingCircleControls from './MinEnclosingCircle';
 import MorphologyExControls from './MorphologyEx';
 import MultiplyControls from './Multiply';
+import NonMaxSupressionControls from './NonMaxSupression';
 import NormalizeControls from './Normalize';
 import NpSum from './NpSum';
 import PyrDownControls from './PyrDown';
@@ -120,6 +121,7 @@ const controlComponents: { [key: string]: ControlPanelType<any, any> } = {
   medianblur: MedianControls,
   morphologyex: MorphologyExControls,
   multiply: MultiplyControls,
+  nonmaxsupression: NonMaxSupressionControls,
   normalize: NormalizeControls,
   npsum: NpSum,
   pyrdown: PyrDownControls,
