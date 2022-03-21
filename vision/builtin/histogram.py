@@ -6,7 +6,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def main(image: object, show_hist=True) -> Tuple[object, List[List[Tuple[int]]]]:
+def main(
+    image: np.ndarray, show_hist=True
+) -> Tuple[np.ndarray, List[List[Tuple[int]]]]:
     ret_image = image
     histogram = []
 

@@ -1,5 +1,6 @@
 import cv2
+import numpy as np
 
 
-def main(image: object):
+def main(image: np.ndarray):
     return cv2.pyrDown(image)

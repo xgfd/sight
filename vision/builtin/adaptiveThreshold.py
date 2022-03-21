@@ -1,8 +1,9 @@
 import cv2
+import numpy as np
 
 
 def main(
-    image: object,
+    image: np.ndarray,
     maxValue: int,
     adaptiveMethod: int,
     thresholdType: int,

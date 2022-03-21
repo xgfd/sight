@@ -7,14 +7,14 @@ from . import Circle
 
 
 def main(
-    image: object,
+    image: np.ndarray,
     contour_mode: int,
     method: int,
     area_pert_range: Tuple[float, float],
     aspect: float,
     line_thickness=2,
     return_image_mode=1,  # controls what image to return 0=colour image with shape overlay; 1=shape on black background; 2=pass on the input image
-) -> Tuple[object, Union[Circle, None]]:
+) -> Tuple[np.ndarray, Union[Circle, None]]:
     contours, _ = cv2.findContours(image, mode=contour_mode, method=method)
 
     image_w, image_h = image.shape[:2]

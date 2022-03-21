@@ -7,11 +7,11 @@ from . import Contour, Rectangle
 
 
 def main(
-    image: object,
+    image: np.ndarray,
     _contour: Contour,
     line_thickness=2,
     return_image_mode=1,  # controls what image to return 0=colour image with shape overlay; 1=shape on black background; 2=pass on the input image
-) -> Tuple[object, Union[Rectangle, None]]:
+) -> Tuple[np.ndarray, Union[Rectangle, None]]:
 
     try:
         rect = cv2.boundingRect(_contour)

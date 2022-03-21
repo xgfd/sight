@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 
-def main(image: object, filter_type: str):
+def main(image: np.ndarray, filter_type: str):
     A_row = np.array([0.25, 0.5, 0.25], dtype=np.float32)
     A_col = np.array([[-1], [0], [1]], dtype=np.float32)
     B_row = np.array([-1, 0, 1], dtype=np.float32)

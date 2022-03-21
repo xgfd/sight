@@ -1,8 +1,9 @@
 import cv2
+import numpy as np
 
 
 def main(
-    image: object,
+    image: np.ndarray,
     ksize_h: int,
     ksize_w: int,
     borderType: int,

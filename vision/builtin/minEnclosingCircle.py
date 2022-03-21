@@ -6,11 +6,11 @@ from . import Contour, Circle
 
 
 def main(
-    image: object,
+    image: np.ndarray,
     _contour: Contour,
     line_thickness: int,
     return_image_mode=1,  # controls what image to return 0=colour image with shape overlay; 1=shape on black background; 2=pass on the input image
-) -> Tuple[object, Union[Circle, None]]:
+) -> Tuple[np.ndarray, Union[Circle, None]]:
 
     try:
         (x, y), radius = cv2.minEnclosingCircle(_contour)

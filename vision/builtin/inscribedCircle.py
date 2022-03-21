@@ -7,13 +7,13 @@ from . import Circle, Contour
 
 
 def main(
-    image: object,
+    image: np.ndarray,
     _contour: Contour,
     distanceType: int,
     maskSize: int,
     line_thickness: int,
     return_image_mode=1,  # controls what image to return 0=colour image with shape overlay; 1=shape on black background; 2=pass on the input image
-) -> Tuple[object, Circle]:
+) -> Tuple[np.ndarray, Circle]:
 
     shape_image = np.zeros_like(image)
     cv2.drawContours(shape_image, [_contour], -1, 255, -1)

@@ -1,13 +1,13 @@
-from typing import List, Tuple
+from typing import List
 
 import numpy as np
 
 
-def main(image: object, axis=0) -> List:
+def main(image: np.ndarray, axis=0) -> List:
     """Sum of array elements over a given axis.
 
     Args:
-        image (object): Input image that is simply passed on.
+        image (np.ndarray): Input image that is simply passed on.
         axis (int, optional): Axis along which a sum is performed. Defaults to 0.
 
     Returns:

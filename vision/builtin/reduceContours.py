@@ -29,17 +29,17 @@ FEATURES = {
 
 
 def main(
-    image: object,
+    image: np.ndarray,
     _contours: List[Contour],
     method: Literal["max", "min", "first", "last", "concatenate"],
     order_by: Literal["contourArea", "minAreaRect", "length", "aspect"],
     line_thickness=2,
     return_image_mode=1,
-) -> Tuple[object, Union[Contour, None]]:
+) -> Tuple[np.ndarray, Union[Contour, None]]:
     """Reduce contours to a single contour.
 
     Args:
-        image (object): Input image.
+        image (np.ndarray): Input image.
         _contours (List[Contour]): Contours to be reduced.
         method (Literal["max", "min", "first", "last"]): Which contour to return.
         sort_by (Literal["contourArea", "minAreaRect", "length", "aspect"]): If `method` is min or max, sort contours by the given feature.
@@ -47,7 +47,7 @@ def main(
         return_image_mode (int, optional): What image to return 0=colour image with shape overlay; 1=shape on black background; 2=pass on the input image. Defaults to 1.
 
     Returns:
-        Tuple[object, Union[Contour, None]]: Return image; selected contour or None if _contours is empty.
+        Tuple[np.ndarray, Union[Contour, None]]: Return image; selected contour or None if _contours is empty.
     """
 
     if len(_contours) == 0:

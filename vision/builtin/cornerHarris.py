@@ -1,7 +1,10 @@
 import cv2
+import numpy as np
 
 
-def main(image: object, block_size: int, aperture_size: int, k: int, normalise: bool):
+def main(
+    image: np.ndarray, block_size: int, aperture_size: int, k: int, normalise: bool
+):
     ret_image = cv2.cornerHarris(image, block_size, aperture_size, k)
     if normalise:
         dst_norm = cv2.normalize(

@@ -5,7 +5,7 @@ import numpy as np
 
 
 def main(
-    image: object,
+    image: np.ndarray,
     filter: Literal["Gaussian", "box", "median", "max", "min"],
     ksize: int,
     diff_mode: Literal["subtract", "divide", "bitwise_and"],
@@ -13,13 +13,13 @@ def main(
     """Generalised highpass filter.
 
     Args:
-        image (object): Input image.
+        image (np.ndarray): Input image.
         filter (Literal["Gaussian", "box", "median", "max", "min"]): Filter type.
         ksize (int): Kernel size.
         diff_mode (Literal["subtract", "divide", "bitwise_and"]): Difference method.
 
     Returns:
-        object: Highpass image.
+        np.ndarray: Highpass image.
     """
     if filter == "Gaussian":
         blur = cv2.GaussianBlur(image, (ksize, ksize), 0)

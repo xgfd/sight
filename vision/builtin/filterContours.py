@@ -6,7 +6,7 @@ from . import Contour
 
 
 def main(
-    image: object,
+    image: np.ndarray,
     _contours: List[Contour],
     _hierarchy: List[Tuple[int, int, int, int]],
     area_range: Tuple[float, float],
@@ -17,7 +17,7 @@ def main(
     straightness_range: Tuple[float, float],
     line_thickness,
     return_image_mode,  # controls what image to return 0=colour image with shape overlay; 1=shape on black background; 2=pass on the input image
-) -> Tuple[object, List[Contour], List[Tuple[int, int, int, int]]]:
+) -> Tuple[np.ndarray, List[Contour], List[Tuple[int, int, int, int]]]:
 
     area_l, area_h = area_range
     bound_area_l, bound_area_h = bound_area_range

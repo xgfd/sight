@@ -1,10 +1,11 @@
 from typing import Literal
 
+import numpy as np
 from skimage.filters import frangi, hessian, meijering, sato
 
 
 def main(
-    image: object,
+    image: np.ndarray,
     sigmas=[1, 10, 2],
     black_ridges=True,
     method: Literal["meijering", "sato", "frangi", "hessian"] = "meijering",
@@ -12,7 +13,7 @@ def main(
     """Detect ridge-like structures, such as neurites, tubes, vessels, wrinkles or rivers. See https://scikit-image.org/docs/dev/auto_examples/edges/plot_ridge_filter.html#sphx-glr-auto-examples-edges-plot-ridge-filter-py for examples.
 
     Args:
-        image (object): Input image.
+        image (np.ndarray): Input image.
         sigmas (Tuple[int, int, int], optional): Sigmas used as scales of filter given as a range tuple (start, end, step). Defaults to [1, 10, 2].
         black_ridges (bool, optional): Detects black ridges or white ridges. Defaults to True.
         method (Literal, optional): Specifies the ridge filter, one of "meijering", "sato", "frangi" or "hessian". Defaults to "meijering".

@@ -4,7 +4,7 @@ import numpy as np
 
 
 def main(
-    image: object,
+    image: np.ndarray,
     thresholds: Tuple[int, int],
     ksize_h: int,
     ksize_w: int,

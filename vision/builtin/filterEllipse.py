@@ -7,13 +7,13 @@ from . import Ellipse
 
 
 def main(
-    image: object,
+    image: np.ndarray,
     _ellipse: Ellipse,
     width_ranage: Tuple[int, int],
     height_ranage: Tuple[int, int],
     line_thickness=2,
     return_image_mode=1,  # controls what image to return 0=colour image with shape overlay; 1=shape on black background; 2=pass on the input image
-) -> Tuple[object, Union[Ellipse, None]]:
+) -> Tuple[np.ndarray, Union[Ellipse, None]]:
 
     try:
         _, (w, h), _ = _ellipse

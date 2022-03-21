@@ -1,5 +1,5 @@
 import numpy as np
 
 
-def main(image: object):
+def main(image: np.ndarray):
     return np.invert(image)

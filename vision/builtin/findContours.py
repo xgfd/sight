@@ -6,12 +6,12 @@ from . import Contour
 
 
 def main(
-    image: object,
+    image: np.ndarray,
     contour_mode: int,
     method: int,
     line_thickness=2,
     return_image_mode=1,  # controls what image to return 0=colour image with shape overlay; 1=shape on black background; 2=pass on the input image
-) -> Tuple[object, List[Contour], List[Tuple[int, int, int, int]]]:
+) -> Tuple[np.ndarray, List[Contour], List[Tuple[int, int, int, int]]]:
     contours, hierarchy = cv2.findContours(image, mode=contour_mode, method=method)
 
     if return_image_mode == 0:

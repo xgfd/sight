@@ -78,11 +78,11 @@ In the most general form, like `fitEllipses`, takes an image, some data (contour
 # fitEllipses.py
 
 def main(
-    image: object,
+    image: np.ndarray,
     _contours: List[Contour],
     line_thickness: int,
     return_image_mode=3,
-) -> Tuple[object, List[Ellipse]]:
+) -> Tuple[np.ndarray, List[Ellipse]]:
 ```
 
 As a convention, the input image is always named `image`, inputs from a previous function have a leading underscore `_`, and control panel parameters are named without a underscore and matche the controls' names.

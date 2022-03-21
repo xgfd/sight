@@ -7,12 +7,12 @@ from . import Circle
 
 
 def main(
-    image: object,
+    image: np.ndarray,
     _circle: Circle,
     radius_range: Tuple[int, int],
     line_thickness=2,
     return_image_mode=1,  # controls what image to return 0=colour image with shape overlay; 1=shape on black background; 2=pass on the input image
-) -> Tuple[object, Union[Circle, None]]:
+) -> Tuple[np.ndarray, Union[Circle, None]]:
     try:
         (x, y), r = _circle
         r_low, r_high = radius_range

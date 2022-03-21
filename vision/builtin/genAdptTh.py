@@ -5,7 +5,7 @@ import numpy as np
 
 
 def main(
-    image: object,
+    image: np.ndarray,
     filter: Literal["Gaussian", "box", "median", "max", "min"],
     ksize: int,
     diff_mode: Literal["subtract", "divide", "bitwise_and"],

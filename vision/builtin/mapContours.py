@@ -56,14 +56,14 @@ DRAWS = {
 
 
 def main(
-    image: object,
+    image: np.ndarray,
     _contours: List[Contour],
     method: Literal[
         "boundingRect", "minAreaRect", "fitEllipse", "convexHull", "minEnclosingCircle"
     ],
     line_thickness=2,
     return_image_mode=1,  # controls what image to return 0=colour image with shape overlay; 1=shape on black background; 2=pass on the input image
-) -> Tuple[object, List[Shape]]:
+) -> Tuple[np.ndarray, List[Shape]]:
 
     shapes = list(map(MAPPERS[method], _contours))
 

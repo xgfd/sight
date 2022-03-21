@@ -1,23 +1,24 @@
 from typing import Tuple
 
 import cv2
+import numpy as np
 
 from . import Circle
 
 
 def main(
-    image: object,
+    image: np.ndarray,
     _circle: Circle,
     dsize_h: int,
     dsize_w: int,
     interpolation_flag: int,
     warp_mode: int,
     inverse_map: int,
-) -> Tuple[object, Circle]:
+) -> Tuple[np.ndarray, Circle]:
     """
 
     Args:
-        image (object): Input image.
+        image (np.ndarray): Input image.
         _circle (Circle): Input data. The transformation circle.
         dsize_h (int): The destination image height.
         dsize_w (int): The destination image width.
@@ -26,7 +27,7 @@ def main(
         inverse_map (int): 16 (cv2.WARP_INVERSE_MAP) for the inverse warp, 0 otherwise.
 
     Returns:
-        object, Circle: Transformed image; The transformation circle.
+        np.ndarray, Circle: Transformed image; The transformation circle.
     """
     center, maxRadius = _circle
     polar_image = cv2.warpPolar(

@@ -12,14 +12,14 @@ palette = [(3, 189, 66), (177, 235, 30), (255, 27, 28), (255, 0, 110), (255, 127
 
 
 def main(
-    image: object,
+    image: np.ndarray,
     _contours: List[Contour],
     _: List[Tuple[int, int, int, int]],
     linkage: Literal["ward", "complete", "average", "single"],
     distance_threshold: float,
     line_thickness,
     return_image_mode,  # controls what image to return 0=colour image with shape overlay; 1=shape on black background; 2=pass on the input image
-) -> Tuple[object, List[Contour], List[Tuple[int, int, int, int]]]:
+) -> Tuple[np.ndarray, List[Contour], List[Tuple[int, int, int, int]]]:
 
     contour_centres = [
         (x + w / 2, y + h / 2)
