@@ -17,6 +17,7 @@ import ControlsBase, { OpControlsProp, OpControlsState } from './ControlsBase';
 import ConvertScaleAbsControls from './ConvertScaleAbs';
 import ConvexHullControls from './ConvexHull';
 import CornerHarrisControls from './CornerHarris';
+import CreateMaskControls from './CreateMask';
 import CvtColorControls from './CvtColor';
 import DefaultControls from './Default';
 import DeshadeControls from './Deshade';
@@ -52,6 +53,7 @@ import NonMaxSupressionControls from './NonMaxSupression';
 import NormalizeControls from './Normalize';
 import NpSum from './NpSum';
 import PyrDownControls from './PyrDown';
+import PyrMeanShiftFilteringControls from './PyrMeanShiftFiltering';
 import PyrUpControls from './PyrUp';
 import ReduceContoursControls from './ReduceContours';
 import RefImageControls from './RefImage';
@@ -86,6 +88,7 @@ const controlComponents: { [key: string]: ControlPanelType<any, any> } = {
   bitwise_xor: BitwiseXorControls,
   bilateralfilter: BilateralControls,
   canny: CannyControls,
+  createmask: CreateMaskControls,
   convertscaleabs: ConvertScaleAbsControls,
   convexhull: ConvexHullControls,
   cornerharris: CornerHarrisControls,
@@ -126,6 +129,7 @@ const controlComponents: { [key: string]: ControlPanelType<any, any> } = {
   npsum: NpSum,
   pyrdown: PyrDownControls,
   pyrup: PyrUpControls,
+  pyrmeanshiftfiltering: PyrMeanShiftFilteringControls,
   reducecontours: ReduceContoursControls,
   refimage: RefImageControls,
   ridgefilter: RidgeFilterControls,
