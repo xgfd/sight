@@ -3,7 +3,7 @@ from typing import List, Tuple, Union, Literal
 import cv2
 import numpy as np
 
-from . import Circle, Contour, Ellipse, Rectangle, RotatedRectangle, Shape
+from . import Circle, Rectangle, Shape
 
 
 def _rect_to_points(rect: Rectangle):
@@ -93,8 +93,8 @@ DRAWS = {
 
 
 def main(
-    _: object,
-    image1: object,
+    _: np.ndarray,
+    image1: np.ndarray,
     _shapes: Union[Shape, List[Shape]],
     method: Literal[
         "auto", "ellipses", "contours", "rectangles", "circles", "rotated rectangles"
@@ -102,7 +102,7 @@ def main(
     colour: Tuple[int, int, int],
     line_thickness=2,
     return_image_mode=1,  # controls what image to return 0=colour image with shape overlay; 1=shape on black background; 2=pass on the input image; 3=gray image with shape overlay
-) -> Tuple[object, Union[Shape, List[Shape]]]:
+) -> Tuple[np.ndarray, Union[Shape, List[Shape]]]:
 
     shape_list = (
         [_shapes] if len(_shapes) > 0 and _is_single_shape(_shapes) else _shapes
