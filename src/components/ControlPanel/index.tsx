@@ -66,6 +66,7 @@ import SobelAmpControls from './SobelAmp';
 import SubtractControls from './Subtract';
 import ThresholdControls from './Threshold';
 import TransformEllipseControls from './TransformEllipse';
+import WarpAffineControls from './WarpAffine';
 import WarpPolarControls from './WarpPolar';
 
 type ControlPanelType<P extends OpControlsProp, S extends OpControlsState> = {
@@ -141,6 +142,7 @@ const controlComponents: { [key: string]: ControlPanelType<any, any> } = {
   subtract: SubtractControls,
   threshold: ThresholdControls,
   transformellipse: TransformEllipseControls,
+  warpaffine: WarpAffineControls,
   warppolar: WarpPolarControls,
 };
 
