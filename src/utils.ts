@@ -43,19 +43,11 @@ function initPyEnvironment() {
           'ModuleNotFoundError: No module named ',
           ''
         );
-        PythonShell.runString(
-          'import sys; print(sys.executable)',
-          options,
-          (_, res) => {
-            notify(
-              'error',
-              `Missing module ${missingModule}`,
-              `Sight is using Python ${
-                (res as string[])[0]
-              }. Is ${missingModule} installed in this Python?
-            `
-            );
-          }
+        notify(
+          'error',
+          `Missing module ${missingModule}`,
+          `Sight is using Python ${pythonPath}. Is ${missingModule} installed in this Python?
+        `
         );
       } else {
         notify('error', e.message, e.stack);
@@ -64,10 +56,10 @@ function initPyEnvironment() {
 
     CVSHELL = new PythonShell('engine.py', options);
 
-    CVSHELL.send('echo ""');
-
     CVSHELL.once('message', () => CVSHELL.removeAllListeners('pythonError'));
     CVSHELL.on('pythonError', startErrorHandler);
+
+    CVSHELL.send('echo ""');
   });
 }
 
