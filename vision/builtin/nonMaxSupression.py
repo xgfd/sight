@@ -7,7 +7,7 @@ from . import Contour
 
 def bounding_box_float(contour: Contour) -> Tuple[float, float, float, float]:
     x, y, w, h = cv2.boundingRect(contour)
-    return np.array([x, y, x + w, y + h], dtype=np.float)
+    return np.array([x, y, x + w, y + h], dtype=float)
 
 
 def main(
