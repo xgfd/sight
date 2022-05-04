@@ -43,6 +43,7 @@ import InRangeControls from './InRange';
 import InscribedCircleControls from './InscribedCircle';
 import InvertControls from './Invert';
 import LaplacianControls from './Laplacian';
+import LocalMaximaControls from './LocalMaxima';
 import MapContoursControls from './MapContours';
 import MatchTemplateControls from './MatchTemplate';
 import MedianControls from './MedianBlur';
@@ -119,6 +120,7 @@ const controlComponents: { [key: string]: ControlPanelType<any, any> } = {
   inscribedcircle: InscribedCircleControls,
   invert: InvertControls,
   laplacian: LaplacianControls,
+  localmaxima: LocalMaximaControls,
   mapcontours: MapContoursControls,
   matchtemplate: MatchTemplateControls,
   minenclosingcircle: MinEnclosingCircleControls,
