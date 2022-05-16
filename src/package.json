@@ -1,7 +1,7 @@
 {
   "name": "sight",
   "productName": "Sight",
-  "version": "1.13.0",
+  "version": "1.13.1",
   "description": "Graphical computer vision development tool. Compose workflows using OpenCV and other functions, and generate Python code.",
   "main": "./main.prod.js",
   "author": {
