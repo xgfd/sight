@@ -15,7 +15,6 @@ import {
   IMAGE_CACHE,
   updateConfig,
 } from './constants';
-import { reloadPython } from './utils';
 
 const isMac = process.platform === 'darwin';
 
@@ -182,7 +181,7 @@ export default class MenuBuilder {
         {
           label: 'Reload Python',
           click: async () => {
-            reloadPython();
+            this.mainWindow.webContents.send('RELOAD_PYTHON');
             dialog.showMessageBox({
               message: `Python environment reloaded`,
             });
@@ -202,7 +201,7 @@ export default class MenuBuilder {
             if (!canceled) {
               const pythonPath = filePaths[0];
               updateConfig({ PY_PATH: pythonPath });
-              reloadPython();
+              this.mainWindow.webContents.send('RELOAD_PYTHON');
               dialog.showMessageBox({
                 message: `Using Python at ${pythonPath}`,
               });

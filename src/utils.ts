@@ -1,9 +1,10 @@
 import { notification } from 'antd';
+import { ipcRenderer } from 'electron';
 import fg from 'fast-glob';
 import fs from 'fs';
 import path from 'path';
 import { PythonShell } from 'python-shell';
-import { BUILTIN, CUSTOM, VISION, getPyPath } from './constants';
+import { BUILTIN, CUSTOM, getPyPath, VISION } from './constants';
 import OpItem from './Operation';
 import { Instruction } from './type';
 
@@ -50,7 +51,7 @@ function initPyEnvironment() {
         `
         );
       } else {
-        notify('error', e.message, e.stack);
+        notify('error', e.message, e.stack || '');
       }
     };
 
@@ -65,11 +66,6 @@ function initPyEnvironment() {
 
 function reloadPython() {
   if (CVSHELL) {
-    CVSHELL.end((err) => {
-      if (err) {
-        notify('error', err.message);
-      }
-    });
     CVSHELL.kill();
   }
   initPyEnvironment();
@@ -219,6 +215,9 @@ function listScripts() {
     .sort((a, b) => (a.toLowerCase() >= b.toLowerCase() ? 1 : -1));
   return { builtin, custom };
 }
+ipcRenderer.on('RELOAD_PYTHON', () => {
+  reloadPython();
+});
 
 initPyEnvironment();
 
