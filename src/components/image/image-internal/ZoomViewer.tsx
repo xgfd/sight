@@ -157,13 +157,13 @@ function intensityLayer(
   if (image !== undefined) {
     const { width, height } = image;
     const scale = zoom.transformMatrix.scaleX; // scaleX==scaleY
-    // adjust for device resolution, convert to image coordinate system and compensate scaling to keep font and line height invariant on different devices, image sizes and scaling
-    const fontSize = (6 * window.devicePixelRatio * viewPort.ratio) / scale;
-    const strokeWidth =
-      (0.2 * window.devicePixelRatio * viewPort.ratio) / scale;
+    const fontSize = 13;
+    const strokeWidth = 0.3;
+    const scaledFontSize = (fontSize * viewPort.ratio) / scale;
+    const scaledStrokeWidth = (strokeWidth * viewPort.ratio) / scale;
     const strokeColour = '#7F7F7F'; // gray
-    // display intensities when all texts fit into 0.9 pixel
-    const zoomedInEnough = 3 * fontSize < 0.9;
+    // display intensities when all texts fit into 0.9 image pixel
+    const zoomedInEnough = 3 * scaledFontSize < 0.9;
     if (zoomedInEnough) {
       // calculate the top-left and bottom-right corners of the viewport in the image coordinate system
       const viewPortTopLeft = zoom.applyInverseToPoint({
@@ -190,7 +190,7 @@ function intensityLayer(
             x2={xn + 1}
             y2={y}
             stroke={strokeColour}
-            strokeWidth={strokeWidth}
+            strokeWidth={scaledStrokeWidth}
           />
         );
       }
@@ -203,7 +203,7 @@ function intensityLayer(
             x2={x}
             y2={yn + 1}
             stroke={strokeColour}
-            strokeWidth={strokeWidth}
+            strokeWidth={scaledStrokeWidth}
           />
         );
       }
@@ -216,11 +216,11 @@ function intensityLayer(
             <g key={`${x},${y}`}>
               <text
                 x={x + 0.5}
-                y={y + 0.5 - fontSize}
+                y={y + 0.5 - scaledFontSize}
                 textAnchor="middle"
                 dominantBaseline="middle"
                 style={{
-                  font: `${fontSize}px monospace`,
+                  font: `${scaledFontSize}px monospace`,
                   fill: 'red',
                 }}
               >
@@ -232,7 +232,7 @@ function intensityLayer(
                 textAnchor="middle"
                 dominantBaseline="middle"
                 style={{
-                  font: `${fontSize}px monospace`,
+                  font: `${scaledFontSize}px monospace`,
                   fill: 'green',
                 }}
               >
@@ -240,11 +240,11 @@ function intensityLayer(
               </text>
               <text
                 x={x + 0.5}
-                y={y + 0.5 + fontSize}
+                y={y + 0.5 + scaledFontSize}
                 textAnchor="middle"
                 dominantBaseline="middle"
                 style={{
-                  font: `${fontSize}px monospace`,
+                  font: `${scaledFontSize}px monospace`,
                   fill: 'blue',
                 }}
               >
@@ -290,7 +290,7 @@ export default function ZoomViewer({
         const { width, height } = canvas;
         // 1 image pixel scale to 30 css pixel at most
         // 1 css pixel is converted to physical pixels then to pixels in the image coordinate system
-        const maxScale = 30 * window.devicePixelRatio * viewPort.ratio;
+        const maxScale = 60 * viewPort.ratio;
 
         return (
           <Zoom
@@ -348,9 +348,7 @@ export default function ZoomViewer({
                           fill="white"
                           fillOpacity={0.2}
                           stroke="white"
-                          strokeWidth={
-                            2 * window.devicePixelRatio * viewPort.ratio
-                          }
+                          strokeWidth={3 * viewPort.ratio}
                           transform={zoom.toStringInvert()}
                         />
                       </g>
