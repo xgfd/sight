@@ -25,7 +25,7 @@ def main(
     Returns:
         np.ndarray: Transformed image.
     """
-    transformation_matrix = np.array(transformation, dtype=np.float).reshape((2, 3))
+    transformation_matrix = np.array(transformation, dtype=float).reshape((2, 3))
     dsize = (image.shape[1], image.shape[0])
     warped_image = cv2.warpAffine(
         image,
