@@ -205,6 +205,9 @@ def _save_result(hash: str, image: object, data: Tuple = ()) -> bool:
     # save as loseless png
     try:
         cv2.imwrite(imagepath, image)
+        data = [
+            d if isinstance(d, np.ndarray) else np.array(d, dtype=object) for d in data
+        ]
         np.savez(datapath, image, *data)
         return True
     except Exception as e:
